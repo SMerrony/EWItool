@@ -32,7 +32,9 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 
 public class MidiPortsEventHandler implements EventHandler<ActionEvent>
@@ -43,7 +45,11 @@ public class MidiPortsEventHandler implements EventHandler<ActionEvent>
     Dialog<ButtonType> dialog = new Dialog<ButtonType>();
     dialog.setTitle( "EWItool - Select MIDI Ports" );
     dialog.getDialogPane().getButtonTypes().addAll( ButtonType.CANCEL, ButtonType.OK );
-    HBox hBox = new HBox();
+    GridPane gp = new GridPane();
+    
+    gp.add( new Label( "MIDI In Ports" ), 0, 0 );
+    gp.add( new Label( "MIDI Out Ports" ), 1, 0 );
+    
     ListView<String> inView, outView;
     List<String> inPortList = new ArrayList<String>(),
                  outPortList = new ArrayList<String>();
@@ -71,8 +77,10 @@ public class MidiPortsEventHandler implements EventHandler<ActionEvent>
         System.err.println( "ERROR - Fetching MIDI information" );
       }
     }
-    hBox.getChildren().addAll( inView, outView );
-    dialog.getDialogPane().setContent( hBox );
+ 
+    gp.add( inView, 0, 1 );
+    gp.add( outView, 1, 1 );
+    dialog.getDialogPane().setContent( gp );
     
     Optional<ButtonType> rc = dialog.showAndWait();
     
