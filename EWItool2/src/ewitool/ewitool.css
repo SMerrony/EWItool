@@ -22,14 +22,35 @@
 #editor-grid {
 	-fx-border-color: darkgray;
 	-fx-padding: 2.0;
-	-fx-text-alignment: center;
 }
+
 #editor-section-label {
-	-fx-font: bold 11pt sans;
+	-fx-font: bold 9pt sans;
+	-fx-alignment: top-center;
 }
 
 #editor-group-label {
-	-fx-alignment: center;
-	-fx-text-alignment: center;
-	-fx-text-fill: red;
+	-fx-font-style:italic;
+}
+#editor-control-label {
+	-fx-min-width: 1cm;
+}
+
+#editor-grid .slider:vertical {
+	-fx-show-tick-marks: true;
+	-fx-min-width: 6mm;
+	/*-fx-background: blue;*/
+}
+#editor-grid .slider:vertical > .thumb {
+	-fx-shape: "M0, 0L5, 0L10, 5L5, 10L0, 10 Z";
+}
+
+/* strangeness: no selector seems to select :horizontal */
+#editor-grid .slider {
+	-fx-show-tick-marks: true;
+	-fx-min-width: 1.5cm;
+	/* -fx-background: red;*/
+}
+#editor-grid .slider > .thumb {
+	-fx-shape: "M0, 0L10, 0L10, 5L5, 10L0, 5 Z";
 }
