@@ -41,7 +41,7 @@ public class MainMenuBar extends MenuBar {
     
     midiMenu = new Menu( "MIDI" );
     portsItem = new MenuItem( "Ports" );
-    portsItem.addEventHandler( ActionEvent.ANY, new MidiPortsEventHandler() );
+    portsItem.addEventHandler( ActionEvent.ANY, new PortsItemEventHandler() );
  
     panicItem = new MenuItem( "Panic (All Notes Off)" );
  
