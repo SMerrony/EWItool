@@ -17,45 +17,101 @@
 
 package ewitool;
 
+import javafx.beans.binding.Bindings;
+import javafx.geometry.HPos;
+import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
 import javafx.scene.control.Tab;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.TextAlignment;
 
 public class PatchEditorTab extends Tab {
-
-
     
   PatchEditorTab() {
     setText( "Patch Editor" );
     setClosable( false );
-    
-
-    
-    VBox vBox = new VBox();
-    vBox.setMaxWidth( Double.MAX_VALUE );
+      
     
     HBox headerBox = new HBox();
     
+    UiOscGrid osc1Grid = new UiOscGrid( 0 );
+    UiOscGrid osc2Grid = new UiOscGrid( 1 );
     HBox oscBox = new HBox();
-    OscGrid osc1Grid = new OscGrid( 0 );
-    OscGrid osc2Grid = new OscGrid( 1 );
     oscBox.getChildren().addAll( osc1Grid, osc2Grid );
-
-    HBox filterBox = new HBox();
-    FilterGrid oscPriFilterGrid = new FilterGrid( 0, "Osc Primary Filter" );
-    FilterGrid oscSecFilterGrid = new FilterGrid( 1, "Osc Secondary Filter" );
     
-    filterBox.getChildren().addAll( oscPriFilterGrid, oscSecFilterGrid );
+    UiFormantGrid formantGrid = new UiFormantGrid();
+    UiKeyTriggerGrid keyTriggerGrid = new UiKeyTriggerGrid();
+    VBox subVbox = new VBox();
+    VBox.setVgrow( formantGrid, Priority.ALWAYS );
+    VBox.setVgrow( keyTriggerGrid, Priority.ALWAYS );
+    subVbox.getChildren().addAll( formantGrid, keyTriggerGrid );
+    subVbox.setMinWidth( 80.0 );
+    UiFilterGrid oscPriFilterGrid = new UiFilterGrid( 0, "Osc Primary Filter" );
+    UiFilterGrid oscSecFilterGrid = new UiFilterGrid( 1, "Osc Secondary Filter" );
+    HBox filterBox = new HBox();    
+    filterBox.getChildren().addAll( subVbox, oscPriFilterGrid, oscSecFilterGrid );
 
+    UiNoiseGrid noiseGrid = new UiNoiseGrid();
+    UiFilterGrid noisePriFilterGrid = new UiFilterGrid( 0, "Noise Primary Filter" );
+    UiFilterGrid noiseSecFilterGrid = new UiFilterGrid( 1, "Noise Secondary Filter" );
     HBox noiseBox = new HBox();
-    FilterGrid noisePriFilterGrid = new FilterGrid( 0, "Noise Primary Filter" );
-    FilterGrid noiseSecFilterGrid = new FilterGrid( 1, "Noise Secondary Filter" );
+    noiseBox.getChildren().addAll( noiseGrid, noisePriFilterGrid, noiseSecFilterGrid );
     
-    noiseBox.getChildren().addAll( noisePriFilterGrid, noiseSecFilterGrid );
-    
-    vBox.getChildren().addAll( headerBox, oscBox, filterBox, noiseBox );
+    UiChorusGrid chorusGrid = new UiChorusGrid();
+    UiDelayGrid delayGrid = new UiDelayGrid();
+    UiReverbGrid reverbGrid = new UiReverbGrid();
+    UiBiteGrid biteGrid = new UiBiteGrid();
+    UiPitchBendGrid pitchBendGrid = new UiPitchBendGrid();
+    UiAntiAliasGrid antiAliasGrid = new UiAntiAliasGrid();
+    UiLevelsGrid levelsGrid = new UiLevelsGrid();
+    HBox multiBox = new HBox();
+    multiBox.getChildren().addAll( chorusGrid, delayGrid, reverbGrid, biteGrid, 
+                                   pitchBendGrid, antiAliasGrid, levelsGrid );
+
+    // all-encompassing VBox
+    VBox vBox = new VBox();
+    VBox.setVgrow( oscBox, Priority.ALWAYS );
+    VBox.setVgrow( filterBox, Priority.ALWAYS );
+    VBox.setVgrow( noiseBox, Priority.ALWAYS );
+    VBox.setVgrow( multiBox, Priority.ALWAYS );
+    vBox.getChildren().addAll( headerBox, oscBox, filterBox, noiseBox, multiBox );
     
     setContent( vBox );
+  }
+  
+}
+
+// helper classes used for (dynamically) labelling the controls
+class ControlLabel extends Label {
+  ControlLabel( String lab, HPos pos ) {
+    this.setText( lab );
+    this.setId( "editor-control-label" );
+    GridPane.setHalignment( this, pos );
+  }
+}
+class BoundRightControlLabel extends Label {
+  BoundRightControlLabel( String lab, HPos pos, Slider sl ) {
+    this.setId( "editor-control-label" );
+    this.setTextAlignment( TextAlignment.CENTER );
+    GridPane.setHalignment( this, pos );
+    this.textProperty().bind( Bindings.format( lab + " - %.0f", sl.valueProperty()) );
+  }
+}
+class BoundBelowControlLabel extends Label {
+  BoundBelowControlLabel( String lab, HPos pos, Slider sl ) {
+    this.setId( "editor-control-label" );
+    this.setTextAlignment( TextAlignment.CENTER );
+    GridPane.setHalignment( this, pos );
+    this.textProperty().bind( Bindings.format( lab + "%n%.0f", sl.valueProperty()) );
+  }
+}
+class GroupLabel extends Label {
+  GroupLabel( String lab ) {
+    this.setText( lab );
+    this.setId( "editor-group-label" );
+    GridPane.setHalignment( this, HPos.CENTER );
   }
 }
