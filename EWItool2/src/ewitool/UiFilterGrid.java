@@ -69,12 +69,6 @@ public class UiFilterGrid extends GridPane {
       add( routingChoice, 0, 1 );
     }
     
-    add( new ControlLabel( "Q", HPos.CENTER ), 1, 1 );
-    add( new ControlLabel( "Mod", HPos.CENTER ), 2, 1 );
-    add( new ControlLabel( "Freq", HPos.CENTER ), 3, 1 );
-    add( new ControlLabel( "Breath", HPos.CENTER ), 4, 1 );
-    add( new ControlLabel( "Time", HPos.CENTER ), 5, 1 );
-    
     typeChoice = new ChoiceBox();
     add( typeChoice, 0, 2 );
     
@@ -82,63 +76,67 @@ public class UiFilterGrid extends GridPane {
     qSlider.setOrientation( Orientation.HORIZONTAL );
     qSlider.setMajorTickUnit( 32.0 );
     add( qSlider, 1, 2 );
+    add( new BoundRightControlLabel( "Q", HPos.CENTER, qSlider ), 1, 1 );
    
     brModSlider = new Slider( 0.0, 127.0, 0.0 );
     brModSlider.setOrientation( Orientation.HORIZONTAL );
     brModSlider.setMajorTickUnit( 32.0 );
     add( brModSlider, 2, 2 );
-
+    add( new BoundRightControlLabel( "Mod", HPos.CENTER, brModSlider ), 2, 1 );
+    
     lfoFreqSlider = new Slider( 0.0, 127.0, 0.0 );
     lfoFreqSlider.setOrientation( Orientation.HORIZONTAL );
     lfoFreqSlider.setMajorTickUnit( 32.0 );
     add( lfoFreqSlider, 3, 2 );
+    add( new BoundRightControlLabel( "Freq", HPos.CENTER, lfoFreqSlider ), 3, 1 );
 
     lfoBreathSlider = new Slider( 0.0, 127.0, 0.0 );
     lfoBreathSlider.setOrientation( Orientation.HORIZONTAL );
     lfoBreathSlider.setMajorTickUnit( 32.0 );
     add( lfoBreathSlider, 4, 2 );
+    add( new BoundRightControlLabel( "Breath", HPos.CENTER, lfoBreathSlider ), 4, 1 );
 
     sweepTimeSlider = new Slider( 0.0, 127.0, 0.0 );
     sweepTimeSlider.setOrientation( Orientation.HORIZONTAL );
     sweepTimeSlider.setMajorTickUnit( 32.0 );
     add( sweepTimeSlider, 5, 2 );
-    
-    add( new ControlLabel( "Key Follow", HPos.CENTER ), 0, 3 );
-    add( new ControlLabel( "Cutoff Freq", HPos.CENTER ), 1, 3 );
-    add( new ControlLabel( "Curve", HPos.CENTER ), 2, 3 );
-    add( new ControlLabel( "Depth", HPos.CENTER ), 3, 3 );
-    add( new ControlLabel( "Threshold", HPos.CENTER ), 4, 3 );
-    add( new ControlLabel( "Depth", HPos.CENTER ), 5, 3 );
+    add( new BoundRightControlLabel( "Time", HPos.CENTER, sweepTimeSlider ), 5, 1 );
     
     keyFollowSlider = new Slider( 0.0, 127.0, 0.0 );
     keyFollowSlider.setOrientation( Orientation.HORIZONTAL );
     keyFollowSlider.setMajorTickUnit( 32.0 );
     add( keyFollowSlider, 0, 4 );   
+    add( new BoundRightControlLabel( "Key Follow", HPos.CENTER, keyFollowSlider ), 0, 3 );
     
     cutoffFreqSlider = new Slider( 0.0, 127.0, 0.0 );
     cutoffFreqSlider.setOrientation( Orientation.HORIZONTAL );
     cutoffFreqSlider.setMajorTickUnit( 32.0 );
     add( cutoffFreqSlider, 1, 4 );
+    add( new BoundRightControlLabel( "Cutoff Freq", HPos.CENTER, cutoffFreqSlider ), 1, 3 );
     
     brCurveSlider = new Slider( 0.0, 127.0, 0.0 );
     brCurveSlider.setOrientation( Orientation.HORIZONTAL );
     brCurveSlider.setMajorTickUnit( 32.0 );
     add( brCurveSlider, 2, 4 );
+    add( new BoundRightControlLabel( "Curve", HPos.CENTER, brCurveSlider ), 2, 3 );
     
     lfoDepthSlider = new Slider( 0.0, 127.0, 0.0 );
     lfoDepthSlider.setOrientation( Orientation.HORIZONTAL );
     lfoDepthSlider.setMajorTickUnit( 32.0 );
     add( lfoDepthSlider, 3, 4 );
+    add( new BoundRightControlLabel( "Depth", HPos.CENTER, lfoDepthSlider ), 3, 3 );
     
     lfoThresholdSlider = new Slider( 0.0, 127.0, 0.0 );
     lfoThresholdSlider.setOrientation( Orientation.HORIZONTAL );
     lfoThresholdSlider.setMajorTickUnit( 32.0 );
     add( lfoThresholdSlider, 4, 4 );
+    add( new BoundRightControlLabel( "Threshold", HPos.CENTER, lfoThresholdSlider ), 4, 3 );
     
     sweepDepthSlider = new Slider( 0.0, 127.0, 0.0 );
     sweepDepthSlider.setOrientation( Orientation.HORIZONTAL );
     sweepDepthSlider.setMajorTickUnit( 32.0 );
     add( sweepDepthSlider, 5, 4 );
+    add( new BoundRightControlLabel( "Depth", HPos.CENTER, sweepDepthSlider ), 5, 3 );
     
   }
 }

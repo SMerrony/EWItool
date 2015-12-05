@@ -19,14 +19,31 @@
 	/* -fx-background: blue; */
 }
 
+#status-grid {
+	-fx-padding: 1cm;
+	-fx-hgap: 3.0mm;
+	-fx-vgap: 3.0mm;
+}
+
+#status-label {
+	-fx-background-color: white;
+	/* -fx-border-radius: 5; */
+	-fx-border-style: solid;
+	-fx-border-color: darkgray;
+	-fx-border-width: 1;
+	-fx-padding: 2.0mm;	
+}
+
 #editor-grid {
 	-fx-border-color: darkgray;
 	-fx-padding: 2.0;
+	/* visibility: -fx-min-width: 2.0cm; */
+	-fx-alignment: center;
 }
 
 #editor-section-label {
 	-fx-font: bold 9pt sans;
-	-fx-alignment: top-center;
+	-fx-alignment: top-left;
 }
 
 #editor-group-label {
@@ -37,17 +54,17 @@
 }
 
 #editor-grid .slider:vertical {
-	-fx-show-tick-marks: true;
-	-fx-min-width: 6mm;
+	-fx-show-tick-marks: false;
+	-fx-min-width: 5mm;
 	/*-fx-background: blue;*/
 }
 #editor-grid .slider:vertical > .thumb {
 	-fx-shape: "M0, 0L5, 0L10, 5L5, 10L0, 10 Z";
 }
 
-/* strangeness: no selector seems to select :horizontal */
+/* ??? strangeness: no selector seems to select :horizontal */
 #editor-grid .slider {
-	-fx-show-tick-marks: true;
+	-fx-show-tick-marks: false;
 	-fx-min-width: 1.5cm;
 	/* -fx-background: red;*/
 }

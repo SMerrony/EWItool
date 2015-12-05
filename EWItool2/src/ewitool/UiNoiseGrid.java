@@ -19,7 +19,6 @@ package ewitool;
 
 import javafx.geometry.HPos;
 import javafx.geometry.Orientation;
-import javafx.geometry.VPos;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.GridPane;
@@ -40,25 +39,24 @@ public class UiNoiseGrid extends GridPane {
     mainLabel.setId( "editor-section-label" );
     add( mainLabel, 0, 0 );
     
-    add( new ControlLabel( "Vol", HPos.CENTER ), 1, 0 );
-    add( new ControlLabel( "Time", HPos.CENTER ), 0, 1 );
-    add( new ControlLabel( "Breath", HPos.CENTER ), 0, 3 );
-    
     timeSlider = new Slider( 0.0, 127.0, 0.0 );
     timeSlider.setOrientation( Orientation.HORIZONTAL );
     timeSlider.setMajorTickUnit( 32.0 );
     add( timeSlider, 0, 2 );
+    add( new BoundBelowControlLabel( "Time", HPos.CENTER, timeSlider ), 0, 1 );
     
     breathSlider = new Slider( 0.0, 127.0, 0.0 );
     breathSlider.setOrientation( Orientation.HORIZONTAL );
     breathSlider.setMajorTickUnit( 32.0 );
     add( breathSlider, 0, 4 );
+    add( new BoundBelowControlLabel( "Breath", HPos.CENTER, breathSlider ), 0, 3 );
     
     volSlider = new Slider( 0.0, 127.0, 0.0 );
     volSlider.setOrientation( Orientation.VERTICAL );
     volSlider.setMajorTickUnit( 32.0 );
     GridPane.setRowSpan( volSlider, 4 );
     add( volSlider, 1, 1 );
+    add( new BoundBelowControlLabel( "Vol", HPos.CENTER, volSlider ), 1, 0 );
   }
   
 

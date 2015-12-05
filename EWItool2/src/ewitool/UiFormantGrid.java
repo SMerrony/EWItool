@@ -34,7 +34,7 @@ public class UiFormantGrid extends GridPane {
     
     setId( "editor-grid" );
     
-    Label mainLabel = new Label( "Format Filter" );
+    Label mainLabel = new Label( "Formant Filter" );
     mainLabel.setId( "editor-section-label" );
     GridPane.setValignment( mainLabel, VPos.TOP );
     add( mainLabel, 0, 0 );

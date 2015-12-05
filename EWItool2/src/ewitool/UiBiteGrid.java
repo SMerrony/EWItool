@@ -22,6 +22,8 @@ import javafx.geometry.Orientation;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.RowConstraints;
 
 /**
  * @author steve
@@ -34,24 +36,31 @@ public class UiBiteGrid extends GridPane {
   UiBiteGrid() {
     
     setId( "editor-grid" );
+
+    RowConstraints fixedRC, vgrowRC;
+    fixedRC = new RowConstraints();
+    fixedRC.setVgrow( Priority.NEVER );
+    vgrowRC = new RowConstraints();
+    vgrowRC.setVgrow( Priority.ALWAYS );
     
+    getRowConstraints().addAll( fixedRC, vgrowRC, vgrowRC, vgrowRC, vgrowRC );
+
     Label mainLabel = new Label( "Bite" );
     mainLabel.setId( "editor-section-label" );
     add( mainLabel, 0, 0 );
-    
-    add( new ControlLabel( "Vibrato", HPos.CENTER ), 0, 1 );
-    add( new ControlLabel( "Tremolo", HPos.CENTER ), 0, 3 );
-    
+      
     vibratoSlider = new Slider( 0.0, 127.0, 0.0 );
     vibratoSlider.setOrientation( Orientation.HORIZONTAL );
     vibratoSlider.setMajorTickUnit( 32.0 );
     add( vibratoSlider, 0, 2 );
+    add( new BoundBelowControlLabel( "Vibrato", HPos.CENTER, vibratoSlider ), 0, 1 );
 
     
     tremoloSlider = new Slider( 0.0, 127.0, 0.0 );
     tremoloSlider.setOrientation( Orientation.HORIZONTAL );
     tremoloSlider.setMajorTickUnit( 32.0 );
     add( tremoloSlider, 0, 4 );
+    add( new BoundBelowControlLabel( "Tremolo", HPos.CENTER, tremoloSlider ), 0, 3 );
     
   }
 }

@@ -22,6 +22,8 @@ import javafx.geometry.Orientation;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.RowConstraints;
 
 /**
  * @author steve
@@ -35,6 +37,13 @@ public class UiLevelsGrid extends GridPane {
     
     setId( "editor-grid" );
     
+    RowConstraints fixedRC, vgrowRC;
+    fixedRC = new RowConstraints();
+    fixedRC.setVgrow( Priority.NEVER );
+    vgrowRC = new RowConstraints();
+    vgrowRC.setVgrow( Priority.ALWAYS );
+    
+    getRowConstraints().addAll( fixedRC, vgrowRC, vgrowRC, vgrowRC, vgrowRC );
     Label mainLabel = new Label( "Levels" );
     mainLabel.setId( "editor-section-label" );
     add( mainLabel, 0, 0 );

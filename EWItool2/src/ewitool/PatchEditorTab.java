@@ -87,31 +87,31 @@ public class PatchEditorTab extends Tab {
 // helper classes used for (dynamically) labelling the controls
 class ControlLabel extends Label {
   ControlLabel( String lab, HPos pos ) {
-    this.setText( lab );
-    this.setId( "editor-control-label" );
+    setText( lab );
+    setId( "editor-control-label" );
     GridPane.setHalignment( this, pos );
   }
 }
 class BoundRightControlLabel extends Label {
   BoundRightControlLabel( String lab, HPos pos, Slider sl ) {
-    this.setId( "editor-control-label" );
-    this.setTextAlignment( TextAlignment.CENTER );
+    setId( "editor-control-label" );
+    setTextAlignment( TextAlignment.CENTER );
     GridPane.setHalignment( this, pos );
-    this.textProperty().bind( Bindings.format( lab + " - %.0f", sl.valueProperty()) );
+    textProperty().bind( Bindings.format( lab + " - %.0f", sl.valueProperty()) );
   }
 }
 class BoundBelowControlLabel extends Label {
   BoundBelowControlLabel( String lab, HPos pos, Slider sl ) {
-    this.setId( "editor-control-label" );
-    this.setTextAlignment( TextAlignment.CENTER );
+    setId( "editor-control-label" );
+    setTextAlignment( TextAlignment.CENTER );
     GridPane.setHalignment( this, pos );
-    this.textProperty().bind( Bindings.format( lab + "%n%.0f", sl.valueProperty()) );
+    textProperty().bind( Bindings.format( lab + "%n%.0f", sl.valueProperty()) );
   }
 }
 class GroupLabel extends Label {
   GroupLabel( String lab ) {
-    this.setText( lab );
-    this.setId( "editor-group-label" );
+    setText( lab );
+    setId( "editor-group-label" );
     GridPane.setHalignment( this, HPos.CENTER );
   }
 }
