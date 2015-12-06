@@ -32,7 +32,7 @@ public class Prefs {
   
   public static String getMidiInPort() {
     Preferences p = Preferences.userRoot().node( PREFS_NODE );
-    return p.get( MIDI_IN_PORT, "" );
+    return p.get( MIDI_IN_PORT, "<Not Chosen>" );
   }
   public static void setMidiInPort( String ip ) {
     Preferences p = Preferences.userRoot().node( PREFS_NODE );
@@ -40,7 +40,7 @@ public class Prefs {
   }
   public static String getMidiOutPort() {
     Preferences p = Preferences.userRoot().node( PREFS_NODE );
-    return p.get( MIDI_OUT_PORT, "" );
+    return p.get( MIDI_OUT_PORT, "<Not Chosen>" );
   }
   public static void setMidiOutPort( String op ) {
     Preferences p = Preferences.userRoot().node( PREFS_NODE );
@@ -48,7 +48,7 @@ public class Prefs {
   }
   public static String getLibraryLocation() {
     Preferences p = Preferences.userRoot().node( PREFS_NODE );
-    return p.get( LIBRARY_LOCATION, "" );
+    return p.get( LIBRARY_LOCATION, "<Not Chosen>" );
   }
   public static void setLibraryLocation( String ll ) {
     Preferences p = Preferences.userRoot().node( PREFS_NODE );
@@ -56,7 +56,7 @@ public class Prefs {
   }
   public static String getEpxHost() {
     Preferences p = Preferences.userRoot().node( PREFS_NODE );
-    return p.get( EPX_HOST, "" );
+    return p.get( EPX_HOST, "<Not Set>" );
   }
   public static void setEpxHost( String host ) {
     Preferences p = Preferences.userRoot().node( PREFS_NODE );
@@ -64,7 +64,7 @@ public class Prefs {
   }
   public static String getEpxUserid() {
     Preferences p = Preferences.userRoot().node( PREFS_NODE );
-    return p.get( EPX_USERID, "" );
+    return p.get( EPX_USERID, "<Not Set>" );
   }
   public static void setEpxUserid( String user ) {
     Preferences p = Preferences.userRoot().node( PREFS_NODE );
@@ -72,7 +72,7 @@ public class Prefs {
   }
   public static String getEpxPassword() {
     Preferences p = Preferences.userRoot().node( PREFS_NODE );
-    return p.get( EPX_PASSWORD, "" );
+    return p.get( EPX_PASSWORD, "<Not Set>" );
   }
   public static void setEpxPassword( String pwd ) {
     Preferences p = Preferences.userRoot().node( PREFS_NODE );
