@@ -50,6 +50,8 @@ public class Main extends Application {
 			scene.getStylesheets().add(getClass().getResource("ewitool.css").toExternalForm());
 			mainStage.setTitle(WINDOW_TITLE);
 			
+			ScratchPad scratchPad = new ScratchPad();
+			
 			mainMenuBar = new MainMenuBar( mainStage );
 			root.setTop( mainMenuBar );
 			
@@ -58,10 +60,10 @@ public class Main extends Application {
 			statusTab = new StatusTab();
 			tabPane.getTabs().add( statusTab );
 			
-			scratchPadTab = new ScratchPadTab();
+			scratchPadTab = new ScratchPadTab( scratchPad );
 			tabPane.getTabs().add( scratchPadTab );
 			
-			patchSetsTab = new PatchSetsTab();
+			patchSetsTab = new PatchSetsTab( scratchPad );
 			tabPane.getTabs().add( patchSetsTab );
 			
 			epxTab = new EPXTab();
