@@ -17,58 +17,158 @@
 
 package ewitool;
 
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Tab;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.stage.DirectoryChooser;
+import javafx.util.Callback;
 
 public class PatchSetsTab extends Tab {
   
   Button importButton, loadEwiButton, deleteButton, saveButton;
-  ListView patchSetList;
-  ListView patchesList;
+  ListView<String> patchSetList;
   
+  ListView<EWI4000sPatch> patchListView;
+  ObservableList<EWI4000sPatch> patchesInSetOL;
+
   PatchSetsTab() {
     
-    setText( "Patch Set Collection" );
+    setText( "Patch Set Library" );
     setClosable( false );
     
-    VBox lhVbox = new VBox();
+    GridPane gp = new GridPane();
+    gp.setMaxHeight( Double.MAX_VALUE );
+    gp.setId( "scratchpad-grid" );
+
+    Label llLabel = new Label( "Library location: " );
+    gp.add( llLabel, 0, 0 );
+    Label libLocLabel = new Label( Prefs.getLibraryLocation() );
+    gp.add( libLocLabel, 1, 0 );
+    Button libLocButton = new Button( "Change" );
+    gp.add( libLocButton, 2, 0 );
+    libLocButton.setOnAction( new EventHandler<ActionEvent>() {
+      @Override public void handle( ActionEvent ae ) {
+        DirectoryChooser dc = new DirectoryChooser();
+        dc.setTitle( "Choose EWI Patch Set Library location" );
+        if (!Prefs.getLibraryLocation().equals( "<Not Chosen>" ))
+          dc.setInitialDirectory( new File( Prefs.getLibraryLocation() ) );
+        File chosenLLdirFile = dc.showDialog( null );
+        if (chosenLLdirFile != null) {
+          Prefs.setLibraryLocation( chosenLLdirFile.getAbsolutePath() );
+          libLocLabel.setText( chosenLLdirFile.getAbsolutePath() );
+        }
+      }
+    });
 
     Label setsLabel = new Label( "Patch Sets" );
-    patchSetList = new ListView();
+    gp.add( setsLabel, 0, 1 );
     
-    HBox lhInnerHbox = new HBox();
+    patchSetList = new ListView<String>();
+    gp.add( patchSetList, 0, 2 );
+    GridPane.setColumnSpan( patchSetList, 3 );
+    if (!Prefs.getLibraryLocation().equals( "<Not Chosen>" )){
+      File llFile = new File( Prefs.getLibraryLocation() );
+      patchSetList.getItems().addAll( llFile.list( new FilenameFilter() {
+        public boolean accept( File llFile, String name ) {
+          return name.toLowerCase().endsWith( ".syx" );
+        }
+      }) );
+    } 
     
+    // Handle changes to the set list selection
+    patchSetList.getSelectionModel().selectedItemProperty().addListener( new ChangeListener<String>() {
+      @Override
+      public void changed( ObservableValue< ? extends String > observable, String oldValue, String newValue ) {
+        System.out.println( "DEBUG - changed - " + newValue + " chosen" );
+        patchesInSetOL.clear();
+        Path path = Paths.get( Prefs.getLibraryLocation(), newValue );
+        try {
+          byte[] allBytes = Files.readAllBytes( path );
+          if ((allBytes != null) && allBytes.length > 200 ) {
+            System.out.println( "DEBUG - bytes read: " + allBytes.length );
+            for (int byteOffset = 0; byteOffset < allBytes.length; byteOffset += EWI4000sPatch.EWI_PATCH_LENGTH ) {
+              EWI4000sPatch ep = new EWI4000sPatch();
+              ep.patch_blob = Arrays.copyOfRange( allBytes, byteOffset, byteOffset + EWI4000sPatch.EWI_PATCH_LENGTH  );
+              ep.decodeBlob();
+              patchesInSetOL.add( ep );
+              //System.out.println( "DEBUG - patch loaded" );
+            }
+            patchListView.setItems( null );
+            patchListView.setItems( patchesInSetOL );
+            loadEwiButton.setDisable( false );
+            deleteButton.setDisable( false );
+          }
+        } catch( IOException e ) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        }
+
+      }   
+    }); 
+  
     importButton = new Button( "Import" );
+    gp.add( importButton, 0, 3 );
     loadEwiButton = new Button( "Load into EWI" );
+    gp.add( loadEwiButton, 1, 3 );
+    loadEwiButton.setDisable( true );
     deleteButton = new Button( "Delete" );
+    gp.add( deleteButton, 2, 3 );
+    deleteButton.setDisable( true );
     
-    lhInnerHbox.getChildren().addAll( importButton, loadEwiButton, deleteButton );
-    lhVbox.getChildren().addAll( setsLabel, patchSetList, lhInnerHbox );
-    VBox.setVgrow( patchSetList, Priority.ALWAYS );
-    
-    VBox rhVbox = new VBox();
     Label patchesLabel = new Label( "Patches" );
-    patchesList = new ListView();
+    gp.add( patchesLabel, 3, 0 );
+    
+    patchesInSetOL = FXCollections.observableArrayList( );
+    
+    patchListView = new ListView<EWI4000sPatch>( patchesInSetOL );
+    gp.add( patchListView, 3, 1 );
+    GridPane.setRowSpan( patchListView, 2 );
+    patchListView.setCellFactory( new Callback<ListView<EWI4000sPatch>, ListCell<EWI4000sPatch>>(){
+      @Override 
+      public ListCell<EWI4000sPatch> call( ListView<EWI4000sPatch> p ) {
+        ListCell<EWI4000sPatch> cell = new ListCell<EWI4000sPatch>() {
+          @Override
+          protected void updateItem( EWI4000sPatch ep, boolean bln ) {
+            super.updateItem( ep, bln );
+            if (ep != null) {
+              String patchName = new String( ep.name );
+              // System.out.println( "DEBUG - patch loaded - " + patchName );
+              setText( patchName );
+            }
+          }
+        };
+        return cell;
+      }
+    });
+    
     saveButton = new Button( "Copy to Scratchpad" );
-    
-    rhVbox.getChildren().addAll( patchesLabel, patchesList, saveButton );
-    
-    HBox hBox = new HBox();
-    hBox.setPadding( new Insets( 4.0 ) );
-    hBox.setSpacing( 8.0 );
-    hBox.getChildren().addAll( lhVbox, rhVbox );
-    VBox.setVgrow( patchesList, Priority.ALWAYS );
-    HBox.setHgrow( lhVbox, Priority.ALWAYS );
-    HBox.setHgrow( rhVbox, Priority.ALWAYS );
-    
-    setContent( hBox );
+    gp.add( saveButton, 0, 3 );
+        
+    setContent( gp );
     
   }
 
