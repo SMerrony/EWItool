@@ -23,39 +23,31 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Tab;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.util.Callback;
 
 public class PatchSetsTab extends Tab {
   
-  Button importButton, loadEwiButton, deleteButton, saveButton;
+  Button importButton, loadEwiButton, deleteButton, copyButton;
   ListView<String> patchSetList;
   
   ListView<EWI4000sPatch> patchListView;
   ObservableList<EWI4000sPatch> patchesInSetOL;
 
-  PatchSetsTab() {
+  PatchSetsTab( ScratchPad scratchPad ) {
     
     setText( "Patch Set Library" );
     setClosable( false );
@@ -121,6 +113,7 @@ public class PatchSetsTab extends Tab {
             patchListView.setItems( patchesInSetOL );
             loadEwiButton.setDisable( false );
             deleteButton.setDisable( false );
+            copyButton.setDisable( true );
           }
         } catch( IOException e ) {
           // TODO Auto-generated catch block
@@ -165,8 +158,28 @@ public class PatchSetsTab extends Tab {
       }
     });
     
-    saveButton = new Button( "Copy to Scratchpad" );
-    gp.add( saveButton, 0, 3 );
+    // Handle changes to the patch list selection
+    patchListView.getSelectionModel().selectedItemProperty().addListener( new ChangeListener<EWI4000sPatch>() {
+      @Override
+      public void changed( ObservableValue< ? extends EWI4000sPatch > observable, EWI4000sPatch oldValue,
+          EWI4000sPatch newValue ) {
+        if (newValue != null) {
+          System.out.println( "DEBUG - Patch selected: " + new String( newValue.name ) );
+          copyButton.setDisable( false );
+        }
+      }   
+    }); 
+
+    copyButton = new Button( "Copy to Scratchpad" );
+    copyButton.setDisable( true );
+    copyButton.setOnAction( new EventHandler<ActionEvent>() {
+      @Override public void handle( ActionEvent ae ) {
+        if (patchListView.getSelectionModel().getSelectedIndex() != -1) {
+          scratchPad.addPatch( patchListView.getSelectionModel().getSelectedItem() );
+        }
+      }
+    });
+    gp.add( copyButton, 3, 3 );
         
     setContent( gp );
     
