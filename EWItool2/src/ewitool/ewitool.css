@@ -34,6 +34,15 @@
 	-fx-padding: 2.0mm;	
 }
 
+#scratchpad-grid {
+	-fx-padding: 1cm;
+	-fx-hgap: 3.0mm;
+	-fx-vgap: 3.0mm;
+}
+#scratchpad-grid .button {
+	-fx-min-width: 25mm;
+}
+
 #editor-grid {
 	-fx-border-color: darkgray;
 	-fx-padding: 2.0;
