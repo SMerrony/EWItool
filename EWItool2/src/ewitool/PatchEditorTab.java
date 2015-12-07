@@ -97,7 +97,7 @@ class BoundRightControlLabel extends Label {
     setId( "editor-control-label" );
     setTextAlignment( TextAlignment.CENTER );
     GridPane.setHalignment( this, pos );
-    textProperty().bind( Bindings.format( lab + " - %.0f", sl.valueProperty()) );
+    textProperty().bind( Bindings.format( lab + " %.0f", sl.valueProperty()) );
   }
 }
 class BoundBelowControlLabel extends Label {
