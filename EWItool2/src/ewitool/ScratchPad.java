@@ -58,7 +58,7 @@ public class ScratchPad {
           ep.patch_blob = Arrays.copyOfRange( allBytes, byteOffset, byteOffset + EWI4000sPatch.EWI_PATCH_LENGTH  );
           ep.decodeBlob();
           patchList.add( ep );
-          System.out.println( "DEBUG - patch loaded" );
+          // System.out.println( "DEBUG - patch loaded" );
         }
       }
     } catch( IOException e ) {

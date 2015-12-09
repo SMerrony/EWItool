@@ -17,29 +17,36 @@
 
 package ewitool;
 
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.VPos;
 import javafx.scene.control.Button;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Tab;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
+import javafx.util.Callback;
 
 public class ScratchPadTab extends Tab {
 	
 	Button clearButton, deleteButton, renameButton, 
 		     viewHexButton, exchangeButton, exportButton;
-	ListView patchList;
+	ListView<EWI4000sPatch> patchList;
+	ScratchPad scratchPad;
 
-	ScratchPadTab() {
+	ScratchPadTab( ScratchPad scratchPad ) {
 
 		setText( "Scratchpad" );
 		setClosable( false );
 		
+		scratchPad.load();
+		
 		GridPane gp = new GridPane();
 		gp.setMaxHeight( Double.MAX_VALUE );
+		gp.setId( "scratchpad-grid" );
 
 		ColumnConstraints col1 = new ColumnConstraints( 100.0, 200.0, Double.MAX_VALUE );
 		col1.setHgrow( Priority.ALWAYS );
@@ -48,43 +55,59 @@ public class ScratchPadTab extends Tab {
 		row1.setVgrow( Priority.ALWAYS );
 		gp.getRowConstraints().addAll( row1 );
 		
-		patchList = new ListView();
+		patchList = new ListView<EWI4000sPatch>( scratchPad.patchList );
     patchList.setMaxSize( Double.MAX_VALUE, Double.MAX_VALUE );
+    patchList.setCellFactory( new Callback<ListView<EWI4000sPatch>, ListCell<EWI4000sPatch>>(){
+      @Override 
+      public ListCell<EWI4000sPatch> call( ListView<EWI4000sPatch> p ) {
+        ListCell<EWI4000sPatch> cell = new ListCell<EWI4000sPatch>() {
+          @Override
+          protected void updateItem( EWI4000sPatch ep, boolean bln ) {
+            super.updateItem( ep, bln );
+            if (ep != null) {
+              String patchName = new String( ep.name );
+              // System.out.println( "DEBUG - patch loaded - " + patchName );
+              setText( patchName );
+            } else {
+              setText( "" );
+            }
+            
+          }
+        };
+        return cell;
+      }
+    });
+
 		gp.add( patchList, 0, 0, 1, 2 );
 		
 		clearButton = new Button( "Clear" );
-		clearButton.setMinWidth( 150.0 );
 		gp.add( clearButton, 1, 0 );
 		GridPane.setValignment( clearButton, VPos.CENTER );
 		
 		deleteButton = new Button( "Delete" );
-		deleteButton.setMinWidth( 150.0 );
+	  deleteButton.setOnAction( new EventHandler<ActionEvent>() {
+      @Override public void handle( ActionEvent ae ) {
+        if (patchList.getSelectionModel().getSelectedIndex() != -1) {
+          scratchPad.removePatch( patchList.getSelectionModel().getSelectedIndex() );
+        }
+      }
+    });
 		gp.add( deleteButton, 2, 0 );
 		
 		renameButton = new Button( "Rename" );
-		renameButton.setMinWidth( 150.0 );
+		//renameButton.setMinWidth( 150.0 );
 	  gp.add( renameButton, 3, 0 );	
 	  
 	  viewHexButton = new Button( "View in Hex" );
-	  viewHexButton.setMinWidth( 150.0 );
 	  gp.add( viewHexButton, 1, 1 );
 	  
 	  exchangeButton = new Button( "Prepare to Exchange" );
-	  exchangeButton.setMinWidth( 150.0 );
 	  gp.add( exchangeButton, 2, 1 );
 	  
 	  exportButton = new Button( "Export" );
-	  exportButton.setMinWidth( 150.0 );
 	  gp.add( exportButton, 3, 1 );
-		
-		AnchorPane ap = new AnchorPane();
-		ap.setMaxSize( Double.MAX_VALUE, Double.MAX_VALUE );
-		ap.getChildren().add( gp );
-		AnchorPane.setLeftAnchor( gp, 30.0 );
-		AnchorPane.setRightAnchor( gp, 30.0 );
-		AnchorPane.setTopAnchor( gp, 30.0 );
-		AnchorPane.setBottomAnchor( gp, 30.0 );
-		setContent( ap );
+
+		setContent( gp );
 
 	}
 }
