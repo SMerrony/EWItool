@@ -18,6 +18,8 @@
 package ewitool;
 	
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.control.MenuBar;
@@ -37,7 +39,8 @@ public class Main extends Application {
 	
 	MenuBar mainMenuBar;
 	Tab statusTab, scratchPadTab, patchSetsTab, epxTab, currentPatchSetTab, keyPatchesTab, patchEditorTab; 
-	 
+	MidiHandler midiHandler;
+	
 	public static void main(String[] args) {
 	    launch(args);
 	  }
@@ -50,9 +53,11 @@ public class Main extends Application {
 			scene.getStylesheets().add(getClass().getResource("ewitool.css").toExternalForm());
 			mainStage.setTitle(WINDOW_TITLE);
 			
+			Prefs userPrefs = new Prefs();
 			ScratchPad scratchPad = new ScratchPad();
+			midiHandler = new MidiHandler();
 			
-			mainMenuBar = new MainMenuBar( mainStage );
+			mainMenuBar = new MainMenuBar( mainStage, userPrefs );
 			root.setTop( mainMenuBar );
 			
 			TabPane tabPane = new TabPane();
@@ -79,6 +84,17 @@ public class Main extends Application {
 			patchEditorTab = new PatchEditorTab();
 			tabPane.getTabs().add( patchEditorTab );
 			
+			// MIDI port assignment change listener
+			userPrefs.midiInPort.addListener( new ChangeListener<String>() {
+			  @Override
+			  public void changed( ObservableValue<? extends String> observable, String oldValue, String newValue ) {
+			    System.out.println( "Debug - Noticed that IN Port Changed to : " + newValue );
+			    midiHandler.stop();
+			    midiHandler = null;
+			    midiHandler = new MidiHandler();
+			  }
+			});
+
 			root.setCenter( tabPane );
 			mainStage.setScene(scene);
 			mainStage.show();

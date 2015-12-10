@@ -31,7 +31,7 @@ public class MainMenuBar extends MenuBar {
            fetchAllItem,
            helpItem, aboutItem;
   
-  public MainMenuBar( Stage mainStage ) {
+  public MainMenuBar( Stage mainStage, Prefs userPrefs ) {
     
     fileMenu = new Menu( "File" );
     printItem = new MenuItem( "Print" );
@@ -41,7 +41,7 @@ public class MainMenuBar extends MenuBar {
     
     midiMenu = new Menu( "MIDI" );
     portsItem = new MenuItem( "Ports" );
-    portsItem.addEventHandler( ActionEvent.ANY, new PortsItemEventHandler() );
+    portsItem.addEventHandler( ActionEvent.ANY, new PortsItemEventHandler( userPrefs ) );
  
     panicItem = new MenuItem( "Panic (All Notes Off)" );
  
