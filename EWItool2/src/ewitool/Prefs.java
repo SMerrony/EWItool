@@ -20,31 +20,44 @@ package ewitool;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+
 public class Prefs {
   
-  public static final String PREFS_NODE = "ewitool";
-  public static final String MIDI_IN_PORT = "MIDI_IN_PORT";
-  public static final String MIDI_OUT_PORT = "MIDI_OUT_PORT";
-  public static final String LIBRARY_LOCATION = "LIBRARY_LOCATION";
-  public static final String EPX_HOST = "EPX_HOST";
-  public static final String EPX_USERID = "EPX_USERID";
-  public static final String EPX_PASSWORD = "EPX_PASSWORD";
+  // these need to be exposed so that they can be observed
+  public StringProperty midiInPort, midiOutPort;
+  
+  private static final String PREFS_NODE = "ewitool";
+  private static final String MIDI_IN_PORT = "MIDI_IN_PORT";
+  private static final String MIDI_OUT_PORT = "MIDI_OUT_PORT";
+  private static final String LIBRARY_LOCATION = "LIBRARY_LOCATION";
+  private static final String EPX_HOST = "EPX_HOST";
+  private static final String EPX_USERID = "EPX_USERID";
+  private static final String EPX_PASSWORD = "EPX_PASSWORD";
+  
+  Prefs() {
+    midiInPort = new SimpleStringProperty( getMidiInPort() );
+    midiOutPort = new SimpleStringProperty( getMidiOutPort() );
+  }
   
   public static String getMidiInPort() {
     Preferences p = Preferences.userRoot().node( PREFS_NODE );
     return p.get( MIDI_IN_PORT, "<Not Chosen>" );
   }
-  public static void setMidiInPort( String ip ) {
+  public void setMidiInPort( String ip ) {
     Preferences p = Preferences.userRoot().node( PREFS_NODE );
     p.put( MIDI_IN_PORT, ip );
+    midiInPort.set( ip );  // This must be last as it notifies change
   }
   public static String getMidiOutPort() {
     Preferences p = Preferences.userRoot().node( PREFS_NODE );
     return p.get( MIDI_OUT_PORT, "<Not Chosen>" );
   }
-  public static void setMidiOutPort( String op ) {
+  public void setMidiOutPort( String op ) {
     Preferences p = Preferences.userRoot().node( PREFS_NODE );
     p.put( MIDI_OUT_PORT, op );
+    midiOutPort.set( op );  // This must be last as it notifies change
   }
   public static String getLibraryLocation() {
     Preferences p = Preferences.userRoot().node( PREFS_NODE );

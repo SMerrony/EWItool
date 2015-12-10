@@ -40,6 +40,12 @@ import javafx.scene.control.ListView;
 import javafx.scene.layout.GridPane;
 
 public class PortsItemEventHandler implements EventHandler<ActionEvent> {
+  
+  Prefs userPrefs;
+  
+  PortsItemEventHandler( Prefs pPrefs ){
+    userPrefs = pPrefs;
+  }
 
   public void handle( ActionEvent arg0 ) {
     
@@ -96,7 +102,12 @@ public class PortsItemEventHandler implements EventHandler<ActionEvent> {
     Optional<ButtonType> rc = dialog.showAndWait();
     
     if (rc.get() == ButtonType.OK) {
-      
+      if (outView.getSelectionModel().getSelectedIndex() != -1) {
+        userPrefs.setMidiOutPort( outView.getSelectionModel().getSelectedItem() );
+      }
+      if (inView.getSelectionModel().getSelectedIndex() != -1) {
+        userPrefs.setMidiInPort( inView.getSelectionModel().getSelectedItem() );
+      } 
     }
   }
 
