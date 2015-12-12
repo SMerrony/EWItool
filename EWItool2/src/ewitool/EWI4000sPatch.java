@@ -27,8 +27,9 @@
 package ewitool;
 
 import java.util.Arrays;
+import java.util.Observable;
 
-public class EWI4000sPatch {
+public class EWI4000sPatch extends Observable {
   
   public final static int EWI_NUM_PATCHES  = 100;  // 0..99
   public final static int EWI_PATCH_LENGTH = 206;  // bytes
@@ -141,7 +142,7 @@ public class EWI4000sPatch {
   byte filler5;
   byte filler6;
   byte filler7;
-  char name[];
+  volatile char name[];
   Osc  osc1;     // 64,18
   Osc  osc2;     // 65,18
   Filter oscFilter1;   // 72,12
@@ -230,10 +231,16 @@ public class EWI4000sPatch {
 
   public void setEmpty( boolean empty ) {
     this.empty = empty;
+    setChanged();
+    notifyObservers();
+  }
+  
+  public String getName() {
+    return new String( name ).trim();
   }
 
   void decodeBlob() {
-     header = Arrays.copyOfRange( patch_blob, 0, 2 );
+     header = Arrays.copyOfRange( patch_blob, 0, 4 );
      mode = patch_blob[4];     // 0x00 to store, 0x20 to edit
      patch_num = patch_blob[5];
      filler2 = patch_blob[6];
@@ -296,6 +303,8 @@ public class EWI4000sPatch {
      reverbTime     = patch_blob[203];
      reverbDamp     = patch_blob[204];
      trailer_f7     = patch_blob[205];   // 0xf7 !!!  
+     
+     setEmpty( false );
 
   }
   
