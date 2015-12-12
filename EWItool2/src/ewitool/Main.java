@@ -17,30 +17,41 @@
 
 package ewitool;
 	
+import java.util.Observable;
+import java.util.Observer;
+
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import javafx.scene.Scene;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
-
 
 public class Main extends Application {
 	
-	private static final double  VERSION = 0.1;
-	private static final int     COPYRIGHT_YEAR = 2015;
-	private static final String  RELEASE_STATUS = "Alpha";
+  static final String  APP_NAME = "EWItool";
+	static final double  VERSION = 0.1;
+	static final int     COPYRIGHT_YEAR = 2015;
+	static final String  RELEASE_STATUS = "Alpha";
+	
+	private static final String  ICON = "/resources/EWItoolLogo1.png";
 	private static final int     SCENE_PREF_WIDTH = 1100;
 	private static final int     SCENE_PREF_HEIGHT = 750;
-	private static final String  WINDOW_TITLE = "EWItool - EWI4000s Patch Handling Tool";
+	private static final String  WINDOW_TITLE = APP_NAME + " - EWI4000s Patch Handling Tool";
 	
 	MenuBar mainMenuBar;
+	TabPane tabPane;
 	Tab statusTab, scratchPadTab, patchSetsTab, epxTab, currentPatchSetTab, keyPatchesTab, patchEditorTab; 
 	MidiHandler midiHandler;
-	
+	volatile SharedData sharedData;
+
 	public static void main(String[] args) {
 	    launch(args);
 	  }
@@ -55,12 +66,14 @@ public class Main extends Application {
 			
 			Prefs userPrefs = new Prefs();
 			ScratchPad scratchPad = new ScratchPad();
-			midiHandler = new MidiHandler();
+			sharedData = new SharedData();
+
+			midiHandler = new MidiHandler( sharedData, userPrefs ); 
 			
-			mainMenuBar = new MainMenuBar( mainStage, userPrefs );
+			mainMenuBar = new MainMenuBar( mainStage, userPrefs, midiHandler );
 			root.setTop( mainMenuBar );
 			
-			TabPane tabPane = new TabPane();
+			tabPane = new TabPane();
 			
 			statusTab = new StatusTab();
 			tabPane.getTabs().add( statusTab );
@@ -75,25 +88,47 @@ public class Main extends Application {
 			tabPane.getTabs().add( epxTab );
 			//epxTab.setDisable( true );
 			
-			currentPatchSetTab = new CurrentPatchSetTab();
+			currentPatchSetTab = new CurrentPatchSetTab( sharedData, scratchPad );
 			tabPane.getTabs().add( currentPatchSetTab );
 			
 			keyPatchesTab = new KeyPatchesTab();
 			tabPane.getTabs().add( keyPatchesTab );
 			
-			patchEditorTab = new PatchEditorTab();
+			patchEditorTab = new PatchEditorTab( sharedData );
 			tabPane.getTabs().add( patchEditorTab );
 			
-			// MIDI port assignment change listener
+			// MIDI port assignment change listeners
 			userPrefs.midiInPort.addListener( new ChangeListener<String>() {
 			  @Override
 			  public void changed( ObservableValue<? extends String> observable, String oldValue, String newValue ) {
 			    System.out.println( "Debug - Noticed that IN Port Changed to : " + newValue );
-			    midiHandler.stop();
-			    midiHandler = null;
-			    midiHandler = new MidiHandler();
+			    midiHandler.restart();
 			  }
 			});
+			userPrefs.midiOutPort.addListener( new ChangeListener<String>() {
+			  @Override
+			  public void changed( ObservableValue<? extends String> observable, String oldValue, String newValue ) {
+			    System.out.println( "Debug - Noticed that OUT Port Changed to : " + newValue );
+			    midiHandler.restart();
+			  }
+			});
+			
+	    EditPatchWatcher editPatchWatcher = new EditPatchWatcher();
+	    sharedData.addObserver( editPatchWatcher );			
+			
+      // customise icon
+      mainStage.getIcons().add( new Image( this.getClass().getResourceAsStream( ICON )));
+      
+			mainStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+			  @Override
+			  public void handle( WindowEvent we ) {
+			    System.out.println( "DEBUG - clean exit" );
+	        midiHandler.close();
+			    Platform.exit();
+			    System.exit( 0 );           
+			  }
+			});
+
 
 			root.setCenter( tabPane );
 			mainStage.setScene(scene);
@@ -102,5 +137,14 @@ public class Main extends Application {
 			e.printStackTrace();
 		}
 	}
-
+	
+  class EditPatchWatcher implements Observer {
+    @Override
+    public void update( Observable o, Object arg ) {
+      if ((int)arg == SharedData.EDIT_PATCH) {
+        System.out.println( "DEBUG - Main: noticed shared data change" );
+        tabPane.getSelectionModel().select( patchEditorTab );
+      }
+    }
+  }
 }
