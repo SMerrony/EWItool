@@ -235,8 +235,27 @@ public class EWI4000sPatch extends Observable {
     notifyObservers();
   }
   
+  // the patch name is stored in the patch as a space-padded char[]
+  // so it must be converted for use as a normal string
   public String getName() {
     return new String( name ).trim();
+  }
+  
+  // set the patch name (see above) from a normal string
+  public boolean setName( String newName ) {
+    if (newName.length() == 0 || newName.length() > EWI_PATCHNAME_LENGTH) return false;
+    char[] cArr = new char[EWI_PATCHNAME_LENGTH]; 
+    for (int i = 0; i < EWI_PATCHNAME_LENGTH; i++)
+      if (i < newName.length()) {
+        cArr[i] = newName.charAt( i );
+      } else {
+        cArr[i] = ' ';
+      }
+    name = cArr;
+    // copy into the blob
+    for (int ix = 12; ix < (12+EWI_PATCHNAME_LENGTH); ix++)
+      patch_blob[ix] = (byte) name[ix - 12];
+    return true;
   }
 
   void decodeBlob() {

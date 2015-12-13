@@ -17,6 +17,8 @@
 
 package ewitool;
 
+import java.util.Optional;
+
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.VPos;
@@ -24,6 +26,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Tab;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
@@ -65,13 +68,10 @@ public class ScratchPadTab extends Tab {
           protected void updateItem( EWI4000sPatch ep, boolean bln ) {
             super.updateItem( ep, bln );
             if (ep != null) {
-              String patchName = new String( ep.name );
-              // System.out.println( "DEBUG - patch loaded - " + patchName );
-              setText( patchName );
+              setText( ep.getName() );
             } else {
               setText( "" );
             }
-            
           }
         };
         return cell;
@@ -95,7 +95,21 @@ public class ScratchPadTab extends Tab {
 		gp.add( deleteButton, 2, 0 );
 		
 		renameButton = new Button( "Rename" );
-		//renameButton.setMinWidth( 150.0 );
+    renameButton.setOnAction( new EventHandler<ActionEvent>() {
+      @Override public void handle( ActionEvent ae ) {
+        if (patchList.getSelectionModel().getSelectedIndex() != -1) {
+          TextInputDialog tid = new TextInputDialog();
+          tid.setTitle( "EWItool - Rename" );
+          tid.setHeaderText( "Rename patch on Scratchpad" );
+          tid.setContentText( "New name:" );
+          Optional<String> result = tid.showAndWait();
+          if (result.isPresent()) {
+            scratchPad.renamePatch( patchList.getSelectionModel().getSelectedIndex(), result.get() );
+            patchList.refresh();
+          }
+        }
+      }
+    });
 	  gp.add( renameButton, 3, 0 );	
 	  
 	  viewHexButton = new Button( "View in Hex" );

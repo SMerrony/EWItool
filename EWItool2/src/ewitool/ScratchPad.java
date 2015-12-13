@@ -42,7 +42,6 @@ public class ScratchPad {
   
   ScratchPad() {
     patchList = FXCollections.observableArrayList();
-    
   }
   
   // load the scratchpad from disk
@@ -51,14 +50,13 @@ public class ScratchPad {
     try {
       byte[] allBytes = Files.readAllBytes( spPath );
       if ((allBytes != null) && allBytes.length > 200 ) {
-        System.out.println( "DEBUG - bytes read: " + allBytes.length );
+        System.out.println( "DEBUG - Scratchpad: bytes read: " + allBytes.length );
         patchList.clear();
         for (int byteOffset = 0; byteOffset < allBytes.length; byteOffset += EWI4000sPatch.EWI_PATCH_LENGTH ) {
           EWI4000sPatch ep = new EWI4000sPatch();
           ep.patch_blob = Arrays.copyOfRange( allBytes, byteOffset, byteOffset + EWI4000sPatch.EWI_PATCH_LENGTH  );
           ep.decodeBlob();
           patchList.add( ep );
-          // System.out.println( "DEBUG - patch loaded" );
         }
       }
     } catch( IOException e ) {
@@ -77,7 +75,6 @@ public class ScratchPad {
         Files.write( spPath, patchList.get( p ).patch_blob, StandardOpenOption.APPEND );
       }
     } catch( IOException e ) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
 
@@ -97,13 +94,28 @@ public class ScratchPad {
   }
   
   public boolean renamePatch( int x, String newName ) {
-    return false;
-  }
-  public void clearAll() {
-    
+    if (patchList.get( x ).setName( newName )) {
+      store();
+      return true;
+    } else
+      return false;    
   }
   
-  // does the specified patch exist in the scratchpad?
+  public boolean clearAll() {
+    Path spPath = Paths.get( Prefs.getLibraryLocation(), SCRATCHPAD_NAME );
+    try {
+      Files.delete( spPath );
+      Files.createFile( spPath );
+      
+    } catch( IOException e ) {
+      e.printStackTrace();
+      return false;
+    }
+    patchList.clear();
+    return true;
+  }
+  
+  // does the specified patch name already exist in the scratchpad?
   public boolean exists( String name ) {
     return false;
   }
