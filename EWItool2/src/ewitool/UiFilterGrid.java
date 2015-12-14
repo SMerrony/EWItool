@@ -19,18 +19,17 @@ package ewitool;
 
 import javafx.geometry.HPos;
 import javafx.geometry.Orientation;
-import javafx.geometry.VPos;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
-import javafx.scene.layout.ColumnConstraints;
+//import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 
 public class UiFilterGrid extends GridPane {
 
-  ChoiceBox routingChoice, typeChoice;
+  ChoiceBox<String> routingChoice, typeChoice;
   Slider qSlider, keyFollowSlider,
          cutoffFreqSlider,
          brModSlider, brCurveSlider,
@@ -42,7 +41,7 @@ public class UiFilterGrid extends GridPane {
     setId( "editor-grid" );
     
     RowConstraints fixedRC, vgrowRC;
-    ColumnConstraints fixedCC, medFixedCC, hgrowCC;
+    //ColumnConstraints fixedCC, medFixedCC, hgrowCC;
     
     fixedRC = new RowConstraints();
     fixedRC.setVgrow( Priority.NEVER );
@@ -65,14 +64,16 @@ public class UiFilterGrid extends GridPane {
     add( new GroupLabel( "Sweep"), 5, 0 );
     
     if (ix == 0) {
-      routingChoice = new ChoiceBox();
+      routingChoice = new ChoiceBox<String>();
+      routingChoice.getItems().addAll( "1-only", "Linked", "Both" );
       add( routingChoice, 0, 1 );
     }
     
-    typeChoice = new ChoiceBox();
+    typeChoice = new ChoiceBox<String>();
+    typeChoice.getItems().addAll( "Low Pass", "High Pass", "Band Pass", "Notch", "Off" );
     add( typeChoice, 0, 2 );
     
-    qSlider = new Slider( 0.0, 127.0, 0.0 );
+    qSlider = new Slider( 5.0, 127.0, 0.0 );          // Val: 5-127
     qSlider.setOrientation( Orientation.HORIZONTAL );
     qSlider.setMajorTickUnit( 32.0 );
     add( qSlider, 1, 2 );
@@ -102,7 +103,7 @@ public class UiFilterGrid extends GridPane {
     add( sweepTimeSlider, 5, 2 );
     add( new BoundRightControlLabel( "Time", HPos.CENTER, sweepTimeSlider ), 5, 1 );
     
-    keyFollowSlider = new Slider( 0.0, 127.0, 0.0 );
+    keyFollowSlider = new Slider( 52.0, 88.0, 0.0 );          // Val. 52-88
     keyFollowSlider.setOrientation( Orientation.HORIZONTAL );
     keyFollowSlider.setMajorTickUnit( 32.0 );
     add( keyFollowSlider, 0, 4 );   

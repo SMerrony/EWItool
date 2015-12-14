@@ -17,7 +17,6 @@
 
 package ewitool;
 
-import javafx.geometry.VPos;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
@@ -28,7 +27,7 @@ import javafx.scene.layout.GridPane;
  */
 public class UiKeyTriggerGrid extends GridPane {
   
-  ChoiceBox keyTriggerChoice;
+  ChoiceBox<String> keyTriggerChoice;
   
   UiKeyTriggerGrid() {
     
@@ -39,7 +38,8 @@ public class UiKeyTriggerGrid extends GridPane {
     GridPane.setColumnSpan( mainLabel, 2 );
     add( mainLabel, 0, 0 );
 
-    keyTriggerChoice = new ChoiceBox();
+    keyTriggerChoice = new ChoiceBox<String>();
+    keyTriggerChoice.getItems().addAll( "Single", "Multi" );
     add( keyTriggerChoice, 0, 1 );
     
   }

@@ -68,7 +68,7 @@ public class UiReverbGrid extends GridPane {
     add( volSlider, 2, 1 );
     add( new BoundBelowControlLabel( "Vol", HPos.CENTER, volSlider ), 2, 0 );
     
-    dampingSlider = new Slider( 0.0, 127.0, 0.0 );
+    dampingSlider = new Slider( 54.0, 74.0, 0.0 );          // Val. 54-74
     dampingSlider.setOrientation( Orientation.HORIZONTAL );
     dampingSlider.setMajorTickUnit( 32.0 );
     add( dampingSlider, 0, 4 );

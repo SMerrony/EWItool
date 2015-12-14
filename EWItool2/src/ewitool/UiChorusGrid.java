@@ -19,7 +19,6 @@ package ewitool;
 
 import javafx.geometry.HPos;
 import javafx.geometry.Orientation;
-import javafx.geometry.VPos;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
@@ -105,7 +104,7 @@ public class UiChorusGrid extends GridPane {
     feedbackSlider.setOrientation( Orientation.HORIZONTAL );
     feedbackSlider.setMajorTickUnit( 32.0 );
     add( feedbackSlider, 4, 2 );
-    add( new BoundBelowControlLabel( "Feedback", HPos.CENTER.CENTER, feedbackSlider ), 4, 1 );
+    add( new BoundBelowControlLabel( "Feedback", HPos.CENTER, feedbackSlider ), 4, 1 );
     
     lfoFreqSlider = new Slider( 0.0, 127.0, 0.0 );
     lfoFreqSlider.setOrientation( Orientation.HORIZONTAL );

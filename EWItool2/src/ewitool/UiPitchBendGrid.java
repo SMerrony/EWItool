@@ -33,7 +33,7 @@ import javafx.scene.layout.RowConstraints;
 public class UiPitchBendGrid extends GridPane {
   
   CheckBox enableCheck;
-  ChoiceBox rangeChoice;
+  ChoiceBox<Integer> rangeChoice;
   
   UiPitchBendGrid() {
     
@@ -57,7 +57,9 @@ public class UiPitchBendGrid extends GridPane {
     
     add( new ControlLabel( "Range", HPos.CENTER ), 0, 2 );
     
-    rangeChoice = new ChoiceBox();
+    rangeChoice = new ChoiceBox<Integer>();
+    for (int i = 0; i < 13; i++)
+      rangeChoice.getItems().add( i );
     add( rangeChoice, 0, 3 );   
   }
 }

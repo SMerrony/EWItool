@@ -24,7 +24,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.ColumnConstraints;
+//import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
@@ -37,7 +37,7 @@ public class UiOscGrid extends GridPane {
          pwmWidthSlider, pwmFreqSlider, pwmDepthSlider,
          sweepTimeSlider, sweepDepthSlider,
          volSlider;
-   ChoiceBox octaveChoice, semitoneChoice;
+   ChoiceBox<Integer> octaveChoice, semitoneChoice;
    CheckBox crossFadeCheck; 
    
   UiOscGrid( int ix ) {
@@ -45,7 +45,7 @@ public class UiOscGrid extends GridPane {
     setId( "editor-grid" );
     
     RowConstraints fixedRC, vgrowRC;
-    ColumnConstraints fixedCC, medFixedCC, hgrowCC;
+    //ColumnConstraints fixedCC, medFixedCC, hgrowCC;
     
     fixedRC = new RowConstraints();
     fixedRC.setVgrow( Priority.NEVER );
@@ -63,17 +63,19 @@ public class UiOscGrid extends GridPane {
     add( new GroupLabel( "Breath" ), 9, 0 );
     
     add( new ControlLabel( "Octave", HPos.CENTER ), 0, 1 );
-    octaveChoice = new ChoiceBox();
+    octaveChoice = new ChoiceBox<Integer>();
+    octaveChoice.getItems().addAll( 2, 1, 0, -1, -2 );
     add( octaveChoice, 0, 2 );
     
-    fineSlider = new Slider( 0.0, 127.0, 0.0 );
+    fineSlider = new Slider( -50.0, 50.0, 0.0 );  // Val is 14-114
     fineSlider.setOrientation( Orientation.HORIZONTAL );
     fineSlider.setMajorTickUnit( 32.0 );
     add( fineSlider, 1, 2 );
     add( new BoundRightControlLabel( "Fine", HPos.CENTER, fineSlider ), 1, 1 );
   
     add( new ControlLabel( "Semitone", HPos.CENTER ), 0, 3 );
-    semitoneChoice = new ChoiceBox();
+    semitoneChoice = new ChoiceBox<Integer>();
+    for (int s = 12; s > -13; s--) semitoneChoice.getItems().add( s );
     add( semitoneChoice, 0, 4 );
 
     beatSlider = new Slider( 0.0, 127.0, 0.0 );

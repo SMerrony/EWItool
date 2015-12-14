@@ -28,7 +28,7 @@ import javafx.scene.layout.GridPane;
  */
 public class UiFormantGrid extends GridPane {
   
-  ChoiceBox formantChoice;
+  ChoiceBox<String> formantChoice;
   
   UiFormantGrid() {
     
@@ -39,7 +39,8 @@ public class UiFormantGrid extends GridPane {
     GridPane.setValignment( mainLabel, VPos.TOP );
     add( mainLabel, 0, 0 );
 
-    formantChoice = new ChoiceBox();
+    formantChoice = new ChoiceBox<String>();
+    formantChoice.getItems().addAll( "Off", "Woodwind", "Strings" );
     add( formantChoice, 0, 1 );
     
   }
