@@ -153,12 +153,21 @@ public class CurrentPatchSetTab extends Tab {
         }
         
       } else if ( rc.get() == renameType) {
-        
+        int pNum = (int) ((Button)ae.getSource()).getUserData();
+        if (sharedData.ewiPatches[pNum].setName( nameField.getText() )) {
+          patchButtons[pNum].setText( nameField.getText() );
+          Alert alert = new Alert( AlertType.INFORMATION, "Patch renamed" );
+          alert.setTitle( "EWItool - Rename Patch" );
+          alert.setHeaderText( "" );
+          alert.showAndWait();
+        } else {
+          Alert alert = new Alert( AlertType.WARNING, "Could not rename to '" + nameField.getText() + "'" );
+          alert.setTitle( "EWItool - Rename Patch" );
+          alert.setHeaderText( "" );
+          alert.showAndWait();
+        }       
       }
     }
-    
   }
-
-
-
+  
 }
