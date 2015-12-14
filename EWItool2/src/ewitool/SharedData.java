@@ -18,6 +18,8 @@
 package ewitool;
 
 import java.util.Observable;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * @author steve
@@ -33,10 +35,15 @@ public class SharedData extends Observable {
                        editingPatchNumber;
   EWI4000sPatch[] ewiPatches;
   
+  // Queues to synchronise requesting/receiving MIDI info
+  BlockingQueue<Integer> patchQ, keyPatchQ;
+  
   SharedData() {
     lastPatchLoaded = NONE;
     editingPatchNumber = NONE;
     ewiPatches = new EWI4000sPatch[EWI4000sPatch.EWI_NUM_PATCHES];
+    patchQ = new LinkedBlockingQueue<Integer>();
+    keyPatchQ = new LinkedBlockingQueue<Integer>();
   }
   
   public void clear() {

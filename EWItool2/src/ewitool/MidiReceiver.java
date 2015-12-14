@@ -47,7 +47,6 @@ public class MidiReceiver implements Receiver {
         EWI4000sPatch thisPatch = new EWI4000sPatch();
         for (int b = 0; b < (MidiHandler.EWI_SYSEX_PRESET_DUMP_LEN - 1); b++)
           thisPatch.patch_blob[b+1] = messageBytes[b];
-        //thisPatch.patch_blob = messageBytes;
         thisPatch.decodeBlob();
         if (thisPatch.header[3] == MidiHandler.MIDI_SYSEX_ALLCHANNELS) {
           int thisPatchNum = (int) thisPatch.patch_num; // FIXME ++?
@@ -56,8 +55,8 @@ public class MidiReceiver implements Receiver {
           } else {
             sharedData.ewiPatches[thisPatchNum] = thisPatch;
             sharedData.ewiPatches[thisPatchNum].decodeBlob();
-            sharedData.setLastPatchLoaded( thisPatchNum );
-            // System.out.println( "DEBUG - MidiReceiver: Patch number: " + thisPatchNum + " received" );
+            sharedData.patchQ.add( thisPatchNum );
+            System.out.println( "DEBUG - MidiReceiver: Patch number: " + thisPatchNum + " received" );
           }
         }
         break;

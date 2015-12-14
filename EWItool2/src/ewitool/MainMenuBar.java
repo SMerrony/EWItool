@@ -18,8 +18,10 @@
 package ewitool;
 
 import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.Cursor;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -65,10 +67,26 @@ public class MainMenuBar extends MenuBar {
       @Override
       public void handle( ActionEvent ae) {
         System.out.println( "DEBUG - Fetch All..." );
-        midiHandler.clearPatches();
-        for (int p = 0; p < EWI4000sPatch.EWI_NUM_PATCHES; p++) {
-          midiHandler.requestPatch( p );
-        }
+
+        Platform.runLater( new Runnable() {
+          @Override
+          public void run() {
+            mainStage.getScene().setCursor( Cursor.WAIT );
+          }
+        });
+        
+        Platform.runLater( new Runnable() {
+          @Override
+          public void run() {
+            mainStage.getScene().setCursor( Cursor.WAIT );
+            midiHandler.clearPatches();
+            for (int p = 0; p < EWI4000sPatch.EWI_NUM_PATCHES; p++) {
+              midiHandler.requestPatch( p );
+            }
+            mainStage.getScene().setCursor( Cursor.DEFAULT );
+          }
+        });
+
       }
     });
     ewiMenu.getItems().addAll( fetchAllItem );

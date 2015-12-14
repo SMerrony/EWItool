@@ -34,6 +34,8 @@
 
 package ewitool;
 
+import java.util.concurrent.TimeUnit;
+
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiDevice;
 import javax.sound.midi.MidiSystem;
@@ -69,7 +71,7 @@ public class MidiHandler {
   public final static int  MAX_SYSEX_LENGTH      = 262144;
   public final static int  EWI_SYSEX_PRESET_DUMP_LEN = EWI4000sPatch.EWI_PATCH_LENGTH;
   public final static int  EWI_SYSEX_QUICKPC_DUMP_LEN = 91;
-  public final static int  MIDI_TIMEOUT_MS       = 3000;
+  public final static int  MIDI_TIMEOUT_MS       = 1000;
   
   SharedData sharedData;
   Prefs userPrefs;
@@ -180,13 +182,22 @@ public class MidiHandler {
       sysEx = new SysexMessage( SysexMessage.SYSTEM_EXCLUSIVE, reqMsg, reqMsg.length );
       outDev.getReceiver().send( sysEx, -1 );
       System.out.println( "DEBUG - Requested patch: " + p );
-
-      while ( sharedData.ewiPatches[p].name[0] == 0 ) {} // FIXME Yuck, yuck, yuck!
-
-      
+      while (true) {
+        // wait for a patch to be received, or timeout
+        Integer pGot = sharedData.patchQ.poll( MIDI_TIMEOUT_MS, TimeUnit.MILLISECONDS );
+        if (pGot == null || pGot != p) {
+          // either timed-out or wrong (out-of-sync) patch, request again
+          outDev.getReceiver().send( sysEx, -1 );
+        } else 
+          // OK - carry on
+          break;
+      } 
     } catch( InvalidMidiDataException e ) {
       e.printStackTrace();
     } catch( MidiUnavailableException e ) {
+      e.printStackTrace();
+    } catch( InterruptedException e ) {
+      // TODO Auto-generated catch block
       e.printStackTrace();
     }
 
