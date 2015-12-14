@@ -252,9 +252,7 @@ public class EWI4000sPatch extends Observable {
         cArr[i] = ' ';
       }
     name = cArr;
-    // copy into the blob
-    for (int ix = 12; ix < (12+EWI_PATCHNAME_LENGTH); ix++)
-      patch_blob[ix] = (byte) name[ix - 12];
+    nameToBlob();
     return true;
   }
 
@@ -325,6 +323,11 @@ public class EWI4000sPatch extends Observable {
      
      setEmpty( false );
 
+  }
+  
+  void nameToBlob() {
+    for (int ix = 12; ix < (12+EWI_PATCHNAME_LENGTH); ix++)
+      patch_blob[ix] = (byte) name[ix - 12];
   }
   
   void encodeBlob() {
