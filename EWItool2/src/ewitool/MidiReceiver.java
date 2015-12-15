@@ -55,6 +55,7 @@ public class MidiReceiver implements Receiver {
           } else {
             sharedData.ewiPatches[thisPatchNum] = thisPatch;
             sharedData.ewiPatches[thisPatchNum].decodeBlob();
+            sharedData.setLastPatchLoaded( thisPatchNum );
             sharedData.patchQ.add( thisPatchNum );
             System.out.println( "DEBUG - MidiReceiver: Patch number: " + thisPatchNum + " received" );
           }

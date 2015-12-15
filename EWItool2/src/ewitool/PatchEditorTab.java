@@ -30,7 +30,7 @@ import javafx.scene.text.TextAlignment;
 
 public class PatchEditorTab extends Tab {
     
-  PatchEditorTab() {
+  PatchEditorTab(SharedData sharedData) {
     setText( "Patch Editor" );
     setClosable( false );
       
@@ -81,7 +81,7 @@ public class PatchEditorTab extends Tab {
     
     setContent( vBox );
   }
-  
+    
 }
 
 // helper classes used for (dynamically) labelling the controls

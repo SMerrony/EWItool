@@ -24,13 +24,18 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 
@@ -146,5 +151,71 @@ public class Main extends Application {
         tabPane.getSelectionModel().select( patchEditorTab );
       }
     }
+  }
+  
+  class MainMenuBar extends MenuBar {
+
+    Menu fileMenu, midiMenu, ewiMenu, patchMenu, helpMenu;
+    MenuItem printItem, preferencesItem, quitItem,
+             portsItem, panicItem, 
+             fetchAllItem,
+             helpItem, aboutItem;
+    
+    public MainMenuBar( Stage mainStage, Prefs userPrefs, MidiHandler midiHandler ) {
+      
+      fileMenu = new Menu( "File" );
+      printItem = new MenuItem( "Print" );
+      preferencesItem = new MenuItem( "Preferences" );
+      quitItem = new MenuItem( "Quit" );
+      quitItem.setOnAction( new EventHandler<ActionEvent>() {
+        @Override
+        public void handle( ActionEvent ae) {
+          System.out.println( "DEBUG - clean exit" );
+          midiHandler.close();
+          Platform.exit();
+          System.exit( 0 );           
+        }
+      });
+      fileMenu.getItems().addAll( printItem, preferencesItem, quitItem );
+      
+      midiMenu = new Menu( "MIDI" );
+      portsItem = new MenuItem( "Ports" );
+      portsItem.addEventHandler( ActionEvent.ANY, new PortsItemEventHandler( userPrefs ) );
+   
+      panicItem = new MenuItem( "Panic (All Notes Off)" );
+   
+      midiMenu.getItems().addAll( portsItem, panicItem );
+        
+      ewiMenu = new Menu( "EWI" );
+      fetchAllItem = new MenuItem( "Fetch All Patches" );
+      fetchAllItem.setOnAction( new EventHandler<ActionEvent>() {
+        @Override
+        public void handle( ActionEvent ae) {
+          System.out.println( "DEBUG - Fetch All..." );
+          Alert busyAlert = new Alert( AlertType.INFORMATION, "Fetching Patches..." );
+          busyAlert.setTitle( "EWItool" );
+          busyAlert.setHeaderText( null );
+          busyAlert.show();
+          midiHandler.clearPatches();
+          for (int p = 0; p < EWI4000sPatch.EWI_NUM_PATCHES; p++) {
+            midiHandler.requestPatch( p );
+          }
+          busyAlert.close();
+          tabPane.getSelectionModel().select( currentPatchSetTab );
+        }
+      });
+      ewiMenu.getItems().addAll( fetchAllItem );
+
+      patchMenu = new Menu( "Patch" );
+      
+      helpMenu = new Menu( "Help" );
+      helpItem = new MenuItem( "Online Help" );
+      aboutItem = new MenuItem( "About " + Main.APP_NAME );
+      helpMenu.getItems().addAll( helpItem, aboutItem );
+      
+      getMenus().addAll( fileMenu, midiMenu, ewiMenu, patchMenu, helpMenu );
+      
+    }
+
   }
 }
