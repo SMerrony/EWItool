@@ -114,8 +114,8 @@ public class MidiHandler {
   }
   
   public void close() {
-    outDev.close();
-    inDev.close();
+    if (outDev != null) outDev.close();
+    if (inDev !=null) inDev.close();
   }
 
   /**
