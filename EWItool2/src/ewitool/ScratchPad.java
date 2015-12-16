@@ -46,6 +46,7 @@ public class ScratchPad {
   
   // load the scratchpad from disk
   public boolean load() {
+	if (Prefs.getLibraryLocation().equals( "<Not Chosen>" )) return false;
     Path spPath = Paths.get( Prefs.getLibraryLocation(), SCRATCHPAD_NAME );
     try {
       byte[] allBytes = Files.readAllBytes( spPath );
