@@ -95,7 +95,7 @@ public class CurrentPatchSetTab extends Tab {
           System.out.println( "      - CurrrentPatchSet: last patch loaded: " + p );
           Platform.runLater( new Runnable() {
             @Override public void run() {
-              patchButtons[p].setText( sd.ewiPatches[p].getName() );
+              patchButtons[p].setText( sd.ewiPatchList.get(p).getName() );
             }
           });
 
@@ -145,7 +145,7 @@ public class CurrentPatchSetTab extends Tab {
       } else if ( rc.get() == replaceType) {
         if (spChoice.getSelectionModel().getSelectedIndex() >= 0) {
           int pNum = (int) ((Button)ae.getSource()).getUserData();
-          sharedData.ewiPatches[pNum] = scratchPad.patchList.get( spChoice.getSelectionModel().getSelectedIndex() );
+          sharedData.ewiPatchList.set( pNum, scratchPad.patchList.get( spChoice.getSelectionModel().getSelectedIndex() ) );
           sharedData.setLastPatchLoaded( pNum );
         } else {
           Alert alert = new Alert( AlertType.WARNING, "No Patch selected from Scratchpad list" );
@@ -154,7 +154,7 @@ public class CurrentPatchSetTab extends Tab {
         
       } else if ( rc.get() == renameType) {
         int pNum = (int) ((Button)ae.getSource()).getUserData();
-        if (sharedData.ewiPatches[pNum].setName( nameField.getText() )) {
+        if (sharedData.ewiPatchList.get( pNum ).setName( nameField.getText() )) {
           patchButtons[pNum].setText( nameField.getText() );
           Alert alert = new Alert( AlertType.INFORMATION, "Patch renamed" );
           alert.setTitle( "EWItool - Rename Patch" );

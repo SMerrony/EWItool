@@ -21,6 +21,9 @@ import java.util.Observable;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
 /**
  * @author steve
  *
@@ -33,7 +36,7 @@ public class SharedData extends Observable {
   
   private volatile int lastPatchLoaded,
                        editingPatchNumber;
-  EWI4000sPatch[] ewiPatches;
+  ObservableList<EWI4000sPatch> ewiPatchList;
   
   // Queues to synchronise requesting/receiving MIDI info
   BlockingQueue<Integer> patchQ, keyPatchQ;
@@ -41,13 +44,13 @@ public class SharedData extends Observable {
   SharedData() {
     lastPatchLoaded = NONE;
     editingPatchNumber = NONE;
-    ewiPatches = new EWI4000sPatch[EWI4000sPatch.EWI_NUM_PATCHES];
+    ewiPatchList = FXCollections.observableArrayList();
     patchQ = new LinkedBlockingQueue<Integer>();
     keyPatchQ = new LinkedBlockingQueue<Integer>();
   }
   
   public void clear() {
-    ewiPatches = new EWI4000sPatch[EWI4000sPatch.EWI_NUM_PATCHES];
+    ewiPatchList.clear();
     setLastPatchLoaded( NONE );
     setEditingPatchNumber( NONE );
   }

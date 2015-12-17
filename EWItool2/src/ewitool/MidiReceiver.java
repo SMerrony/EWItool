@@ -26,7 +26,7 @@ public class MidiReceiver implements Receiver {
   SharedData sharedData;
 
   /**
-   * @param ewiPatches
+   * @param ewiPatchList
    */
   public MidiReceiver( SharedData pSharedData ) {
     sharedData = pSharedData;
@@ -53,8 +53,8 @@ public class MidiReceiver implements Receiver {
           if (thisPatchNum < 0 || thisPatchNum >= EWI4000sPatch.EWI_NUM_PATCHES) {
             System.err.println( "Error - Invalid patch number (" + thisPatchNum + ") received from EWI");
           } else {
-            sharedData.ewiPatches[thisPatchNum] = thisPatch;
-            sharedData.ewiPatches[thisPatchNum].decodeBlob();
+        	thisPatch.decodeBlob();
+            sharedData.ewiPatchList.add( thisPatch );
             sharedData.setLastPatchLoaded( thisPatchNum );
             sharedData.patchQ.add( thisPatchNum );
             System.out.println( "DEBUG - MidiReceiver: Patch number: " + thisPatchNum + " received" );

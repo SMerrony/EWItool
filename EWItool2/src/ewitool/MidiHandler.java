@@ -167,7 +167,7 @@ public class MidiHandler {
       System.exit( 1 );
     }
     
-    sharedData.ewiPatches[p] = new EWI4000sPatch();
+    //sharedData.ewiPatchList[p] = new EWI4000sPatch();
     
     byte[] reqMsg = new byte[6];
     //reqMsg[0] = MIDI_SYSEX_HEADER;

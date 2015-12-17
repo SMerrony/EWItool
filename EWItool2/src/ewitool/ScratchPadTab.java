@@ -22,6 +22,8 @@ import java.util.Optional;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.VPos;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -45,7 +47,12 @@ public class ScratchPadTab extends Tab {
 		setText( "Scratchpad" );
 		setClosable( false );
 		
-		scratchPad.load();
+		if (!scratchPad.load()) {
+			Alert warnAlert = new Alert( AlertType.WARNING );
+			warnAlert.setTitle( "EWItool - Warning" );
+			warnAlert.setContentText( "Either the Library Path is not set or the directory is inaccessible.  Please fix this on the Patch Set Library tab before continuing." );
+			warnAlert.showAndWait();
+		}
 		
 		GridPane gp = new GridPane();
 		gp.setMaxHeight( Double.MAX_VALUE );
