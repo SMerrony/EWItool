@@ -1,18 +1,19 @@
 /**
  * This file is part of EWItool.
-
-    EWItool is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    EWItool is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with EWItool.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * EWItool is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *  EWItool is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with EWItool.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * @author Steve Merrony
  */
 
 .root {
@@ -20,7 +21,7 @@
 }
 
 #status-grid {
-	-fx-padding: 1cm;
+	-fx-padding: 10mm;
 	-fx-hgap: 3.0mm;
 	-fx-vgap: 3.0mm;
 }
@@ -30,22 +31,25 @@
 	/* -fx-border-radius: 5; */
 	-fx-border-style: solid;
 	-fx-border-color: darkgray;
-	-fx-border-width: 1;
+	-fx-border-width: 1px;
 	-fx-padding: 2.0mm;	
 }
 
 #scratchpad-grid {
-	-fx-padding: 1cm;
+	-fx-padding: 10mm;
 	-fx-hgap: 3.0mm;
 	-fx-vgap: 3.0mm;
 }
 #scratchpad-grid .button {
 	-fx-min-width: 25mm;
 }
+#editor-header-box {
+	-fx-max-height: 25mm;
+}
 
 #editor-grid {
 	-fx-border-color: darkgray;
-	-fx-padding: 2.0;
+	-fx-padding: 2px;
 	/* visibility: -fx-min-width: 2.0cm; */
 	-fx-alignment: center;
 }
@@ -59,7 +63,7 @@
 	-fx-font-style:italic;
 }
 #editor-control-label {
-	-fx-min-width: 1cm;
+	-fx-min-width: 10mm;
 }
 
 #editor-grid .slider:vertical {
@@ -74,7 +78,7 @@
 /* ??? strangeness: no selector seems to select :horizontal */
 #editor-grid .slider {
 	-fx-show-tick-marks: false;
-	-fx-min-width: 1.5cm;
+	-fx-min-width: 15mm;
 	/* -fx-background: red;*/
 }
 #editor-grid .slider > .thumb {
