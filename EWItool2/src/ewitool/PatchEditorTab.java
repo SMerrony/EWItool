@@ -18,15 +18,21 @@
 package ewitool;
 
 import javafx.beans.binding.Bindings;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Tab;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
+import javafx.util.Callback;
 
 public class PatchEditorTab extends Tab {
     
@@ -34,8 +40,31 @@ public class PatchEditorTab extends Tab {
     setText( "Patch Editor" );
     setClosable( false );
       
-    
+    ListView<EWI4000sPatch> patchList; // TODO - this occurs elsewhere eg. ScratchPadTab - abstract it out?
+	patchList = new ListView<EWI4000sPatch>( sharedData.ewiPatchList ); 
+
+    patchList.setCellFactory( new Callback<ListView<EWI4000sPatch>, ListCell<EWI4000sPatch>>(){
+      @Override 
+      public ListCell<EWI4000sPatch> call( ListView<EWI4000sPatch> p ) {
+        ListCell<EWI4000sPatch> cell = new ListCell<EWI4000sPatch>() {
+          @Override
+          protected void updateItem( EWI4000sPatch ep, boolean bln ) {
+            super.updateItem( ep, bln );
+            if (ep != null) {
+              setText( ep.patch_num + ": " + ep.getName() );
+            } else {
+              setText( "" );
+            }
+          }
+        };
+        return cell;
+      }
+    });
     HBox headerBox = new HBox();
+    Region lSpaceRegion = new Region(), rSpaceRegion = new Region();
+    HBox.setHgrow( lSpaceRegion, Priority.ALWAYS );
+    HBox.setHgrow( rSpaceRegion, Priority.ALWAYS );
+    headerBox.getChildren().addAll( lSpaceRegion, patchList, rSpaceRegion );
     
     UiOscGrid osc1Grid = new UiOscGrid( 0 );
     UiOscGrid osc2Grid = new UiOscGrid( 1 );
@@ -73,6 +102,7 @@ public class PatchEditorTab extends Tab {
 
     // all-encompassing VBox
     VBox vBox = new VBox();
+    VBox.setVgrow( headerBox, Priority.NEVER );
     VBox.setVgrow( oscBox, Priority.ALWAYS );
     VBox.setVgrow( filterBox, Priority.ALWAYS );
     VBox.setVgrow( noiseBox, Priority.ALWAYS );
@@ -80,8 +110,20 @@ public class PatchEditorTab extends Tab {
     vBox.getChildren().addAll( headerBox, oscBox, filterBox, noiseBox, multiBox );
     
     setContent( vBox );
+
+    // what to do when the tab is selected...
+    this.setOnSelectionChanged( new EventHandler<Event>() {
+    	@Override
+    	public void handle(Event arg0) {
+    		System.out.println( "DEBUG - Patch editor activated" );
+    		patchList.getSelectionModel().select( sharedData.getEditingPatchNumber() );
+    		patchList.scrollTo( sharedData.getEditingPatchNumber() );
+    	}
+    }
+    );
+
   }
-    
+
 }
 
 // helper classes used for (dynamically) labelling the controls
