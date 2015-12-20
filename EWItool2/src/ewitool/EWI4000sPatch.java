@@ -29,6 +29,8 @@ package ewitool;
 import java.util.Arrays;
 import java.util.Observable;
 
+import javafx.beans.property.SimpleIntegerProperty;
+
 public class EWI4000sPatch extends Observable {
   
   public final static int EWI_NUM_PATCHES  = 100;  // 0..99
@@ -131,11 +133,11 @@ public class EWI4000sPatch extends Observable {
     }
   }
   
-  byte patch_blob[];
+  byte patchBlob[];
   
   byte header[];
   byte mode;     // 0x00 to store, 0x20 to edit
-  byte patch_num;
+  byte patchNum;
   byte filler2;
   byte filler3;
   byte filler4;
@@ -170,8 +172,8 @@ public class EWI4000sPatch extends Observable {
   byte chorusSwitch;
   Nrpn ampNRPN;    // 88,3
   byte biteTremolo;
-  byte ampLevel;
-  byte octaveLevel;
+  SimpleIntegerProperty ampLevel;
+  SimpleIntegerProperty octaveLevel;
   Nrpn chorusNRPN;   // 112,9
   byte chorusDelay1;
   byte chorusModLev1;
@@ -199,7 +201,7 @@ public class EWI4000sPatch extends Observable {
   private boolean empty;
   
   EWI4000sPatch() {
-    patch_blob = new byte[EWI_PATCH_LENGTH];
+    patchBlob = new byte[EWI_PATCH_LENGTH];
     header = new byte[4];
     name = new char[EWI_PATCHNAME_LENGTH];
     osc1 = new Osc();
@@ -215,12 +217,14 @@ public class EWI4000sPatch extends Observable {
     chorusNRPN = new Nrpn();
     delayNRPN = new Nrpn();
     reverbNRPN = new Nrpn();
+    ampLevel = new SimpleIntegerProperty();
+    octaveLevel = new SimpleIntegerProperty();
     setEmpty( true );
   }
   
   EWI4000sPatch( byte[] blob ) {
     this();
-    patch_blob = blob;
+    patchBlob = blob;
     setEmpty( false );
     decodeBlob();
   }
@@ -255,71 +259,76 @@ public class EWI4000sPatch extends Observable {
     nameToBlob();
     return true;
   }
+  
+  public void setPatchNum( byte numByte ) {
+    patchNum = numByte;
+    patchBlob[5] = numByte;
+  }
 
   void decodeBlob() {
-     header = Arrays.copyOfRange( patch_blob, 0, 4 );
-     mode = patch_blob[4];     // 0x00 to store, 0x20 to edit
-     patch_num = patch_blob[5];
-     filler2 = patch_blob[6];
-     filler3 = patch_blob[7];
-     filler4 = patch_blob[8];
-     filler5 = patch_blob[9];
-     filler6 = patch_blob[10];
-     filler7 = patch_blob[11];
+     header = Arrays.copyOfRange( patchBlob, 0, 4 );
+     mode = patchBlob[4];     // 0x00 to store, 0x20 to edit
+     patchNum = patchBlob[5];
+     filler2 = patchBlob[6];
+     filler3 = patchBlob[7];
+     filler4 = patchBlob[8];
+     filler5 = patchBlob[9];
+     filler6 = patchBlob[10];
+     filler7 = patchBlob[11];
      for (int ix = 12; ix < (12+EWI_PATCHNAME_LENGTH); ix++)
-       name[ix - 12] = (char) patch_blob[ix];
-     osc1.decode( Arrays.copyOfRange( patch_blob, 44, 65) );     // 64,18
-     osc2.decode( Arrays.copyOfRange( patch_blob, 65, 86 ) );     // 65,18
-     oscFilter1.decode( Arrays.copyOfRange( patch_blob, 86, 101 ) );   // 72,12
-     oscFilter2.decode( Arrays.copyOfRange( patch_blob, 101, 116 ) );   // 73,12
-     noiseFilter1.decode( Arrays.copyOfRange( patch_blob, 116, 131 ) ); // 74,12
-     noiseFilter2.decode( Arrays.copyOfRange( patch_blob, 131, 146 ) ); // 75,12
-     antiAliasNRPN.decode( Arrays.copyOfRange( patch_blob, 146, 149 ) );  // 79,3
-     antiAliasSwitch    = patch_blob[149];
-     antiAliasCutoff    = patch_blob[150];
-     antiAliasKeyFollow = patch_blob[151];
-     noiseNRPN.decode( Arrays.copyOfRange( patch_blob, 152, 155 ) );    // 80,3
-     noiseTime    = patch_blob[155];
-     noiseBreath  = patch_blob[156];
-     noiseLevel   = patch_blob[157];
-     miscNRPN.decode( Arrays.copyOfRange( patch_blob, 158, 161 ) );   // 81,10
-     bendRange    = patch_blob[161];
-     bendStepMode = patch_blob[162];
-     biteVibrato  = patch_blob[163];
-     oscFilterLink = patch_blob[164];
-     noiseFilterLink = patch_blob[165];
-     formantFilter   = patch_blob[166];
-     osc2Xfade       = patch_blob[167];
-     keyTrigger      = patch_blob[168];
-     filler10        = patch_blob[169];
-     chorusSwitch    = patch_blob[170];
-     ampNRPN.decode( Arrays.copyOfRange( patch_blob, 171, 174 ) );    // 88,3
-     biteTremolo    = patch_blob[174];
-     ampLevel       = patch_blob[175];
-     octaveLevel    = patch_blob[176];
-     chorusNRPN.decode( Arrays.copyOfRange( patch_blob, 177, 180 ) );   // 112,9
-     chorusDelay1   = patch_blob[180];
-     chorusModLev1  = patch_blob[181];
-     chorusWetLev1  = patch_blob[182];
-     chorusDelay2   = patch_blob[183];
-     chorusModLev2  = patch_blob[184];
-     chorusWetLev2  = patch_blob[185];
-     chorusFeedback = patch_blob[186];
-     chorusLFOfreq  = patch_blob[187];
-     chorusDryLevel = patch_blob[188];
-     delayNRPN.decode( Arrays.copyOfRange( patch_blob, 189, 192 ) );    // 113,5
-     delayTime      = patch_blob[192];
-     delayFeedback  = patch_blob[193];
-     delayDamp      = patch_blob[194];
-     delayLevel     = patch_blob[195];
-     delayMix       = patch_blob[196];   // ZJ
-     reverbNRPN.decode( Arrays.copyOfRange( patch_blob, 197, 200 ) );   // 114,5
-     reverbMix      = patch_blob[200];    // ZJ
-     reverbLevel    = patch_blob[201];
-     reverbDensity  = patch_blob[202];
-     reverbTime     = patch_blob[203];
-     reverbDamp     = patch_blob[204];
-     trailer_f7     = patch_blob[205];   // 0xf7 !!!  
+       name[ix - 12] = (char) patchBlob[ix];
+     osc1.decode( Arrays.copyOfRange( patchBlob, 44, 65) );     // 64,18
+     osc2.decode( Arrays.copyOfRange( patchBlob, 65, 86 ) );     // 65,18
+     oscFilter1.decode( Arrays.copyOfRange( patchBlob, 86, 101 ) );   // 72,12
+     oscFilter2.decode( Arrays.copyOfRange( patchBlob, 101, 116 ) );   // 73,12
+     noiseFilter1.decode( Arrays.copyOfRange( patchBlob, 116, 131 ) ); // 74,12
+     noiseFilter2.decode( Arrays.copyOfRange( patchBlob, 131, 146 ) ); // 75,12
+     antiAliasNRPN.decode( Arrays.copyOfRange( patchBlob, 146, 149 ) );  // 79,3
+     antiAliasSwitch    = patchBlob[149];
+     antiAliasCutoff    = patchBlob[150];
+     antiAliasKeyFollow = patchBlob[151];
+     noiseNRPN.decode( Arrays.copyOfRange( patchBlob, 152, 155 ) );    // 80,3
+     noiseTime    = patchBlob[155];
+     noiseBreath  = patchBlob[156];
+     noiseLevel   = patchBlob[157];
+     miscNRPN.decode( Arrays.copyOfRange( patchBlob, 158, 161 ) );   // 81,10
+     bendRange    = patchBlob[161];
+     bendStepMode = patchBlob[162];
+     biteVibrato  = patchBlob[163];
+     oscFilterLink = patchBlob[164];
+     noiseFilterLink = patchBlob[165];
+     formantFilter   = patchBlob[166];
+     osc2Xfade       = patchBlob[167];
+     keyTrigger      = patchBlob[168];
+     filler10        = patchBlob[169];
+     chorusSwitch    = patchBlob[170];
+     ampNRPN.decode( Arrays.copyOfRange( patchBlob, 171, 174 ) );    // 88,3
+     biteTremolo    = patchBlob[174];
+     ampLevel.set( (int) patchBlob[175] );
+     octaveLevel.setValue( (int) patchBlob[176] );
+     chorusNRPN.decode( Arrays.copyOfRange( patchBlob, 177, 180 ) );   // 112,9
+     chorusDelay1   = patchBlob[180];
+     chorusModLev1  = patchBlob[181];
+     chorusWetLev1  = patchBlob[182];
+     chorusDelay2   = patchBlob[183];
+     chorusModLev2  = patchBlob[184];
+     chorusWetLev2  = patchBlob[185];
+     chorusFeedback = patchBlob[186];
+     chorusLFOfreq  = patchBlob[187];
+     chorusDryLevel = patchBlob[188];
+     delayNRPN.decode( Arrays.copyOfRange( patchBlob, 189, 192 ) );    // 113,5
+     delayTime      = patchBlob[192];
+     delayFeedback  = patchBlob[193];
+     delayDamp      = patchBlob[194];
+     delayLevel     = patchBlob[195];
+     delayMix       = patchBlob[196];   // ZJ
+     reverbNRPN.decode( Arrays.copyOfRange( patchBlob, 197, 200 ) );   // 114,5
+     reverbMix      = patchBlob[200];    // ZJ
+     reverbLevel    = patchBlob[201];
+     reverbDensity  = patchBlob[202];
+     reverbTime     = patchBlob[203];
+     reverbDamp     = patchBlob[204];
+     trailer_f7     = patchBlob[205];   // 0xf7 !!!  
      
      setEmpty( false );
 
@@ -327,7 +336,7 @@ public class EWI4000sPatch extends Observable {
   
   void nameToBlob() {
     for (int ix = 12; ix < (12+EWI_PATCHNAME_LENGTH); ix++)
-      patch_blob[ix] = (byte) name[ix - 12];
+      patchBlob[ix] = (byte) name[ix - 12];
   }
   
   void encodeBlob() {
