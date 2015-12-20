@@ -42,6 +42,7 @@ import javax.sound.midi.MidiSystem;
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Receiver;
 import javax.sound.midi.Sequencer;
+import javax.sound.midi.ShortMessage;
 import javax.sound.midi.Synthesizer;
 import javax.sound.midi.SysexMessage;
 
@@ -224,6 +225,56 @@ public class MidiHandler {
     }
 
   }
+  
+  boolean sendSysEx( final byte[] sysexBytes ) {
+    try {
+      SysexMessage sysEx = new SysexMessage( SysexMessage.SYSTEM_EXCLUSIVE, sysexBytes, sysexBytes.length );
+      outDev.getReceiver().send( sysEx, -1 );
+    } catch( InvalidMidiDataException e ) {
+       e.printStackTrace();
+       return false;
+    } catch( MidiUnavailableException e ) {
+      e.printStackTrace();
+      return false;
+    }
+    // FIXME ?The Qt version had a SLEEP(250) here?
+    return true;
+  }
 
+  boolean sendPatch( EWI4000sPatch patch, final byte mode ) {
+    patch.mode = mode;
+    if (!sendSysEx( patch.patchBlob )) return false;
+    if (mode == EWI4000sPatch.EWI_EDIT) {
+      // if we're going to edit we need to send it again as patch 0 with the 
+      // edit flag set...  
+      patch.setPatchNum( (byte) 0x00 );
+      if (!sendSysEx( patch.patchBlob )) return false;
+    }
+    return true;
+  }
+  
+  boolean sendControlChange( int cc, int val, int ch ) {
+    try {
+      ShortMessage sm = new ShortMessage( ShortMessage.CONTROL_CHANGE, ch, cc, val );
+      outDev.getReceiver().send( sm, -1 );
+    } catch( InvalidMidiDataException e ) {
+      e.printStackTrace();
+      return false;
+    } catch( MidiUnavailableException e ) {
+      e.printStackTrace();
+      return false;
+    }
+    
+    return true;
+  }
+  
+  boolean sendLiveControl( int lsb, int msb, int cValue ) {
+    sendControlChange( MIDI_CC_NRPN_LSB, lsb, 0 );
+    sendControlChange( MIDI_CC_NRPN_MSB, msb, 0 );
+    sendControlChange( MIDI_CC_DATA_ENTRY, cValue, 0 );
+    sendControlChange( MIDI_CC_NRPN_LSB, 127, 0 );
+    sendControlChange( MIDI_CC_NRPN_MSB, 127, 0 );
+    return true;
+  }
   
 }
