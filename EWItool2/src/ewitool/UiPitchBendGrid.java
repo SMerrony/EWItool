@@ -35,7 +35,7 @@ public class UiPitchBendGrid extends GridPane {
   CheckBox enableCheck;
   ChoiceBox<Integer> rangeChoice;
   
-  UiPitchBendGrid() {
+  UiPitchBendGrid(SharedData sharedData, MidiHandler midiHandler) {
     
     setId( "editor-grid" );
     
@@ -53,6 +53,15 @@ public class UiPitchBendGrid extends GridPane {
     add( mainLabel, 0, 0 );
 
     enableCheck = new CheckBox( "Enable" );
+    enableCheck.setOnAction( (event) -> {
+      if (enableCheck.isSelected()) {
+	midiHandler.sendLiveControl( 9, 81, 1 );
+	sharedData.editPatch.bendStepMode = 1;
+      } else {
+	midiHandler.sendLiveControl( 9, 81, 0 );
+	sharedData.editPatch.bendStepMode = 0;
+      }
+    });
     add( enableCheck, 0,1 );
     
     add( new ControlLabel( "Range", HPos.CENTER ), 0, 2 );
@@ -60,6 +69,15 @@ public class UiPitchBendGrid extends GridPane {
     rangeChoice = new ChoiceBox<Integer>();
     for (int i = 0; i < 13; i++)
       rangeChoice.getItems().add( i );
+    rangeChoice.setOnAction( (event) -> {
+      midiHandler.sendLiveControl( 8, 81, rangeChoice.getSelectionModel().getSelectedIndex() );
+      sharedData.editPatch.bendRange = rangeChoice.getSelectionModel().getSelectedIndex(); 
+    });
     add( rangeChoice, 0, 3 );   
+  }
+  
+  void setControls( SharedData sharedData ) {
+    enableCheck.setSelected( sharedData.editPatch.bendStepMode == 1 );  // TODO Check this is working
+    rangeChoice.getSelectionModel().select( sharedData.editPatch.bendRange );
   }
 }

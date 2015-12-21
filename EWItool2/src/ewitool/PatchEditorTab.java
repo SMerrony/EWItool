@@ -36,7 +36,7 @@ import javafx.util.Callback;
 
 public class PatchEditorTab extends Tab {
     
-  PatchEditorTab(SharedData sharedData) {
+  PatchEditorTab(SharedData sharedData, MidiHandler midiHandler) {
     setText( "Patch Editor" );
     setClosable( false );
       
@@ -51,7 +51,7 @@ public class PatchEditorTab extends Tab {
           protected void updateItem( EWI4000sPatch ep, boolean bln ) {
             super.updateItem( ep, bln );
             if (ep != null) {
-              setText( ep.patch_num + ": " + ep.getName() );
+              setText( ep.patchNum + ": " + ep.getName() );
             } else {
               setText( "" );
             }
@@ -89,13 +89,13 @@ public class PatchEditorTab extends Tab {
     HBox noiseBox = new HBox();
     noiseBox.getChildren().addAll( noiseGrid, noisePriFilterGrid, noiseSecFilterGrid );
     
-    UiChorusGrid chorusGrid = new UiChorusGrid();
-    UiDelayGrid delayGrid = new UiDelayGrid();
-    UiReverbGrid reverbGrid = new UiReverbGrid();
-    UiBiteGrid biteGrid = new UiBiteGrid();
-    UiPitchBendGrid pitchBendGrid = new UiPitchBendGrid();
-    UiAntiAliasGrid antiAliasGrid = new UiAntiAliasGrid();
-    UiLevelsGrid levelsGrid = new UiLevelsGrid();
+    UiChorusGrid chorusGrid = new UiChorusGrid( sharedData, midiHandler);
+    UiDelayGrid delayGrid = new UiDelayGrid( sharedData, midiHandler );
+    UiReverbGrid reverbGrid = new UiReverbGrid( sharedData, midiHandler );
+    UiBiteGrid biteGrid = new UiBiteGrid( sharedData, midiHandler);
+    UiPitchBendGrid pitchBendGrid = new UiPitchBendGrid( sharedData, midiHandler);
+    UiAntiAliasGrid antiAliasGrid = new UiAntiAliasGrid( sharedData, midiHandler);
+    UiLevelsGrid levelsGrid = new UiLevelsGrid( sharedData, midiHandler );
     HBox multiBox = new HBox();
     multiBox.getChildren().addAll( chorusGrid, delayGrid, reverbGrid, biteGrid, 
                                    pitchBendGrid, antiAliasGrid, levelsGrid );
@@ -118,6 +118,15 @@ public class PatchEditorTab extends Tab {
     		System.out.println( "DEBUG - Patch editor activated" );
     		patchList.getSelectionModel().select( sharedData.getEditingPatchNumber() );
     		patchList.scrollTo( sharedData.getEditingPatchNumber() );
+    		chorusGrid.setControls( sharedData );
+    		delayGrid.setControls( sharedData );
+    		reverbGrid.setControls( sharedData );
+    		biteGrid.setControls( sharedData );
+    		pitchBendGrid.setControls( sharedData );
+    		antiAliasGrid.setControls( sharedData );
+    		levelsGrid.setControls( sharedData );
+    		
+    		midiHandler.sendPatch( sharedData.editPatch, EWI4000sPatch.EWI_EDIT );
     	}
     }
     );

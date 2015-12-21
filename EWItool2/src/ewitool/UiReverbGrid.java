@@ -33,7 +33,7 @@ public class UiReverbGrid extends GridPane {
   
   Slider timeSlider, densitySlider, dampingSlider, drySlider, volSlider;
   
-  UiReverbGrid() {
+  UiReverbGrid(SharedData sharedData, MidiHandler midiHandler) {
     
     setId( "editor-grid" );
     
@@ -52,18 +52,30 @@ public class UiReverbGrid extends GridPane {
     timeSlider = new Slider( 0.0, 127.0, 0.0 );
     timeSlider.setOrientation( Orientation.HORIZONTAL );
     timeSlider.setMajorTickUnit( 32.0 );
+    timeSlider.valueProperty().addListener( (observable, oldVal, newVal) -> {
+      midiHandler.sendLiveControl( 3, 114, newVal.intValue() );
+      sharedData.editPatch.reverbTime = newVal.intValue();
+    });
     add( timeSlider, 0, 2 );
     add( new BoundBelowControlLabel( "Time", HPos.CENTER, timeSlider ), 0, 1 );
     
     densitySlider = new Slider( 0.0, 127.0, 0.0 );
     densitySlider.setOrientation( Orientation.HORIZONTAL );
     densitySlider.setMajorTickUnit( 32.0 );
+    densitySlider.valueProperty().addListener( (observable, oldVal, newVal) -> {
+      midiHandler.sendLiveControl( 2, 114, newVal.intValue() );
+      sharedData.editPatch.reverbDensity = newVal.intValue();
+    });
     add( densitySlider, 1, 2 );
     add( new BoundBelowControlLabel( "Density", HPos.CENTER, densitySlider ), 1, 1 );
     
     volSlider = new Slider( 0.0, 127.0, 0.0 );
     volSlider.setOrientation( Orientation.VERTICAL );
     volSlider.setMajorTickUnit( 32.0 );
+    volSlider.valueProperty().addListener( (observable, oldVal, newVal) -> {
+      midiHandler.sendLiveControl( 1, 114, newVal.intValue() );
+      sharedData.editPatch.reverbLevel = newVal.intValue();
+    });
     GridPane.setRowSpan( volSlider, 4 );
     add( volSlider, 2, 1 );
     add( new BoundBelowControlLabel( "Vol", HPos.CENTER, volSlider ), 2, 0 );
@@ -71,13 +83,29 @@ public class UiReverbGrid extends GridPane {
     dampingSlider = new Slider( 54.0, 74.0, 0.0 );          // Val. 54-74
     dampingSlider.setOrientation( Orientation.HORIZONTAL );
     dampingSlider.setMajorTickUnit( 32.0 );
+    dampingSlider.valueProperty().addListener( (observable, oldVal, newVal) -> {
+      midiHandler.sendLiveControl( 4, 114, newVal.intValue() );
+      sharedData.editPatch.reverbDamp = newVal.intValue();
+    });
     add( dampingSlider, 0, 4 );
     add( new BoundBelowControlLabel( "Damping", HPos.CENTER, dampingSlider ), 0, 3 );
     
     drySlider = new Slider( 0.0, 127.0, 0.0 );
     drySlider.setOrientation( Orientation.HORIZONTAL );
     drySlider.setMajorTickUnit( 32.0 );
+    drySlider.valueProperty().addListener( (observable, oldVal, newVal) -> {
+      midiHandler.sendLiveControl( 0, 114, newVal.intValue() );
+      sharedData.editPatch.reverbDry = newVal.intValue();
+    });
     add( drySlider, 1, 4 );
     add( new BoundBelowControlLabel( "Dry", HPos.CENTER, drySlider ), 1, 3 );
+  }
+  
+  void setControls( SharedData sharedData ) {
+    timeSlider.setValue( sharedData.editPatch.reverbTime );
+    densitySlider.setValue( sharedData.editPatch.reverbDensity );
+    volSlider.setValue( sharedData.editPatch.reverbLevel );
+    dampingSlider.setValue( sharedData.editPatch.reverbDamp );
+    drySlider.setValue( sharedData.editPatch.reverbDry );
   }
 }
