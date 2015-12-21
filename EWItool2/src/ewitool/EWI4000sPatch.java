@@ -187,9 +187,9 @@ public class EWI4000sPatch extends Observable {
   int delayFeedback;
   int delayDamp;
   int delayLevel;
-  int delayMix;   // ZJ
+  int delayDry;   // ZJ
   Nrpn reverbNRPN;   // 114,5
-  int reverbMix;    // ZJ
+  int reverbDry;    // ZJ
   int reverbLevel;
   int reverbDensity;
   int reverbTime;
@@ -318,9 +318,9 @@ public class EWI4000sPatch extends Observable {
      delayFeedback  = patchBlob[193];
      delayDamp      = patchBlob[194];
      delayLevel     = patchBlob[195];
-     delayMix       = patchBlob[196];   // ZJ
+     delayDry       = patchBlob[196];   // ZJ
      reverbNRPN.decode( Arrays.copyOfRange( patchBlob, 197, 200 ) );   // 114,5
-     reverbMix      = patchBlob[200];    // ZJ
+     reverbDry      = patchBlob[200];    // ZJ
      reverbLevel    = patchBlob[201];
      reverbDensity  = patchBlob[202];
      reverbTime     = patchBlob[203];
