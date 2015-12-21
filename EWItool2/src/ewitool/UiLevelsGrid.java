@@ -33,7 +33,7 @@ public class UiLevelsGrid extends GridPane {
   
   Slider masterSlider, octaveSlider;
   
-  UiLevelsGrid() {
+  UiLevelsGrid(SharedData sharedData, MidiHandler midiHandler) {
     
     setId( "editor-grid" );
     
@@ -52,15 +52,28 @@ public class UiLevelsGrid extends GridPane {
     masterSlider.setOrientation( Orientation.VERTICAL );
     masterSlider.setMajorTickUnit( 32.0 );
     GridPane.setRowSpan( masterSlider, 3 );
+    masterSlider.valueProperty().addListener( (observable, oldVal, newVal) -> {
+      //System.out.println( "DEBUG - UiLevelsGrid - Master Slider changed to " + newVal.intValue() );
+      midiHandler.sendLiveControl( 1, 88, newVal.intValue() );
+      sharedData.editPatch.ampLevel = newVal.intValue();
+    });
     add( masterSlider, 0, 2 );
     add( new BoundBelowControlLabel( "Master", HPos.CENTER, masterSlider ), 0, 1 );
     
     octaveSlider = new Slider( 0.0, 127.0, 0.0 );
     octaveSlider.setOrientation( Orientation.VERTICAL );
     octaveSlider.setMajorTickUnit( 32.0 );
+    octaveSlider.valueProperty().addListener( (observable, oldVal, newVal)-> {
+      midiHandler.sendLiveControl( 2, 88, newVal.intValue() );
+      sharedData.editPatch.octaveLevel = newVal.intValue();
+    });
     GridPane.setRowSpan( octaveSlider, 3 );
     add( octaveSlider, 1, 2 );
     add( new BoundBelowControlLabel( "Octave", HPos.CENTER, octaveSlider ), 1, 1 );
   }
   
+  void setControls( SharedData sharedData ) {
+    masterSlider.setValue( sharedData.editPatch.ampLevel );
+    octaveSlider.setValue( sharedData.editPatch.octaveLevel );
+  }
 }
