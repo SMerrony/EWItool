@@ -29,8 +29,6 @@ package ewitool;
 import java.util.Arrays;
 import java.util.Observable;
 
-import javafx.beans.property.SimpleIntegerProperty;
-
 public class EWI4000sPatch extends Observable {
   
   public final static int EWI_NUM_PATCHES  = 100;  // 0..99
@@ -51,24 +49,24 @@ public class EWI4000sPatch extends Observable {
   
   class Osc {
     Nrpn nrpn;
-    byte octave;     // int 64 +/-2
-    byte semitone;   // int 64 +/-12
-    byte fine;  // int -50 - +50 cents
-    byte beat;  // int 0% - 100%
+    int octave;     // int 64 +/-2
+    int semitone;   // int 64 +/-12
+    int fine;  // int -50 - +50 cents
+    int beat;  // int 0% - 100%
     byte filler1;    // this really is unused (for firmware 2.3 anyway)
-    byte sawtooth;   // %
-    byte triangle;   // %
-    byte square;     // %
-    byte pulseWidth; // %
-    byte pwmFreq;    // %
-    byte pwmDepth;   // %
-    byte sweepDepth; // %
-    byte sweepTime;  // %
-    byte breathDepth;     // %  ?-50/+50?
-    byte breathAttain;    // %
-    byte breathCurve;     // %  ? =50+50?
-    byte breathThreshold; // %
-    byte level;      // %
+    int sawtooth;   // %
+    int triangle;   // %
+    int square;     // %
+    int pulseWidth; // %
+    int pwmFreq;    // %
+    int pwmDepth;   // %
+    int sweepDepth; // %
+    int sweepTime;  // %
+    int breathDepth;     // %  ?-50/+50?
+    int breathAttain;    // %
+    int breathCurve;     // %  ? =50+50?
+    int breathThreshold; // %
+    int level;      // %
     
     Osc() {
       nrpn = new Nrpn();
@@ -99,18 +97,18 @@ public class EWI4000sPatch extends Observable {
   
   class Filter {
     Nrpn nrpn;
-    byte mode;
-    byte freq;
-    byte q;
-    byte keyFollow;
-    byte breathMod;
-    byte lfoFreq;
-    byte lfoDepth;
-    byte lfoBreath;
-    byte lfoThreshold;
-    byte sweepDepth;
-    byte sweepTime;
-    byte breathCurve;  
+    int mode;
+    int freq;
+    int q;
+    int keyFollow;
+    int breathMod;
+    int lfoFreq;
+    int lfoDepth;
+    int lfoBreath;
+    int lfoThreshold;
+    int sweepDepth;
+    int sweepTime;
+    int breathCurve;  
     
     Filter() {
       nrpn = new Nrpn();
@@ -137,7 +135,7 @@ public class EWI4000sPatch extends Observable {
   
   byte header[];
   byte mode;     // 0x00 to store, 0x20 to edit
-  byte patchNum;
+  int patchNum;
   byte filler2;
   byte filler3;
   byte filler4;
@@ -152,50 +150,50 @@ public class EWI4000sPatch extends Observable {
   Filter noiseFilter1; // 74,12
   Filter noiseFilter2; // 75,12
   Nrpn antiAliasNRPN;  // 79,3
-  byte antiAliasSwitch;
-  byte antiAliasCutoff;
-  byte antiAliasKeyFollow;
+  int antiAliasSwitch;
+  int antiAliasCutoff;
+  int antiAliasKeyFollow;
   Nrpn noiseNRPN;    // 80,3
-  byte noiseTime;
-  byte noiseBreath;
-  byte noiseLevel;
+  int noiseTime;
+  int noiseBreath;
+  int noiseLevel;
   Nrpn miscNRPN;   // 81,10
-  byte bendRange;
-  byte bendStepMode;
-  byte biteVibrato;
-  byte oscFilterLink;
-  byte noiseFilterLink;
-  byte formantFilter;
-  byte osc2Xfade;
-  byte keyTrigger;
-  byte filler10;
-  byte chorusSwitch;
+  int bendRange;
+  int bendStepMode;
+  int biteVibrato;
+  int oscFilterLink;
+  int noiseFilterLink;
+  int formantFilter;
+  int osc2Xfade;
+  int keyTrigger;
+  int filler10;
+  int chorusSwitch;
   Nrpn ampNRPN;    // 88,3
-  byte biteTremolo;
-  SimpleIntegerProperty ampLevel;
-  SimpleIntegerProperty octaveLevel;
+  int biteTremolo;
+  int ampLevel;
+  int octaveLevel;
   Nrpn chorusNRPN;   // 112,9
-  byte chorusDelay1;
-  byte chorusModLev1;
-  byte chorusWetLev1;
-  byte chorusDelay2;
-  byte chorusModLev2;
-  byte chorusWetLev2;
-  byte chorusFeedback;
-  byte chorusLFOfreq;
-  byte chorusDryLevel;
+  int chorusDelay1;
+  int chorusModLev1;
+  int chorusWetLev1;
+  int chorusDelay2;
+  int chorusModLev2;
+  int chorusWetLev2;
+  int chorusFeedback;
+  int chorusLFOfreq;
+  int chorusDryLevel;
   Nrpn delayNRPN;    // 113,5
-  byte delayTime;
-  byte delayFeedback;
-  byte delayDamp;
-  byte delayLevel;
-  byte delayMix;   // ZJ
+  int delayTime;
+  int delayFeedback;
+  int delayDamp;
+  int delayLevel;
+  int delayMix;   // ZJ
   Nrpn reverbNRPN;   // 114,5
-  byte reverbMix;    // ZJ
-  byte reverbLevel;
-  byte reverbDensity;
-  byte reverbTime;
-  byte reverbDamp;
+  int reverbMix;    // ZJ
+  int reverbLevel;
+  int reverbDensity;
+  int reverbTime;
+  int reverbDamp;
   byte trailer_f7;   // 0xf7 !!!  
   
   private boolean empty;
@@ -217,8 +215,7 @@ public class EWI4000sPatch extends Observable {
     chorusNRPN = new Nrpn();
     delayNRPN = new Nrpn();
     reverbNRPN = new Nrpn();
-    ampLevel = new SimpleIntegerProperty();
-    octaveLevel = new SimpleIntegerProperty();
+   
     setEmpty( true );
   }
   
@@ -304,8 +301,8 @@ public class EWI4000sPatch extends Observable {
      chorusSwitch    = patchBlob[170];
      ampNRPN.decode( Arrays.copyOfRange( patchBlob, 171, 174 ) );    // 88,3
      biteTremolo    = patchBlob[174];
-     ampLevel.set( (int) patchBlob[175] );
-     octaveLevel.setValue( (int) patchBlob[176] );
+     ampLevel	    = (int) patchBlob[175];
+     octaveLevel    = (int) patchBlob[176];
      chorusNRPN.decode( Arrays.copyOfRange( patchBlob, 177, 180 ) );   // 112,9
      chorusDelay1   = patchBlob[180];
      chorusModLev1  = patchBlob[181];
