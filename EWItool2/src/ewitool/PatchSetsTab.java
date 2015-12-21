@@ -104,7 +104,7 @@ public class PatchSetsTab extends Tab {
             System.out.println( "DEBUG - bytes read: " + allBytes.length );
             for (int byteOffset = 0; byteOffset < allBytes.length; byteOffset += EWI4000sPatch.EWI_PATCH_LENGTH ) {
               EWI4000sPatch ep = new EWI4000sPatch();
-              ep.patch_blob = Arrays.copyOfRange( allBytes, byteOffset, byteOffset + EWI4000sPatch.EWI_PATCH_LENGTH  );
+              ep.patchBlob = Arrays.copyOfRange( allBytes, byteOffset, byteOffset + EWI4000sPatch.EWI_PATCH_LENGTH  );
               ep.decodeBlob();
               patchesInSetOL.add( ep );
               //System.out.println( "DEBUG - patch loaded" );

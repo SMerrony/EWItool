@@ -36,7 +36,11 @@ public class SharedData extends Observable {
   
   private volatile int lastPatchLoaded,
                        editingPatchNumber;
+  
+  // We ASSUME that there are always NUM_EWI_PATCHES on this list once it is loaded...
   ObservableList<EWI4000sPatch> ewiPatchList;
+  
+  public volatile EWI4000sPatch editPatch;  // This is the patch currently being edited
   
   // Queues to synchronise requesting/receiving MIDI info
   BlockingQueue<Integer> patchQ, keyPatchQ;
@@ -44,6 +48,7 @@ public class SharedData extends Observable {
   SharedData() {
     lastPatchLoaded = NONE;
     editingPatchNumber = NONE;
+    editPatch = new EWI4000sPatch();
     ewiPatchList = FXCollections.observableArrayList();
     patchQ = new LinkedBlockingQueue<Integer>();
     keyPatchQ = new LinkedBlockingQueue<Integer>();
@@ -70,8 +75,11 @@ public class SharedData extends Observable {
   }
   
   public void setEditingPatchNumber( int p ) {
-    editingPatchNumber = p;
-    setChanged();
-    notifyObservers( EDIT_PATCH );
+    if (p != NONE) {
+      editingPatchNumber = p;
+      editPatch = ewiPatchList.get( editingPatchNumber );
+      setChanged();
+      notifyObservers( EDIT_PATCH );
+    }
   }
 }

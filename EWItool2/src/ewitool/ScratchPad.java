@@ -55,7 +55,7 @@ public class ScratchPad {
         patchList.clear();
         for (int byteOffset = 0; byteOffset < allBytes.length; byteOffset += EWI4000sPatch.EWI_PATCH_LENGTH ) {
           EWI4000sPatch ep = new EWI4000sPatch();
-          ep.patch_blob = Arrays.copyOfRange( allBytes, byteOffset, byteOffset + EWI4000sPatch.EWI_PATCH_LENGTH  );
+          ep.patchBlob = Arrays.copyOfRange( allBytes, byteOffset, byteOffset + EWI4000sPatch.EWI_PATCH_LENGTH  );
           ep.decodeBlob();
           patchList.add( ep );
         }
@@ -73,7 +73,7 @@ public class ScratchPad {
       Files.delete( spPath );
       Files.createFile( spPath );
       for (int p = 0; p < patchList.size(); p++){
-        Files.write( spPath, patchList.get( p ).patch_blob, StandardOpenOption.APPEND );
+        Files.write( spPath, patchList.get( p ).patchBlob, StandardOpenOption.APPEND );
       }
     } catch( IOException e ) {
       e.printStackTrace();

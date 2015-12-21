@@ -99,7 +99,7 @@ public class Main extends Application {
 			keyPatchesTab = new KeyPatchesTab();
 			tabPane.getTabs().add( keyPatchesTab );
 			
-			patchEditorTab = new PatchEditorTab( sharedData );
+			patchEditorTab = new PatchEditorTab( sharedData, midiHandler );
 			tabPane.getTabs().add( patchEditorTab );
 			
 			// MIDI port assignment change listeners
