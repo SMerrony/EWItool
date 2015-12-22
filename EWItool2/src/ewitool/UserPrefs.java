@@ -23,7 +23,9 @@ import java.util.prefs.Preferences;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-public class Prefs {
+public class UserPrefs {
+  
+  private Preferences p;
   
   // these need to be exposed so that they can be observed
   public StringProperty midiInPort, midiOutPort;
@@ -36,64 +38,52 @@ public class Prefs {
   private static final String EPX_USERID = "EPX_USERID";
   private static final String EPX_PASSWORD = "EPX_PASSWORD";
   
-  Prefs() {
+  UserPrefs() {
+    p = Preferences.userRoot().node( PREFS_NODE );
     midiInPort = new SimpleStringProperty( getMidiInPort() );
     midiOutPort = new SimpleStringProperty( getMidiOutPort() );
   }
   
-  public static String getMidiInPort() {
-    Preferences p = Preferences.userRoot().node( PREFS_NODE );
+  public String getMidiInPort() {
     return p.get( MIDI_IN_PORT, "<Not Chosen>" );
   }
   public void setMidiInPort( String ip ) {
-    Preferences p = Preferences.userRoot().node( PREFS_NODE );
     p.put( MIDI_IN_PORT, ip );
     midiInPort.set( ip );  // This must be last as it notifies change
   }
-  public static String getMidiOutPort() {
-    Preferences p = Preferences.userRoot().node( PREFS_NODE );
+  public String getMidiOutPort() {
     return p.get( MIDI_OUT_PORT, "<Not Chosen>" );
   }
   public void setMidiOutPort( String op ) {
-    Preferences p = Preferences.userRoot().node( PREFS_NODE );
     p.put( MIDI_OUT_PORT, op );
     midiOutPort.set( op );  // This must be last as it notifies change
   }
-  public static String getLibraryLocation() {
-    Preferences p = Preferences.userRoot().node( PREFS_NODE );
+  public String getLibraryLocation() {
     return p.get( LIBRARY_LOCATION, "<Not Chosen>" );
   }
-  public static void setLibraryLocation( String ll ) {
-    Preferences p = Preferences.userRoot().node( PREFS_NODE );
+  public void setLibraryLocation( String ll ) {
     p.put( LIBRARY_LOCATION, ll );
   }
-  public static String getEpxHost() {
-    Preferences p = Preferences.userRoot().node( PREFS_NODE );
+  public String getEpxHost() {
     return p.get( EPX_HOST, "<Not Set>" );
   }
-  public static void setEpxHost( String host ) {
-    Preferences p = Preferences.userRoot().node( PREFS_NODE );
+  public void setEpxHost( String host ) {
     p.put( EPX_HOST, host );
   }
-  public static String getEpxUserid() {
-    Preferences p = Preferences.userRoot().node( PREFS_NODE );
+  public String getEpxUserid() {
     return p.get( EPX_USERID, "<Not Set>" );
   }
-  public static void setEpxUserid( String user ) {
-    Preferences p = Preferences.userRoot().node( PREFS_NODE );
+  public void setEpxUserid( String user ) {
     p.put( EPX_USERID, user );
   }
-  public static String getEpxPassword() {
-    Preferences p = Preferences.userRoot().node( PREFS_NODE );
+  public String getEpxPassword() {
     return p.get( EPX_PASSWORD, "<Not Set>" );
   }
-  public static void setEpxPassword( String pwd ) {
-    Preferences p = Preferences.userRoot().node( PREFS_NODE );
+  public void setEpxPassword( String pwd ) {
     p.put( EPX_PASSWORD, pwd );
   }
   
   public boolean clearPrefs() {
-    Preferences p = Preferences.userRoot().node( PREFS_NODE );
     try {
       p.clear();
     } catch( BackingStoreException e ) {

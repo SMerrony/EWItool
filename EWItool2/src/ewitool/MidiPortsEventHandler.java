@@ -19,8 +19,6 @@ package ewitool;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-
 import javax.sound.midi.MidiDevice;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Sequencer;
@@ -35,7 +33,6 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 
 public class MidiPortsEventHandler implements EventHandler<ActionEvent>
 {
@@ -82,7 +79,7 @@ public class MidiPortsEventHandler implements EventHandler<ActionEvent>
     gp.add( outView, 1, 1 );
     dialog.getDialogPane().setContent( gp );
     
-    Optional<ButtonType> rc = dialog.showAndWait();
+    dialog.showAndWait();
     
   }
 

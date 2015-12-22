@@ -47,7 +47,7 @@ public class PatchSetsTab extends Tab {
   ListView<EWI4000sPatch> patchListView;
   ObservableList<EWI4000sPatch> patchesInSetOL;
 
-  PatchSetsTab( ScratchPad scratchPad ) {
+  PatchSetsTab( ScratchPad scratchPad, UserPrefs userPrefs ) {
     
     setText( "Patch Set Library" );
     setClosable( false );
@@ -58,7 +58,7 @@ public class PatchSetsTab extends Tab {
 
     Label llLabel = new Label( "Library location: " );
     gp.add( llLabel, 0, 0 );
-    Label libLocLabel = new Label( Prefs.getLibraryLocation() );
+    Label libLocLabel = new Label( userPrefs.getLibraryLocation() );
     gp.add( libLocLabel, 1, 0 );
     Button libLocButton = new Button( "Change" );
     gp.add( libLocButton, 2, 0 );
@@ -66,11 +66,11 @@ public class PatchSetsTab extends Tab {
       @Override public void handle( ActionEvent ae ) {
         DirectoryChooser dc = new DirectoryChooser();
         dc.setTitle( "Choose EWI Patch Set Library location" );
-        if (!Prefs.getLibraryLocation().equals( "<Not Chosen>" ))
-          dc.setInitialDirectory( new File( Prefs.getLibraryLocation() ) );
+        if (!userPrefs.getLibraryLocation().equals( "<Not Chosen>" ))
+          dc.setInitialDirectory( new File( userPrefs.getLibraryLocation() ) );
         File chosenLLdirFile = dc.showDialog( null );
         if (chosenLLdirFile != null) {
-          Prefs.setLibraryLocation( chosenLLdirFile.getAbsolutePath() );
+          userPrefs.setLibraryLocation( chosenLLdirFile.getAbsolutePath() );
           libLocLabel.setText( chosenLLdirFile.getAbsolutePath() );
         }
       }
@@ -82,8 +82,8 @@ public class PatchSetsTab extends Tab {
     patchSetList = new ListView<String>();
     gp.add( patchSetList, 0, 2 );
     GridPane.setColumnSpan( patchSetList, 3 );
-    if (!Prefs.getLibraryLocation().equals( "<Not Chosen>" )){
-      File llFile = new File( Prefs.getLibraryLocation() );
+    if (!userPrefs.getLibraryLocation().equals( "<Not Chosen>" )){
+      File llFile = new File( userPrefs.getLibraryLocation() );
       patchSetList.getItems().addAll( llFile.list( new FilenameFilter() {
         public boolean accept( File llFile, String name ) {
           return name.toLowerCase().endsWith( ".syx" );
@@ -97,7 +97,7 @@ public class PatchSetsTab extends Tab {
       public void changed( ObservableValue< ? extends String > observable, String oldValue, String newValue ) {
         System.out.println( "DEBUG - changed - " + newValue + " chosen" );
         patchesInSetOL.clear();
-        Path path = Paths.get( Prefs.getLibraryLocation(), newValue );
+        Path path = Paths.get( userPrefs.getLibraryLocation(), newValue );
         try {
           byte[] allBytes = Files.readAllBytes( path );
           if ((allBytes != null) && allBytes.length > 200 ) {

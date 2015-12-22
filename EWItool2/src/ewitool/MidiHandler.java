@@ -75,10 +75,10 @@ public class MidiHandler {
   public final static int  MIDI_TIMEOUT_MS       = 1000;
   
   SharedData sharedData;
-  Prefs userPrefs;
+  UserPrefs userPrefs;
   MidiDevice inDev = null, outDev = null; 
   
-  MidiHandler( SharedData pSharedData, Prefs pUserPrefs ) {
+  MidiHandler( SharedData pSharedData, UserPrefs pUserPrefs ) {
     
     sharedData = pSharedData;
     userPrefs = pUserPrefs;

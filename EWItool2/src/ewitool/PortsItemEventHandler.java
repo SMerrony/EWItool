@@ -41,9 +41,9 @@ import javafx.scene.layout.GridPane;
 
 public class PortsItemEventHandler implements EventHandler<ActionEvent> {
   
-  Prefs userPrefs;
+  UserPrefs userPrefs;
   
-  PortsItemEventHandler( Prefs pPrefs ){
+  PortsItemEventHandler( UserPrefs pPrefs ){
     userPrefs = pPrefs;
   }
 
@@ -65,8 +65,8 @@ public class PortsItemEventHandler implements EventHandler<ActionEvent> {
     inView = new ListView<String>( inPorts );
     outView = new ListView<String>( outPorts );
        
-    String lastInDevice = Prefs.getMidiInPort();
-    String lastOutDevice = Prefs.getMidiOutPort();
+    String lastInDevice = userPrefs.getMidiInPort();
+    String lastOutDevice = userPrefs.getMidiOutPort();
     int ipIx = -1, opIx = -1;
     
     MidiDevice device;

@@ -37,17 +37,19 @@ import javafx.collections.ObservableList;
 public class ScratchPad {
   
   ObservableList<EWI4000sPatch> patchList;
+  UserPrefs userPrefs;
   
   public static final String SCRATCHPAD_NAME = "SCRATCHPAD.BIN";
   
-  ScratchPad() {
+  ScratchPad( UserPrefs pPrefs ) {
+    userPrefs = pPrefs;
     patchList = FXCollections.observableArrayList();
   }
   
   // load the scratchpad from disk
   public boolean load() {
-	if (Prefs.getLibraryLocation().equals( "<Not Chosen>" )) return false;
-    Path spPath = Paths.get( Prefs.getLibraryLocation(), SCRATCHPAD_NAME );
+	if (userPrefs.getLibraryLocation().equals( "<Not Chosen>" )) return false;
+    Path spPath = Paths.get( userPrefs.getLibraryLocation(), SCRATCHPAD_NAME );
     try {
       byte[] allBytes = Files.readAllBytes( spPath );
       if ((allBytes != null) && allBytes.length > 200 ) {
@@ -68,7 +70,7 @@ public class ScratchPad {
   
   // write the scratchpad to disk
   public boolean store() {
-    Path spPath = Paths.get( Prefs.getLibraryLocation(), SCRATCHPAD_NAME );
+    Path spPath = Paths.get( userPrefs.getLibraryLocation(), SCRATCHPAD_NAME );
     try {
       Files.delete( spPath );
       Files.createFile( spPath );
@@ -103,7 +105,7 @@ public class ScratchPad {
   }
   
   public boolean clearAll() {
-    Path spPath = Paths.get( Prefs.getLibraryLocation(), SCRATCHPAD_NAME );
+    Path spPath = Paths.get( userPrefs.getLibraryLocation(), SCRATCHPAD_NAME );
     try {
       Files.delete( spPath );
       Files.createFile( spPath );

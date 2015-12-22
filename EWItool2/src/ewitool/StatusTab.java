@@ -23,36 +23,36 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 
 public class StatusTab extends Tab {
-	
+
   StatusLabel ewiField, epxField, scratchpadField, libLocField;
-	
-	StatusTab() {
-		this.setText( "Status" );
-		this.setClosable( false );
-		GridPane gp = new GridPane();
-		gp.setId( "status-grid" );
-				
-		gp.add( new Label( "EWI Connection" ), 0, 0 );
-		ewiField = new StatusLabel( "Not Connected" );
-		gp.add( ewiField, 1, 0 );
-		
-		gp.add( new Label( "EWI Patch Exchange (EPX) Connection" ), 0, 1 );
-		epxField = new StatusLabel( "Not Connected" );
-		gp.add( epxField, 1, 1 );
-		
+
+  StatusTab( UserPrefs userPrefs ) {
+    this.setText( "Status" );
+    this.setClosable( false );
+    GridPane gp = new GridPane();
+    gp.setId( "status-grid" );
+
+    gp.add( new Label( "EWI Connection" ), 0, 0 );
+    ewiField = new StatusLabel( "Not Connected" );
+    gp.add( ewiField, 1, 0 );
+
+    gp.add( new Label( "EWI Patch Exchange (EPX) Connection" ), 0, 1 );
+    epxField = new StatusLabel( "Not Connected" );
+    gp.add( epxField, 1, 1 );
+
     gp.add( new Label( "Library Location" ), 0, 2 );
-    libLocField = new StatusLabel( Prefs.getLibraryLocation() );
+    libLocField = new StatusLabel( userPrefs.getLibraryLocation() );
     gp.add( libLocField, 1, 2 );
-    
-		gp.add( new Label( "Patches on Scratchpad" ), 0, 3 );
-		scratchpadField = new StatusLabel( "0" );
-		gp.add( scratchpadField, 1, 3 );
-		
-		AnchorPane ap = new AnchorPane();
-		ap.getChildren().add( gp );
-		this.setContent( ap );
-		
-	}
+
+    gp.add( new Label( "Patches on Scratchpad" ), 0, 3 );
+    scratchpadField = new StatusLabel( "0" );
+    gp.add( scratchpadField, 1, 3 );
+
+    AnchorPane ap = new AnchorPane();
+    ap.getChildren().add( gp );
+    this.setContent( ap );
+
+  }
 
 }
 
@@ -61,5 +61,5 @@ class StatusLabel extends Label {
     setText( initVal );
     setId( "status-label" );
   }
-  
+
 }
