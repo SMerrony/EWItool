@@ -35,6 +35,9 @@ import javafx.scene.text.TextAlignment;
 import javafx.util.Callback;
 
 public class PatchEditorTab extends Tab {
+  
+  enum Osc { OSC1, OSC2 }
+  enum Filter { OSC_PRI, OSC_SEC, NOISE_PRI, NOISE_SEC }
     
   PatchEditorTab(SharedData sharedData, MidiHandler midiHandler) {
     setText( "Patch Editor" );
@@ -66,8 +69,8 @@ public class PatchEditorTab extends Tab {
     HBox.setHgrow( rSpaceRegion, Priority.ALWAYS );
     headerBox.getChildren().addAll( lSpaceRegion, patchList, rSpaceRegion );
     
-    UiOscGrid osc1Grid = new UiOscGrid( 0 );
-    UiOscGrid osc2Grid = new UiOscGrid( 1 );
+    UiOscGrid osc1Grid = new UiOscGrid( sharedData, midiHandler, Osc.OSC1 );
+    UiOscGrid osc2Grid = new UiOscGrid( sharedData, midiHandler, Osc.OSC2 );
     HBox oscBox = new HBox();
     oscBox.getChildren().addAll( osc1Grid, osc2Grid );
     
@@ -78,14 +81,14 @@ public class PatchEditorTab extends Tab {
     VBox.setVgrow( keyTriggerGrid, Priority.ALWAYS );
     subVbox.getChildren().addAll( formantGrid, keyTriggerGrid );
     subVbox.setMinWidth( 80.0 );
-    UiFilterGrid oscPriFilterGrid = new UiFilterGrid( 0, "Osc Primary Filter" );
-    UiFilterGrid oscSecFilterGrid = new UiFilterGrid( 1, "Osc Secondary Filter" );
+    UiFilterGrid oscPriFilterGrid = new UiFilterGrid( Filter.OSC_PRI );
+    UiFilterGrid oscSecFilterGrid = new UiFilterGrid( Filter.OSC_SEC );
     HBox filterBox = new HBox();    
     filterBox.getChildren().addAll( subVbox, oscPriFilterGrid, oscSecFilterGrid );
 
     UiNoiseGrid noiseGrid = new UiNoiseGrid();
-    UiFilterGrid noisePriFilterGrid = new UiFilterGrid( 0, "Noise Primary Filter" );
-    UiFilterGrid noiseSecFilterGrid = new UiFilterGrid( 1, "Noise Secondary Filter" );
+    UiFilterGrid noisePriFilterGrid = new UiFilterGrid( Filter.NOISE_PRI );
+    UiFilterGrid noiseSecFilterGrid = new UiFilterGrid( Filter.NOISE_SEC );
     HBox noiseBox = new HBox();
     noiseBox.getChildren().addAll( noiseGrid, noisePriFilterGrid, noiseSecFilterGrid );
     
@@ -118,6 +121,8 @@ public class PatchEditorTab extends Tab {
     		System.out.println( "DEBUG - Patch editor activated" );
     		patchList.getSelectionModel().select( sharedData.getEditingPatchNumber() );
     		patchList.scrollTo( sharedData.getEditingPatchNumber() );
+    		osc1Grid.setControls( sharedData, Osc.OSC1 );
+    		osc2Grid.setControls( sharedData, Osc.OSC2 );
     		chorusGrid.setControls( sharedData );
     		delayGrid.setControls( sharedData );
     		reverbGrid.setControls( sharedData );

@@ -17,6 +17,7 @@
 
 package ewitool;
 
+import ewitool.PatchEditorTab.Filter;
 import javafx.geometry.HPos;
 import javafx.geometry.Orientation;
 import javafx.scene.control.ChoiceBox;
@@ -36,7 +37,7 @@ public class UiFilterGrid extends GridPane {
          lfoFreqSlider, lfoBreathSlider, lfoDepthSlider, lfoThresholdSlider,
          sweepTimeSlider, sweepDepthSlider;
   
-  UiFilterGrid( int ix, String title ) {
+  UiFilterGrid( Filter filter ) {
     
     setId( "editor-grid" );
     
@@ -50,7 +51,21 @@ public class UiFilterGrid extends GridPane {
     
     getRowConstraints().addAll( fixedRC, vgrowRC, vgrowRC, vgrowRC, vgrowRC );
     
-    Label mainLabel = new Label( title );
+    Label mainLabel = new Label();
+    switch( filter ) {
+    case NOISE_PRI:
+      mainLabel.setText( "Primary Noise Filter" );
+      break;
+    case NOISE_SEC:
+      mainLabel.setText( "Secondary Noise Filter" );
+      break;
+    case OSC_PRI:
+      mainLabel.setText( "Primary Osc Filter" );
+      break;
+    case OSC_SEC:
+      mainLabel.setText( "Secondary Osc Filter" );
+      break;  
+    }
     mainLabel.setId( "editor-section-label" );
     GridPane.setColumnSpan( mainLabel, 2 );
     add( mainLabel, 0, 0 );
@@ -63,7 +78,7 @@ public class UiFilterGrid extends GridPane {
     
     add( new GroupLabel( "Sweep"), 5, 0 );
     
-    if (ix == 0) {
+    if (filter == Filter.NOISE_PRI || filter == Filter.OSC_PRI) {
       routingChoice = new ChoiceBox<String>();
       routingChoice.getItems().addAll( "1-only", "Linked", "Both" );
       add( routingChoice, 0, 1 );
