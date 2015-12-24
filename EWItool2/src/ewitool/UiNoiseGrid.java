@@ -31,7 +31,7 @@ public class UiNoiseGrid extends GridPane {
   
   Slider timeSlider, breathSlider, volSlider;
   
-  UiNoiseGrid() {
+  UiNoiseGrid( SharedData sharedData, MidiHandler midiHandler ) {
     
     setId( "editor-grid" );
     
@@ -42,12 +42,20 @@ public class UiNoiseGrid extends GridPane {
     timeSlider = new Slider( 0.0, 127.0, 0.0 );
     timeSlider.setOrientation( Orientation.HORIZONTAL );
     timeSlider.setMajorTickUnit( 32.0 );
+    timeSlider.valueProperty().addListener( (observable, oldVal, newVal)-> {
+      midiHandler.sendLiveControl( 0, 80, newVal.intValue() );
+      sharedData.editPatch.noiseTime = newVal.intValue();
+    });
     add( timeSlider, 0, 2 );
     add( new BoundBelowControlLabel( "Time", HPos.CENTER, timeSlider ), 0, 1 );
     
     breathSlider = new Slider( 0.0, 127.0, 0.0 );
     breathSlider.setOrientation( Orientation.HORIZONTAL );
     breathSlider.setMajorTickUnit( 32.0 );
+    breathSlider.valueProperty().addListener( (observable, oldVal, newVal)-> {
+      midiHandler.sendLiveControl( 1, 80, newVal.intValue() );
+      sharedData.editPatch.noiseBreath = newVal.intValue();
+    });
     add( breathSlider, 0, 4 );
     add( new BoundBelowControlLabel( "Breath", HPos.CENTER, breathSlider ), 0, 3 );
     
@@ -55,10 +63,19 @@ public class UiNoiseGrid extends GridPane {
     volSlider.setOrientation( Orientation.VERTICAL );
     volSlider.setMajorTickUnit( 32.0 );
     GridPane.setRowSpan( volSlider, 4 );
+    volSlider.valueProperty().addListener( (observable, oldVal, newVal)-> {
+      midiHandler.sendLiveControl( 2, 80, newVal.intValue() );
+      sharedData.editPatch.noiseLevel = newVal.intValue();
+    });
     add( volSlider, 1, 1 );
     add( new BoundBelowControlLabel( "Vol", HPos.CENTER, volSlider ), 1, 0 );
   }
   
+  void setControls( SharedData sharedData ) {
+    timeSlider.setValue( sharedData.editPatch.noiseTime );
+    breathSlider.setValue( sharedData.editPatch.noiseBreath );
+    volSlider.setValue( sharedData.editPatch.noiseLevel );
+  }
 
 
 }

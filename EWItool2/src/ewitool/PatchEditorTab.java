@@ -74,8 +74,8 @@ public class PatchEditorTab extends Tab {
     HBox oscBox = new HBox();
     oscBox.getChildren().addAll( osc1Grid, osc2Grid );
     
-    UiFormantGrid formantGrid = new UiFormantGrid();
-    UiKeyTriggerGrid keyTriggerGrid = new UiKeyTriggerGrid();
+    UiFormantGrid formantGrid = new UiFormantGrid( sharedData, midiHandler );
+    UiKeyTriggerGrid keyTriggerGrid = new UiKeyTriggerGrid( sharedData, midiHandler );
     VBox subVbox = new VBox();
     VBox.setVgrow( formantGrid, Priority.ALWAYS );
     VBox.setVgrow( keyTriggerGrid, Priority.ALWAYS );
@@ -86,7 +86,7 @@ public class PatchEditorTab extends Tab {
     HBox filterBox = new HBox();    
     filterBox.getChildren().addAll( subVbox, oscPriFilterGrid, oscSecFilterGrid );
 
-    UiNoiseGrid noiseGrid = new UiNoiseGrid();
+    UiNoiseGrid noiseGrid = new UiNoiseGrid( sharedData, midiHandler );
     UiFilterGrid noisePriFilterGrid = new UiFilterGrid( sharedData, midiHandler, Filter.NOISE_PRI );
     UiFilterGrid noiseSecFilterGrid = new UiFilterGrid( sharedData, midiHandler, Filter.NOISE_SEC );
     HBox noiseBox = new HBox();
@@ -116,32 +116,32 @@ public class PatchEditorTab extends Tab {
 
     // what to do when the tab is selected...
     this.setOnSelectionChanged( new EventHandler<Event>() {
-    	@Override
-    	public void handle(Event arg0) {
-    		System.out.println( "DEBUG - Patch editor activated" );
-    		patchList.getSelectionModel().select( sharedData.getEditingPatchNumber() );
-    		patchList.scrollTo( sharedData.getEditingPatchNumber() );
-    		osc1Grid.setControls( sharedData, Osc.OSC1 );
-    		osc2Grid.setControls( sharedData, Osc.OSC2 );
-    		oscPriFilterGrid.setControls( sharedData, Filter.OSC_PRI );
-    		oscSecFilterGrid.setControls( sharedData, Filter.OSC_SEC );
-    		noisePriFilterGrid.setControls( sharedData, Filter.NOISE_PRI );
-    		noiseSecFilterGrid.setControls( sharedData, Filter.NOISE_SEC );
-    		chorusGrid.setControls( sharedData );
-    		delayGrid.setControls( sharedData );
-    		reverbGrid.setControls( sharedData );
-    		biteGrid.setControls( sharedData );
-    		pitchBendGrid.setControls( sharedData );
-    		antiAliasGrid.setControls( sharedData );
-    		levelsGrid.setControls( sharedData );
-    		
-    		midiHandler.sendPatch( sharedData.editPatch, EWI4000sPatch.EWI_EDIT );
-    	}
-    }
-    );
+      @Override
+      public void handle(Event arg0) {
+	System.out.println( "DEBUG - Patch editor activated" );
+	patchList.getSelectionModel().select( sharedData.getEditingPatchNumber() );
+	patchList.scrollTo( sharedData.getEditingPatchNumber() );
+	osc1Grid.setControls( sharedData, Osc.OSC1 );
+	osc2Grid.setControls( sharedData, Osc.OSC2 );
+	formantGrid.setControls( sharedData );
+	keyTriggerGrid.setControls( sharedData );
+	oscPriFilterGrid.setControls( sharedData, Filter.OSC_PRI );
+	oscSecFilterGrid.setControls( sharedData, Filter.OSC_SEC );
+	noiseGrid.setControls( sharedData );
+	noisePriFilterGrid.setControls( sharedData, Filter.NOISE_PRI );
+	noiseSecFilterGrid.setControls( sharedData, Filter.NOISE_SEC );
+	chorusGrid.setControls( sharedData );
+	delayGrid.setControls( sharedData );
+	reverbGrid.setControls( sharedData );
+	biteGrid.setControls( sharedData );
+	pitchBendGrid.setControls( sharedData );
+	antiAliasGrid.setControls( sharedData );
+	levelsGrid.setControls( sharedData );
 
+	midiHandler.sendPatch( sharedData.editPatch, EWI4000sPatch.EWI_EDIT );
+      }
+    });
   }
-
 }
 
 // helper classes used for (dynamically) labelling the controls

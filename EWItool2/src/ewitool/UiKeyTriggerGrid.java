@@ -29,7 +29,7 @@ public class UiKeyTriggerGrid extends GridPane {
   
   ChoiceBox<String> keyTriggerChoice;
   
-  UiKeyTriggerGrid() {
+  UiKeyTriggerGrid( SharedData sharedData, MidiHandler midiHandler ) {
     
     setId( "editor-grid" );
     
@@ -40,7 +40,14 @@ public class UiKeyTriggerGrid extends GridPane {
 
     keyTriggerChoice = new ChoiceBox<String>();
     keyTriggerChoice.getItems().addAll( "Single", "Multi" );
+    keyTriggerChoice.setOnAction( (event) -> {
+      midiHandler.sendLiveControl( 7, 81, keyTriggerChoice.getSelectionModel().getSelectedIndex() );
+      sharedData.editPatch.formantFilter = keyTriggerChoice.getSelectionModel().getSelectedIndex(); 
+    });
     add( keyTriggerChoice, 0, 1 );
     
+  }
+  void setControls( SharedData sharedData ) {
+    keyTriggerChoice.getSelectionModel().select( sharedData.editPatch.keyTrigger );
   }
 }
