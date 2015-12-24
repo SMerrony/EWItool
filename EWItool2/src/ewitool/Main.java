@@ -192,7 +192,7 @@ public class Main extends Application {
 	@Override
 	public void handle( ActionEvent ae) {
 	  System.out.println( "DEBUG - Fetch All..." );
-	  Alert busyAlert = new Alert( AlertType.INFORMATION, "Fetching Patches..." );
+	  Alert busyAlert = new Alert( AlertType.INFORMATION, "Fetching all patches.  Please wait..." );
 	  busyAlert.setTitle( "EWItool" );
 	  busyAlert.setHeaderText( null );
 	  busyAlert.show();
