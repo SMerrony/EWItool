@@ -81,14 +81,14 @@ public class PatchEditorTab extends Tab {
     VBox.setVgrow( keyTriggerGrid, Priority.ALWAYS );
     subVbox.getChildren().addAll( formantGrid, keyTriggerGrid );
     subVbox.setMinWidth( 80.0 );
-    UiFilterGrid oscPriFilterGrid = new UiFilterGrid( Filter.OSC_PRI );
-    UiFilterGrid oscSecFilterGrid = new UiFilterGrid( Filter.OSC_SEC );
+    UiFilterGrid oscPriFilterGrid = new UiFilterGrid( sharedData, midiHandler, Filter.OSC_PRI );
+    UiFilterGrid oscSecFilterGrid = new UiFilterGrid( sharedData, midiHandler, Filter.OSC_SEC );
     HBox filterBox = new HBox();    
     filterBox.getChildren().addAll( subVbox, oscPriFilterGrid, oscSecFilterGrid );
 
     UiNoiseGrid noiseGrid = new UiNoiseGrid();
-    UiFilterGrid noisePriFilterGrid = new UiFilterGrid( Filter.NOISE_PRI );
-    UiFilterGrid noiseSecFilterGrid = new UiFilterGrid( Filter.NOISE_SEC );
+    UiFilterGrid noisePriFilterGrid = new UiFilterGrid( sharedData, midiHandler, Filter.NOISE_PRI );
+    UiFilterGrid noiseSecFilterGrid = new UiFilterGrid( sharedData, midiHandler, Filter.NOISE_SEC );
     HBox noiseBox = new HBox();
     noiseBox.getChildren().addAll( noiseGrid, noisePriFilterGrid, noiseSecFilterGrid );
     
@@ -123,6 +123,10 @@ public class PatchEditorTab extends Tab {
     		patchList.scrollTo( sharedData.getEditingPatchNumber() );
     		osc1Grid.setControls( sharedData, Osc.OSC1 );
     		osc2Grid.setControls( sharedData, Osc.OSC2 );
+    		oscPriFilterGrid.setControls( sharedData, Filter.OSC_PRI );
+    		oscSecFilterGrid.setControls( sharedData, Filter.OSC_SEC );
+    		noisePriFilterGrid.setControls( sharedData, Filter.NOISE_PRI );
+    		noiseSecFilterGrid.setControls( sharedData, Filter.NOISE_SEC );
     		chorusGrid.setControls( sharedData );
     		delayGrid.setControls( sharedData );
     		reverbGrid.setControls( sharedData );
