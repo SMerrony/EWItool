@@ -80,9 +80,6 @@ public class Main extends Application {
 
       tabPane = new TabPane();
 
-      statusTab = new StatusTab( userPrefs );
-      tabPane.getTabs().add( statusTab );
-
       scratchPadTab = new ScratchPadTab( scratchPad );
       tabPane.getTabs().add( scratchPadTab );
 
@@ -95,12 +92,14 @@ public class Main extends Application {
 
       currentPatchSetTab = new CurrentPatchSetTab( sharedData, scratchPad );
       tabPane.getTabs().add( currentPatchSetTab );
+      currentPatchSetTab.setDisable( true );
 
       keyPatchesTab = new KeyPatchesTab();
       tabPane.getTabs().add( keyPatchesTab );
 
       patchEditorTab = new PatchEditorTab( sharedData, midiHandler );
       tabPane.getTabs().add( patchEditorTab );
+      patchEditorTab.setDisable( true );
 
       // MIDI port assignment change listeners
       userPrefs.midiInPort.addListener( new ChangeListener<String>() {
@@ -148,6 +147,7 @@ public class Main extends Application {
     public void update( Observable o, Object arg ) {
       if ((int)arg == SharedData.EDIT_PATCH) {
 	System.out.println( "DEBUG - Main: noticed shared data change" );
+	patchEditorTab.setDisable( false );
 	tabPane.getSelectionModel().select( patchEditorTab );
       }
     }
@@ -201,6 +201,7 @@ public class Main extends Application {
 	    midiHandler.requestPatch( p );
 	  }
 	  busyAlert.close();
+	  currentPatchSetTab.setDisable( false );
 	  tabPane.getSelectionModel().select( currentPatchSetTab );
 	}
       });
