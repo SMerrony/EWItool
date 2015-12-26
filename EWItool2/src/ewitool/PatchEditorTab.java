@@ -21,9 +21,8 @@ import javafx.beans.binding.Bindings;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Tab;
 import javafx.scene.layout.GridPane;
@@ -32,7 +31,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
-import javafx.util.Callback;
 
 public class PatchEditorTab extends Tab {
   
@@ -43,31 +41,12 @@ public class PatchEditorTab extends Tab {
     setText( "Patch Editor" );
     setClosable( false );
       
-    ListView<EWI4000sPatch> patchList; // TODO - this occurs elsewhere eg. ScratchPadTab - abstract it out?
-	patchList = new ListView<EWI4000sPatch>( sharedData.ewiPatchList ); 
-
-    patchList.setCellFactory( new Callback<ListView<EWI4000sPatch>, ListCell<EWI4000sPatch>>(){
-      @Override 
-      public ListCell<EWI4000sPatch> call( ListView<EWI4000sPatch> p ) {
-        ListCell<EWI4000sPatch> cell = new ListCell<EWI4000sPatch>() {
-          @Override
-          protected void updateItem( EWI4000sPatch ep, boolean bln ) {
-            super.updateItem( ep, bln );
-            if (ep != null) {
-              setText( ep.patchNum + ": " + ep.getName() );
-            } else {
-              setText( "" );
-            }
-          }
-        };
-        return cell;
-      }
-    });
+    ComboBox<String> patchesCombo = new ComboBox<String>();
     HBox headerBox = new HBox();
     Region lSpaceRegion = new Region(), rSpaceRegion = new Region();
     HBox.setHgrow( lSpaceRegion, Priority.ALWAYS );
     HBox.setHgrow( rSpaceRegion, Priority.ALWAYS );
-    headerBox.getChildren().addAll( lSpaceRegion, patchList, rSpaceRegion );
+    headerBox.getChildren().addAll( lSpaceRegion, patchesCombo, rSpaceRegion );
     
     UiOscGrid osc1Grid = new UiOscGrid( sharedData, midiHandler, Osc.OSC1 );
     UiOscGrid osc2Grid = new UiOscGrid( sharedData, midiHandler, Osc.OSC2 );
@@ -119,8 +98,11 @@ public class PatchEditorTab extends Tab {
       @Override
       public void handle(Event arg0) {
 	System.out.println( "DEBUG - Patch editor activated" );
-	patchList.getSelectionModel().select( sharedData.getEditingPatchNumber() );
-	patchList.scrollTo( sharedData.getEditingPatchNumber() );
+	patchesCombo.getItems().clear();
+	for (int p = 0; p < EWI4000sPatch.EWI_NUM_PATCHES; p++) {
+	  patchesCombo.getItems().add( p + " - " + sharedData.ewiPatchList.get( p ).getName() );
+	}
+	patchesCombo.getSelectionModel().select( sharedData.getEditingPatchNumber() );
 	osc1Grid.setControls( sharedData, Osc.OSC1 );
 	osc2Grid.setControls( sharedData, Osc.OSC2 );
 	formantGrid.setControls( sharedData );

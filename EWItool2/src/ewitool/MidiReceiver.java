@@ -36,39 +36,62 @@ public class MidiReceiver implements Receiver {
   public void send( MidiMessage message, long timeStamp ) {
 
     // we are currently only interested in SysEx messages from the EWI
+    // Unfortunately the structure of the SysEx messages is not consistent - we 
+    // have to examine the first few bytes...
+
     if (message instanceof SysexMessage) {
       byte[] messageBytes = ((SysexMessage) message).getData();
-      switch( messageBytes[3] ) {
-      case MidiHandler.MIDI_PRESET_DUMP:
-        if (messageBytes.length != (MidiHandler.EWI_SYSEX_PRESET_DUMP_LEN - 1)) {
-          System.err.println( "Error - Invalid preset dump SysEx received from EWI");
-          return;
-        }
-        EWI4000sPatch thisPatch = new EWI4000sPatch();
-        for (int b = 0; b < (MidiHandler.EWI_SYSEX_PRESET_DUMP_LEN - 1); b++)
-          thisPatch.patchBlob[b+1] = messageBytes[b];
-        thisPatch.decodeBlob();
-        if (thisPatch.header[3] == MidiHandler.MIDI_SYSEX_ALLCHANNELS) {
-          int thisPatchNum = (int) thisPatch.patchNum; // FIXME ++?
-          if (thisPatchNum < 0 || thisPatchNum >= EWI4000sPatch.EWI_NUM_PATCHES) {
-            System.err.println( "Error - Invalid patch number (" + thisPatchNum + ") received from EWI");
-          } else {
-        	thisPatch.decodeBlob();
-            sharedData.ewiPatchList.add( thisPatch );
-            sharedData.setLastPatchLoaded( thisPatchNum );
-            sharedData.patchQ.add( thisPatchNum );
-            System.out.println( "DEBUG - MidiReceiver: Patch number: " + thisPatchNum + " received" );
-          }
-        }
-        break;
-      case MidiHandler.MIDI_QUICKPC_DUMP:
-        break;
-      default:
-        System.err.println( "Warning - Unrecognised SysEx type (" + messageBytes[4] + ") received from EWI");
-        break;
-      }
-    }
 
+      if (messageBytes[0] == MidiHandler.MIDI_SYSEX_AKAI_ID && 
+	  messageBytes[1] == MidiHandler.MIDI_SYSEX_AKAI_EWI4K &&
+	  messageBytes[2] == MidiHandler.MIDI_SYSEX_ALLCHANNELS) { // PATCH
+
+	if (messageBytes.length != (MidiHandler.EWI_SYSEX_PRESET_DUMP_LEN - 1)) {
+	  System.err.println( "Error - Invalid preset dump SysEx received from EWI (" + messageBytes.length + " bytes)" );
+	  return;
+	}
+	EWI4000sPatch thisPatch = new EWI4000sPatch();
+	for (int b = 0; b < (MidiHandler.EWI_SYSEX_PRESET_DUMP_LEN - 1); b++)
+	  thisPatch.patchBlob[b+1] = messageBytes[b];
+	thisPatch.decodeBlob();
+	if (thisPatch.header[3] == MidiHandler.MIDI_SYSEX_ALLCHANNELS) {
+	  int thisPatchNum = (int) thisPatch.patchNum; // FIXME ++?
+	  if (thisPatchNum < 0 || thisPatchNum >= EWI4000sPatch.EWI_NUM_PATCHES) {
+	    System.err.println( "Error - Invalid patch number (" + thisPatchNum + ") received from EWI");
+	  } else {
+	    thisPatch.decodeBlob();
+	    sharedData.ewiPatchList.add( thisPatch );
+	    sharedData.setLastPatchLoaded( thisPatchNum );
+	    sharedData.patchQ.add( thisPatchNum );
+	    System.out.println( "DEBUG - MidiReceiver: Patch number: " + thisPatchNum + " received" );
+	  }
+	}
+	return;
+      }
+      //      case MidiHandler.MIDI_QUICKPC_DUMP:
+      //	break;
+
+      if (messageBytes[0] == 0x7e && messageBytes[1] == 0x00) { // DEVICE ID
+	if (messageBytes.length != (MidiHandler.EWI_SYSEX_ID_RESPONSE_LEN - 1)) {
+	  sharedData.deviceIdQ.add( SharedData.DeviceIdResponse.WRONG_LENGTH );
+	  return;
+	}
+	if (messageBytes[4] != MidiHandler.MIDI_SYSEX_AKAI_ID) {
+	  sharedData.deviceIdQ.add( SharedData.DeviceIdResponse.NOT_AKAI );
+	  return;
+	}
+	if (messageBytes[5] != MidiHandler.MIDI_SYSEX_AKAI_EWI4K) {
+	  sharedData.deviceIdQ.add( SharedData.DeviceIdResponse.NOT_EWI4000S );
+	  return;
+	}
+	// Could get firmware version here too if needed...
+	System.out.println( "DEBUG - MidiReceiver got correct EWI4000s Device ID" );
+	sharedData.deviceIdQ.add( SharedData.DeviceIdResponse.IS_EWI4000S);
+	return;
+      }
+
+      System.err.println( "Warning - Unrecognised SysEx type received from EWI " + messageBytes[0] + " " + messageBytes[1]+ " " + messageBytes[2]+ " " + messageBytes[3] );
+    }
   }
 
   @Override

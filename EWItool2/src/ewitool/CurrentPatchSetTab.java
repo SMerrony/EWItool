@@ -1,10 +1,7 @@
 package ewitool;
 
-import java.util.Observable;
-import java.util.Observer;
 import java.util.Optional;
 
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
@@ -26,6 +23,7 @@ import javafx.scene.layout.RowConstraints;
 public class CurrentPatchSetTab extends Tab {
 
   Button[] patchButtons;
+  Button saveButton;
   SharedData sharedData;
   ScratchPad scratchPad;
 
@@ -76,31 +74,16 @@ public class CurrentPatchSetTab extends Tab {
         gp.add( patchButtons[ix], (c * 2 ) + 1, r );
       }
     }
-
-    DataWatcher sharedDataWatcher  = new DataWatcher();
-    sharedData.addObserver( sharedDataWatcher );
+    
+    saveButton = new Button( "Save to Library" );
+    gp.add( saveButton, 5, 20 );
 
     setContent( gp );   
   }
 
-  class DataWatcher implements Observer {
-
-    @Override
-    public void update( Observable o, Object arg ) {
-      if ((int)arg == SharedData.PATCH_LOADED) {
-        System.out.println( "DEBUG - CurrrentPatchSet: noticed shared data change" );
-        SharedData sd = (SharedData) o;
-        int p = sd.getLastPatchLoaded();
-        if (p != SharedData.NONE) {
-          System.out.println( "      - CurrrentPatchSet: last patch loaded: " + p );
-          Platform.runLater( new Runnable() {
-            @Override public void run() {
-              patchButtons[p].setText( sd.ewiPatchList.get(p).getName() );
-            }
-          });
-
-        }
-      }
+  public void updateLabels() { 
+    for (int p = 0; p <EWI4000sPatch.EWI_NUM_PATCHES; p++ ) {
+      patchButtons[p].setText( sharedData.ewiPatchList.get( p ).getName() );
     }
   }
 

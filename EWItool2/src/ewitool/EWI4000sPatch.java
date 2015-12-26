@@ -27,9 +27,8 @@
 package ewitool;
 
 import java.util.Arrays;
-import java.util.Observable;
 
-public class EWI4000sPatch extends Observable {
+public class EWI4000sPatch { // extends Observable {
   
   public final static int EWI_NUM_PATCHES  = 100;  // 0..99
   public final static int EWI_PATCH_LENGTH = 206;  // bytes
@@ -232,8 +231,8 @@ public class EWI4000sPatch extends Observable {
 
   public void setEmpty( boolean empty ) {
     this.empty = empty;
-    setChanged();
-    notifyObservers();
+    //setChanged();
+    //notifyObservers();
   }
   
   // the patch name is stored in the patch as a space-padded char[]

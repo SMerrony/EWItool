@@ -60,6 +60,9 @@ public class MidiHandler {
 
   public final static byte MIDI_SYSEX_HEADER     = (byte) 0b11110000; // 0xf0
   public final static byte MIDI_SYSEX_TRAILER    = (byte) 0b11110111; // 0xf7
+  public final static byte MIDI_SYSEX_GEN_INFO   = 0x06;
+  public final static byte MIDI_SYSEX_ID_REQ     = 0x01;
+  public final static byte MIDI_SYSEX_ID         = 0x02;
   public final static byte MIDI_SYSEX_AKAI_ID    = 0x47; 
   public final static byte MIDI_SYSEX_AKAI_EWI4K = 0x64;
   public final static byte MIDI_SYSEX_CHANNEL    = 0x00;
@@ -72,7 +75,8 @@ public class MidiHandler {
   public final static int  MAX_SYSEX_LENGTH      = 262144;
   public final static int  EWI_SYSEX_PRESET_DUMP_LEN = EWI4000sPatch.EWI_PATCH_LENGTH;
   public final static int  EWI_SYSEX_QUICKPC_DUMP_LEN = 91;
-  public final static int  MIDI_TIMEOUT_MS       = 1000;
+  public final static int  EWI_SYSEX_ID_RESPONSE_LEN = 15;
+  public final static int  MIDI_TIMEOUT_MS       = 3000;
   
   SharedData sharedData;
   UserPrefs userPrefs;
@@ -171,7 +175,6 @@ public class MidiHandler {
     //sharedData.ewiPatchList[p] = new EWI4000sPatch();
     
     byte[] reqMsg = new byte[6];
-    //reqMsg[0] = MIDI_SYSEX_HEADER;
     reqMsg[0] = MIDI_SYSEX_AKAI_ID;
     reqMsg[1] = MIDI_SYSEX_AKAI_EWI4K;
     reqMsg[2] = MIDI_SYSEX_CHANNEL;
@@ -179,20 +182,23 @@ public class MidiHandler {
     reqMsg[4] = (byte) p;
     reqMsg[5] = MIDI_SYSEX_TRAILER;
     SysexMessage sysEx;
+    boolean gotIt = false;
     try {
-      sysEx = new SysexMessage( SysexMessage.SYSTEM_EXCLUSIVE, reqMsg, reqMsg.length );
-      outDev.getReceiver().send( sysEx, -1 );
-      System.out.println( "DEBUG - Requested patch: " + p );
-      while (true) {
-        // wait for a patch to be received, or timeout
-        Integer pGot = sharedData.patchQ.poll( MIDI_TIMEOUT_MS, TimeUnit.MILLISECONDS );
-        if (pGot == null || pGot != p) {
-          // either timed-out or wrong (out-of-sync) patch, request again
-          outDev.getReceiver().send( sysEx, -1 );
-        } else 
-          // OK - carry on
-          break;
-      } 
+      while (!gotIt) {
+	sysEx = new SysexMessage( SysexMessage.SYSTEM_EXCLUSIVE, reqMsg, reqMsg.length );
+	outDev.getReceiver().send( sysEx, -1 );
+	System.out.println( "DEBUG - MidiHandler Sent request for patch: " + p );
+
+	// wait for a patch to be received, or timeout
+	Integer pGot = sharedData.patchQ.poll( MIDI_TIMEOUT_MS, TimeUnit.MILLISECONDS );
+	if (pGot == null)  {
+	  System.out.println( "DEBUG - MidiHandler patch request timed out" );
+	} else 	if (pGot == p) {
+	  break;
+	} else if (pGot != p) {
+	  System.out.println( "DEBUG - MidiHandler Got out-of-sync patch: " + p );
+	} 
+      }
     } catch( InvalidMidiDataException e ) {
       e.printStackTrace();
     } catch( MidiUnavailableException e ) {
@@ -201,13 +207,11 @@ public class MidiHandler {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
-
   }
-  
+
   void requestQuickPCs() {
     
     byte[] reqMsg = new byte[6];
-    // reqMsg[0] = MIDI_SYSEX_HEADER;
     reqMsg[0] = MIDI_SYSEX_AKAI_ID;
     reqMsg[1] = MIDI_SYSEX_AKAI_EWI4K;
     reqMsg[2] = MIDI_SYSEX_ALLCHANNELS;
@@ -224,6 +228,35 @@ public class MidiHandler {
       e.printStackTrace();
     }
 
+  }
+  
+  boolean requestDeviceID() {
+    byte[] reqMsg = new byte[5];
+    reqMsg[0] = 0x7E;
+    reqMsg[1] = MIDI_SYSEX_ALLCHANNELS;
+    reqMsg[2] = MIDI_SYSEX_GEN_INFO;
+    reqMsg[3] = MIDI_SYSEX_ID_REQ;
+    reqMsg[4] = MIDI_SYSEX_TRAILER;
+    System.out.println( "DEBUG - MidiHandler requesting Device ID" );
+    if (!sendSysEx( reqMsg )) return false;
+    try {
+      SharedData.DeviceIdResponse dId = sharedData.deviceIdQ.poll( MIDI_TIMEOUT_MS, TimeUnit.MILLISECONDS );
+      if (dId == SharedData.DeviceIdResponse.IS_EWI4000S) {
+	System.out.println( "DEBUG - MidiHandler found EWI4000s" );
+	sharedData.setEwiAttached( true );
+	return true;
+      } else if (dId == null) {
+	System.out.println( "DEBUG - MidiHandler did not find EWI4000s and timed out" );
+	sharedData.setEwiAttached( false );
+      } else {
+	System.out.println( "DEBUG - MidiHandler did not find EWI4000s and got unexpected response" );
+	sharedData.setEwiAttached( false );
+      }
+    } catch( InterruptedException e ) {
+      System.out.println( "DEBUG - MidiHandler did not EWI4000s and was interrupter" );
+    }
+    requestDeviceID();
+    return false;
   }
   
   boolean sendSysEx( final byte[] sysexBytes ) {

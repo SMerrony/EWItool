@@ -192,6 +192,7 @@ public class Main extends Application {
 	@Override
 	public void handle( ActionEvent ae) {
 	  System.out.println( "DEBUG - Fetch All..." );
+	  // midiHandler.requestDeviceID();
 	  Alert busyAlert = new Alert( AlertType.INFORMATION, "Fetching all patches.  Please wait..." );
 	  busyAlert.setTitle( "EWItool" );
 	  busyAlert.setHeaderText( null );
@@ -201,6 +202,7 @@ public class Main extends Application {
 	    midiHandler.requestPatch( p );
 	  }
 	  busyAlert.close();
+	  ((CurrentPatchSetTab) currentPatchSetTab).updateLabels();
 	  currentPatchSetTab.setDisable( false );
 	  tabPane.getSelectionModel().select( currentPatchSetTab );
 	}

@@ -17,12 +17,10 @@
 
 package ewitool;
 
+import java.util.ArrayList;
 import java.util.Observable;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 
 /**
  * @author steve
@@ -33,31 +31,39 @@ public class SharedData extends Observable {
   public final static int NONE = -1;
   public final static int PATCH_LOADED = 1;
   public final static int EDIT_PATCH   = 2;
+  public final static int EWI_CONNECTION = 3;
   
   private volatile int lastPatchLoaded,
                        editingPatchNumber;
+  private volatile boolean ewiAttached;
+  
+  enum DeviceIdResponse { WRONG_LENGTH, NOT_AKAI, NOT_EWI4000S, IS_EWI4000S }
   
   // We ASSUME that there are always NUM_EWI_PATCHES on this list once it is loaded...
-  ObservableList<EWI4000sPatch> ewiPatchList;
+  ArrayList<EWI4000sPatch> ewiPatchList;
+  //ObservableList<EWI4000sPatch> ewiPatchList;
   
   public volatile EWI4000sPatch editPatch;  // This is the patch currently being edited
   
   // Queues to synchronise requesting/receiving MIDI info
   BlockingQueue<Integer> patchQ, keyPatchQ;
+  BlockingQueue<DeviceIdResponse> deviceIdQ;
   
   SharedData() {
     lastPatchLoaded = NONE;
     editingPatchNumber = NONE;
     editPatch = new EWI4000sPatch();
-    ewiPatchList = FXCollections.observableArrayList();
+    ewiPatchList = new ArrayList<EWI4000sPatch>(); //FXCollections.observableArrayList();
     patchQ = new LinkedBlockingQueue<Integer>();
     keyPatchQ = new LinkedBlockingQueue<Integer>();
+    deviceIdQ = new LinkedBlockingQueue<DeviceIdResponse>();
   }
   
   public void clear() {
     ewiPatchList.clear();
     setLastPatchLoaded( NONE );
     setEditingPatchNumber( NONE );
+    patchQ.clear();
   }
   
   public int getLastPatchLoaded() {
@@ -66,8 +72,21 @@ public class SharedData extends Observable {
   
   public void setLastPatchLoaded( int p ) {
     lastPatchLoaded = p;
-    setChanged();
-    notifyObservers( PATCH_LOADED );
+    // Notification seems dangerous as it causes GUI updates to occur on the (implicit) MIDI listener thread...
+    //setChanged();
+    //notifyObservers( PATCH_LOADED );
+  }
+  
+  public boolean getEwiAttached() {
+    return ewiAttached;
+  }
+  
+  public void setEwiAttached( boolean isIt ) {
+    if (isIt != ewiAttached) {
+      ewiAttached = isIt;
+      setChanged();
+      notifyObservers( EWI_CONNECTION );
+    }
   }
 
   public int getEditingPatchNumber() {
