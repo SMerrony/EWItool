@@ -64,7 +64,7 @@ public class CurrentPatchSetTab extends Tab {
       gp.getRowConstraints().add( rc );
       for (int c = 0; c < 5; c++) {
         int ix = (c * 20 ) + r;
-        gp.add( new Label( Integer.toString( ix ) ), c * 2, r );
+        gp.add( new Label( Integer.toString( (ix + 1) % 100 ) ), c * 2, r );
         patchButtons[ix] = new Button( "<Empty>" );  // TODO Create method to do this
         patchButtons[ix].setUserData( ix );  // store the patch number 
         patchButtons[ix].setMinWidth( 40.0 );
@@ -124,7 +124,7 @@ public class CurrentPatchSetTab extends Tab {
         sharedData.setEditingPatchNumber( (int) ((Button)ae.getSource()).getUserData() );
         // editor tab should detect the change and self-activate
       } else if ( rc.get() == copyType) {
-        
+        scratchPad.addPatch( sharedData.ewiPatchList.get( (int) ((Button)ae.getSource()).getUserData() ) );
       } else if ( rc.get() == replaceType) {
         if (spChoice.getSelectionModel().getSelectedIndex() >= 0) {
           int pNum = (int) ((Button)ae.getSource()).getUserData();
