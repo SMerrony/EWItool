@@ -39,7 +39,6 @@ import java.util.concurrent.TimeUnit;
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiDevice;
 import javax.sound.midi.MidiSystem;
-import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Receiver;
 import javax.sound.midi.Sequencer;
 import javax.sound.midi.ShortMessage;
@@ -80,7 +79,8 @@ public class MidiHandler {
   
   SharedData sharedData;
   UserPrefs userPrefs;
-  MidiDevice inDev = null, outDev = null; 
+  MidiDevice inDev = null, outDev = null;
+  Receiver midiIn, midiOut;
   
   MidiHandler( SharedData pSharedData, UserPrefs pUserPrefs ) {
     
@@ -88,7 +88,6 @@ public class MidiHandler {
     userPrefs = pUserPrefs;
      
     MidiDevice device;
-    Receiver midiIn;
     MidiDevice.Info[] infos = MidiSystem.getMidiDeviceInfo();
     for (int d = 0; d < infos.length; d++) {
       try {
@@ -98,6 +97,7 @@ public class MidiHandler {
             if (infos[d].getName().equals( userPrefs.midiOutPort.getValue() )) {
               outDev = MidiSystem.getMidiDevice( infos[d] );
               outDev.open();
+              midiOut = outDev.getReceiver();
               //midiOut = new MidiSender();
               System.out.println( "Debug - OUT Port: " + infos[d].getName());
             }
@@ -119,8 +119,8 @@ public class MidiHandler {
   }
   
   public void close() {
-    if (outDev != null) outDev.close();
-    if (inDev !=null) inDev.close();
+    if (outDev != null) { midiOut.close(); outDev.close(); }
+    if (inDev !=null) { midiIn.close(); inDev.close(); }
   }
 
   /**
@@ -141,6 +141,7 @@ public class MidiHandler {
             if (infos[d].getName().equals( userPrefs.midiOutPort.getValue() )) {
               outDev = MidiSystem.getMidiDevice( infos[d] );
               outDev.open();
+              midiOut = outDev.getReceiver();
               //midiOut = new MidiSender();
               System.out.println( "Debug - OUT Port: " + infos[d].getName());
             }
@@ -165,14 +166,12 @@ public class MidiHandler {
     sharedData.clear();
   }
   
-  void requestPatch( int p ) {
+  synchronized void requestPatch( final int p ) {
     
-    if (p < 0 || p > EWI4000sPatch.EWI_NUM_PATCHES) {
+    if (p < 0 || p >= EWI4000sPatch.EWI_NUM_PATCHES) {
       System.err.println( "Error - Attempt to request out-of-range patch (" + p + ")" );
       System.exit( 1 );
     }
-    
-    //sharedData.ewiPatchList[p] = new EWI4000sPatch();
     
     byte[] reqMsg = new byte[6];
     reqMsg[0] = MIDI_SYSEX_AKAI_ID;
@@ -181,35 +180,31 @@ public class MidiHandler {
     reqMsg[3] = MIDI_PRESET_DUMP_REQ;
     reqMsg[4] = (byte) p;
     reqMsg[5] = MIDI_SYSEX_TRAILER;
-    SysexMessage sysEx;
     boolean gotIt = false;
     try {
       while (!gotIt) {
-	sysEx = new SysexMessage( SysexMessage.SYSTEM_EXCLUSIVE, reqMsg, reqMsg.length );
-	outDev.getReceiver().send( sysEx, -1 );
-	System.out.println( "DEBUG - MidiHandler Sent request for patch: " + p );
+	System.out.println( "DEBUG - MidiHandler Sending request for patch: " + p );
+	sendSysEx( reqMsg );
 
 	// wait for a patch to be received, or timeout
 	Integer pGot = sharedData.patchQ.poll( MIDI_TIMEOUT_MS, TimeUnit.MILLISECONDS );
 	if (pGot == null)  {
 	  System.out.println( "DEBUG - MidiHandler patch request timed out" );
+	  sharedData.patchQ.clear();
+	  sendSystemReset();
 	} else 	if (pGot == p) {
-	  break;
+	  gotIt = true;
 	} else if (pGot != p) {
 	  System.out.println( "DEBUG - MidiHandler Got out-of-sync patch: " + p );
+	  sharedData.patchQ.clear();
 	} 
       }
-    } catch( InvalidMidiDataException e ) {
-      e.printStackTrace();
-    } catch( MidiUnavailableException e ) {
-      e.printStackTrace();
     } catch( InterruptedException e ) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
   }
 
-  void requestQuickPCs() {
+  synchronized void requestQuickPCs() {
     
     byte[] reqMsg = new byte[6];
     reqMsg[0] = MIDI_SYSEX_AKAI_ID;
@@ -221,16 +216,14 @@ public class MidiHandler {
     SysexMessage sysEx;
     try {
       sysEx = new SysexMessage( SysexMessage.SYSTEM_EXCLUSIVE, reqMsg, reqMsg.length );
-      outDev.getReceiver().send( sysEx, -1 );
+      midiOut.send( sysEx, -1 );
     } catch( InvalidMidiDataException e ) {
-      e.printStackTrace();
-    } catch( MidiUnavailableException e ) {
       e.printStackTrace();
     }
 
   }
   
-  boolean requestDeviceID() {
+  synchronized boolean requestDeviceID() {
     byte[] reqMsg = new byte[5];
     reqMsg[0] = 0x7E;
     reqMsg[1] = MIDI_SYSEX_ALLCHANNELS;
@@ -253,28 +246,31 @@ public class MidiHandler {
 	sharedData.setEwiAttached( false );
       }
     } catch( InterruptedException e ) {
-      System.out.println( "DEBUG - MidiHandler did not EWI4000s and was interrupter" );
+      System.out.println( "DEBUG - MidiHandler did not EWI4000s and was interrupted" );
     }
     requestDeviceID();
     return false;
   }
   
-  boolean sendSysEx( final byte[] sysexBytes ) {
+  // all SysEx requests must go via this method - which is synchronised to avoid overlapping requests
+  synchronized boolean sendSysEx( final byte[] sysexBytes ) {
     try {
       SysexMessage sysEx = new SysexMessage( SysexMessage.SYSTEM_EXCLUSIVE, sysexBytes, sysexBytes.length );
-      outDev.getReceiver().send( sysEx, -1 );
+      midiOut.send( sysEx, -1 );
     } catch( InvalidMidiDataException e ) {
        e.printStackTrace();
        return false;
-    } catch( MidiUnavailableException e ) {
-      e.printStackTrace();
-      return false;
     }
     // FIXME ?The Qt version had a SLEEP(250) here?
+//    try {
+//      Thread.sleep( 250 );
+//    } catch( InterruptedException e ) {
+//      e.printStackTrace();
+//    }
     return true;
   }
 
-  boolean sendPatch( EWI4000sPatch patch, final byte mode ) {
+  synchronized boolean sendPatch( EWI4000sPatch patch, final byte mode ) {
     patch.mode = mode;
     if (!sendSysEx( patch.patchBlob )) return false;
     if (mode == EWI4000sPatch.EWI_EDIT) {
@@ -286,28 +282,39 @@ public class MidiHandler {
     return true;
   }
   
-  boolean sendControlChange( int cc, int val, int ch ) {
+  synchronized boolean sendControlChange( int cc, int val, int ch ) {
     try {
       ShortMessage sm = new ShortMessage( ShortMessage.CONTROL_CHANGE, ch, cc, val );
-      outDev.getReceiver().send( sm, -1 );
+      midiOut.send( sm, -1 );
     } catch( InvalidMidiDataException e ) {
       e.printStackTrace();
       return false;
-    } catch( MidiUnavailableException e ) {
-      e.printStackTrace();
-      return false;
-    }
-    
+    }    
     return true;
   }
   
-  boolean sendLiveControl( int lsb, int msb, int cValue ) {
+  synchronized boolean sendLiveControl( int lsb, int msb, int cValue ) {
     sendControlChange( MIDI_CC_NRPN_LSB, lsb, 0 );
     sendControlChange( MIDI_CC_NRPN_MSB, msb, 0 );
     sendControlChange( MIDI_CC_DATA_ENTRY, cValue, 0 );
     sendControlChange( MIDI_CC_NRPN_LSB, 127, 0 );
     sendControlChange( MIDI_CC_NRPN_MSB, 127, 0 );
     return true;
+  }
+  
+  synchronized void sendSystemReset() {
+    try {
+      System.out.println( "DEBUG - MidiHandler sending System Reset to EWI" );
+      ShortMessage sm = new ShortMessage( ShortMessage.SYSTEM_RESET );
+      midiOut.send(  sm,  -1 );
+    } catch( InvalidMidiDataException e ) {
+      e.printStackTrace();
+    } 
+    try {
+      Thread.sleep( 3000 );
+    } catch( InterruptedException e ) {
+      e.printStackTrace();
+    }
   }
   
 }
