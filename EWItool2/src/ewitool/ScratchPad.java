@@ -72,7 +72,7 @@ public class ScratchPad {
   public boolean store() {
     Path spPath = Paths.get( userPrefs.getLibraryLocation(), SCRATCHPAD_NAME );
     try {
-      Files.delete( spPath );
+      Files.deleteIfExists( spPath );
       Files.createFile( spPath );
       for (int p = 0; p < patchList.size(); p++){
         Files.write( spPath, patchList.get( p ).patchBlob, StandardOpenOption.APPEND );

@@ -121,6 +121,13 @@ public class ScratchPadTab extends Tab {
     gp.add( renameButton, 3, 0 );	
 
     viewHexButton = new Button( "View in Hex" );
+    viewHexButton.setOnAction( (event) -> {
+      if (patchList.getSelectionModel().getSelectedIndex() != -1) {
+	byte[] blob = scratchPad.patchList.get( patchList.getSelectionModel().getSelectedIndex() ).patchBlob;
+        UiHexViewDialog hexDialog = new UiHexViewDialog( blob );
+        hexDialog.showAndWait();
+      }
+    }); 
     gp.add( viewHexButton, 1, 1 );
 
     exchangeButton = new Button( "Prepare to Exchange" );
