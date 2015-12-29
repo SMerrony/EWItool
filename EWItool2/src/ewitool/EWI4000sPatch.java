@@ -260,6 +260,15 @@ public class EWI4000sPatch { // extends Observable {
     patchNum = numByte;
     patchBlob[5] = numByte;
   }
+  
+  public void setPatchMode( byte newMode ) {
+    if (newMode != EWI_SAVE && newMode != EWI_EDIT) {
+      System.err.println( "Error - Internal error in EWI4000sPatch: Invalid Edit/Save mode requested" );
+      System.exit( 1 );
+    }
+    mode = newMode;
+    patchBlob[4] = mode;
+  }
 
   void decodeBlob() {
      header = Arrays.copyOfRange( patchBlob, 0, 4 );
@@ -337,6 +346,16 @@ public class EWI4000sPatch { // extends Observable {
   
   void encodeBlob() {
     
+  }
+  
+  /* return a copy of all but the first byte of the blob
+   * 
+   */
+  public byte[] sendableBlob() {
+    byte[] sendable = new byte[EWI_PATCH_LENGTH - 1];
+    for (int b = 1; b < EWI_PATCH_LENGTH; b++)
+      sendable[b-1] = patchBlob[b];
+    return sendable;
   }
   
   public static String toHex( byte[] blob, boolean addSpaces ) {
