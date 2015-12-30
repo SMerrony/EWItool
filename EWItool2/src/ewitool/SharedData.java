@@ -48,6 +48,7 @@ public class SharedData extends Observable {
   // Queues to synchronise requesting/receiving MIDI info
   BlockingQueue<Integer> patchQ, keyPatchQ;
   BlockingQueue<DeviceIdResponse> deviceIdQ;
+  BlockingQueue<SendMsg> sendQ;
   
   SharedData() {
     lastPatchLoaded = NONE;
@@ -57,6 +58,7 @@ public class SharedData extends Observable {
     patchQ = new LinkedBlockingQueue<Integer>();
     keyPatchQ = new LinkedBlockingQueue<Integer>();
     deviceIdQ = new LinkedBlockingQueue<DeviceIdResponse>();
+    sendQ = new LinkedBlockingQueue<SendMsg>();
   }
   
   public void clear() {

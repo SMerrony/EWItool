@@ -33,7 +33,7 @@ public class MidiReceiver implements Receiver {
   }
 
   @Override
-  public void send( MidiMessage message, long timeStamp ) {
+  public synchronized void send( MidiMessage message, long timeStamp ) {
 
     // we are currently only interested in SysEx messages from the EWI
     // Unfortunately the structure of the SysEx messages is not consistent - we 
@@ -43,23 +43,23 @@ public class MidiReceiver implements Receiver {
       byte[] messageBytes = ((SysexMessage) message).getData();
 
       if (messageBytes[0] == MidiHandler.MIDI_SYSEX_AKAI_ID && 
-	  messageBytes[1] == MidiHandler.MIDI_SYSEX_AKAI_EWI4K &&
-	  messageBytes[2] == MidiHandler.MIDI_SYSEX_ALLCHANNELS) { // PATCH
+	  messageBytes[1] == MidiHandler.MIDI_SYSEX_AKAI_EWI4K /* &&
+	  messageBytes[2] == MidiHandler.MIDI_SYSEX_ALLCHANNELS */) { // PATCH
 
 	if (messageBytes.length != (MidiHandler.EWI_SYSEX_PRESET_DUMP_LEN - 1)) {
 	  System.err.println( "Error - Invalid preset dump SysEx received from EWI (" + messageBytes.length + " bytes)" );
 	  return;
 	}
 	EWI4000sPatch thisPatch = new EWI4000sPatch();
-	for (int b = 0; b < (MidiHandler.EWI_SYSEX_PRESET_DUMP_LEN - 1); b++)
-	  thisPatch.patchBlob[b+1] = messageBytes[b];
+	thisPatch.patchBlob[0] = (byte) 0b11110000; // 0xf0
+	for (int b = 0; b < (MidiHandler.EWI_SYSEX_PRESET_DUMP_LEN - 1); b++) thisPatch.patchBlob[b+1] = messageBytes[b];
+	thisPatch.patchBlob[MidiHandler.EWI_SYSEX_PRESET_DUMP_LEN - 1] = (byte) 0b11110111; // 0xf7
 	thisPatch.decodeBlob();
 	if (thisPatch.header[3] == MidiHandler.MIDI_SYSEX_ALLCHANNELS) {
-	  int thisPatchNum = (int) thisPatch.patchNum; // FIXME ++?
+	  int thisPatchNum = (int) thisPatch.patchNum;                            // FIXME Adjust patch number++ ???
 	  if (thisPatchNum < 0 || thisPatchNum >= EWI4000sPatch.EWI_NUM_PATCHES) {
 	    System.err.println( "Error - Invalid patch number (" + thisPatchNum + ") received from EWI");
 	  } else {
-	    thisPatch.decodeBlob();
 	    sharedData.ewiPatchList.add( thisPatch );
 	    sharedData.setLastPatchLoaded( thisPatchNum );
 	    sharedData.patchQ.add( thisPatchNum );
@@ -90,7 +90,7 @@ public class MidiReceiver implements Receiver {
 	return;
       }
 
-      System.err.println( "Warning - Unrecognised SysEx type received from EWI " + messageBytes[0] + " " + messageBytes[1]+ " " + messageBytes[2]+ " " + messageBytes[3] );
+      System.err.println( "Warning - Unrecognised SysEx type of length " + messageBytes.length + " received from EWI, starting: " + messageBytes[0] + " " + messageBytes[1]+ " " + messageBytes[2] );
     }
   }
 
