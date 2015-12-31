@@ -82,8 +82,10 @@ public class CurrentPatchSetTab extends Tab {
   }
 
   public void updateLabels() { 
-    for (int p = 0; p <EWI4000sPatch.EWI_NUM_PATCHES; p++ ) {
-      patchButtons[p].setText( sharedData.ewiPatchList.get( p ).getName() );
+    if (sharedData.ewiPatchList.size() > 0) {
+      for (int p = 0; p <EWI4000sPatch.EWI_NUM_PATCHES; p++ ) {
+        patchButtons[p].setText( sharedData.ewiPatchList.get( p ).getName() );
+      }
     }
   }
 
