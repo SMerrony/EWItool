@@ -29,7 +29,6 @@ import javax.sound.midi.MidiSystem;
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Receiver;
 import javax.sound.midi.Sequencer;
-import javax.sound.midi.ShortMessage;
 import javax.sound.midi.Synthesizer;
 import javax.sound.midi.SysexMessage;
 
@@ -53,6 +52,7 @@ public class MidiHandler {
   public final static byte MIDI_SYSEX_AKAI_ID    = 0x47; // 71.
   public final static byte MIDI_SYSEX_AKAI_EWI4K = 0x64; // 100.
   public final static byte MIDI_SYSEX_CHANNEL    = 0x00;
+  public final static byte MIDI_SYSEX_NONREALTIME = 0x7e;
   public final static byte MIDI_SYSEX_ALLCHANNELS = 0x7f;
 
   public final static byte MIDI_CC_DATA_ENTRY    = 0x06;
@@ -63,10 +63,14 @@ public class MidiHandler {
   public final static int  EWI_SYSEX_PRESET_DUMP_LEN = EWI4000sPatch.EWI_PATCH_LENGTH;
   public final static int  EWI_SYSEX_QUICKPC_DUMP_LEN = 91;
   public final static int  EWI_SYSEX_ID_RESPONSE_LEN = 15;
+  // N.B. MIDI_TIMEOUT_MS must be significantly longer than MIDI_MESSAGE_SPACER_MS
+  // otherwise send & receive can get out of sync
+  public final static int  MIDI_MESSAGE_SPACER_MS = 100;
   public final static int  MIDI_TIMEOUT_MS       = 3000;
   
   SharedData sharedData;
   UserPrefs userPrefs;
+  Thread sendThread;
   MidiDevice inDev = null, outDev = null;
   Receiver midiIn, midiOut;
   
@@ -74,7 +78,6 @@ public class MidiHandler {
     
     sharedData = pSharedData;
     userPrefs = pUserPrefs;
-     
     MidiDevice device;
     MidiDevice.Info[] infos = MidiSystem.getMidiDeviceInfo();
     for (int d = 0; d < infos.length; d++) {
@@ -96,21 +99,9 @@ public class MidiHandler {
 		e1.printStackTrace();
 		System.err.println( "Error - MidiHandler() could not open chosen MIDI OUT device" );
 	      }
-	      try {
-		midiOut = outDev.getReceiver();
-	      } catch( MidiUnavailableException e ) {
-		e.printStackTrace();
-		System.err.println( "Error - MidiHandler() could not get chosen MIDI OUT receiver" );
-	      }
-	      Thread sendThread;
-	      (sendThread = new Thread( new MidiSender( sharedData.sendQ, midiOut ) )).start();
+
+	      (sendThread = new Thread( new MidiSender( sharedData.sendQ, outDev ) )).start();
 	      sendThread.setName( "EWItool MIDI Sender" );
-/*	      try {
-		outDev.getTransmitter().setReceiver( midiOut );
-	      } catch( MidiUnavailableException e ) {
-		e.printStackTrace();
-		System.err.println( "Error - MidiHandler() could not set chosen MIDI OUT receiver" );
-	      }*/
 	      System.out.println( "Debug - OUT Port: " + infos[d].getName());
 	    }
 	  } else if (device.getMaxTransmitters() != 0) {
@@ -142,7 +133,7 @@ public class MidiHandler {
   }
 
   public void close() {
-    if (outDev != null && outDev.isOpen()) { midiOut.close(); outDev.close(); }
+    if (sendThread != null && sendThread.isAlive()) sendThread.interrupt();
     if (inDev !=null && inDev.isOpen()) { midiIn.close(); inDev.close(); }
   }
 
@@ -169,29 +160,25 @@ public class MidiHandler {
       System.exit( 1 );
     }
     
-    byte[] reqMsg = new byte[6];
-    reqMsg[0] = MIDI_SYSEX_AKAI_ID;
-    reqMsg[1] = MIDI_SYSEX_AKAI_EWI4K;
-    reqMsg[2] = MIDI_SYSEX_CHANNEL;
-    reqMsg[3] = MIDI_PRESET_DUMP_REQ;
-    reqMsg[4] = (byte) p;
-    reqMsg[5] = MIDI_SYSEX_TRAILER;
+    byte[] reqMsg = new byte[7];
+    reqMsg[0] = MIDI_SYSEX_HEADER;
+    reqMsg[1] = MIDI_SYSEX_AKAI_ID;	// 0x47 71.
+    reqMsg[2] = MIDI_SYSEX_AKAI_EWI4K;	// 0x64 100.
+    reqMsg[3] = MIDI_SYSEX_CHANNEL;	// 0x00
+    reqMsg[4] = MIDI_PRESET_DUMP_REQ;	// 0x40 64.
+    reqMsg[5] = (byte) p;
+    reqMsg[6] = MIDI_SYSEX_TRAILER;	// 0xf7 -9.
     boolean gotIt = false;
     try {
       while (!gotIt) {
-	while (!sharedData.patchQ.isEmpty()) {
-	  System.out.println( "DEBUG - MidiHandler waiting for patchQ to empty before reqeusting (next) patch" ); 
-	  Thread.sleep( 250 );
-	}
 	System.out.println( "DEBUG - MidiHandler Sending request for patch: " + p );
-	if (!sendSysEx( reqMsg )) continue;
-
+	sendSysEx( reqMsg.clone() );
 	// wait for a patch to be received, or timeout
 	Integer pGot = sharedData.patchQ.poll( MIDI_TIMEOUT_MS, TimeUnit.MILLISECONDS );
 	if (pGot == null)  {
 	  System.out.println( "DEBUG - MidiHandler patch request timed out" );
 	  sharedData.patchQ.clear();
-	  sendSystemReset();
+	  // sendSystemReset();
 	} else 	if (pGot == p) {
 	  gotIt = true;
 	} else if (pGot != p) {
@@ -224,14 +211,15 @@ public class MidiHandler {
   }
   
   synchronized boolean requestDeviceID() {
-    byte[] reqMsg = new byte[5];
-    reqMsg[0] = 0x7E;
-    reqMsg[1] = MIDI_SYSEX_ALLCHANNELS;
-    reqMsg[2] = MIDI_SYSEX_GEN_INFO;
-    reqMsg[3] = MIDI_SYSEX_ID_REQ;
-    reqMsg[4] = MIDI_SYSEX_TRAILER;
+    byte[] reqMsg = new byte[6];
+    reqMsg[0] = MIDI_SYSEX_HEADER;
+    reqMsg[1] = MIDI_SYSEX_NONREALTIME;
+    reqMsg[2] = MIDI_SYSEX_ALLCHANNELS;
+    reqMsg[3] = MIDI_SYSEX_GEN_INFO;
+    reqMsg[4] = MIDI_SYSEX_ID_REQ;
+    reqMsg[5] = MIDI_SYSEX_TRAILER;
     System.out.println( "DEBUG - MidiHandler requesting Device ID" );
-    if (!sendSysEx( reqMsg )) return false;
+    sendSysEx( reqMsg.clone() );
     try {
       SharedData.DeviceIdResponse dId = sharedData.deviceIdQ.poll( MIDI_TIMEOUT_MS, TimeUnit.MILLISECONDS );
       if (dId == SharedData.DeviceIdResponse.IS_EWI4000S) {
@@ -253,56 +241,32 @@ public class MidiHandler {
   }
   
   // all SysEx requests must go via this method - which is synchronised to avoid overlapping requests
- synchronized boolean sendSysEx( final byte[] sysexBytes ) {
+  synchronized void sendSysEx( final byte[] sysexBytes ) {
    SendMsg msg = new SendMsg();
    msg.msgType = SendMsg.MsgType.SYSEX;
    msg.bytes = sysexBytes;
    sharedData.sendQ.add( msg );
-//   SendMsg msg = new SendMsg();
-//   
-//    try {
-//      SysexMessage sysEx = new SysexMessage( SysexMessage.SYSTEM_EXCLUSIVE, sysexBytes, sysexBytes.length );
-//      if (!outDev.isOpen()) {
-//	System.err.println( "Error - MidiHandler: Attempt to sendSysEx to closed MIDI device" );
-//	return false;
-//      }
-//      midiOut.send( sysEx, -1 );
-//    } catch( InvalidMidiDataException e ) {
-//       e.printStackTrace();
-//       return false;
-//    }
-    // FIXME ?The Qt version had a SLEEP(250) here?
-//    try {
-//      Thread.sleep( 250 );
-//    } catch( InterruptedException e ) {
-//      e.printStackTrace();
-//    }
-    return true;
   }
 
   synchronized boolean sendPatch( EWI4000sPatch patch, final byte mode ) {
     patch.setPatchMode( mode );
-    if (!sendSysEx( patch.sendableBlob() )) return false;
+    sendSysEx( patch.patchBlob );
     if (mode == EWI4000sPatch.EWI_EDIT) {
       // if we're going to edit we need to send it again as patch 0 with the 
       // edit flag still set...  
       patch.setPatchNum( (byte) 0x00 );
-      if (!sendSysEx( patch.sendableBlob() )) {
-	return false;
-      }
+      sendSysEx( patch.patchBlob );
     }
     return true;
   }
   
-  synchronized boolean sendControlChange( int cc, int val, int ch ) {
-    try {
-      ShortMessage sm = new ShortMessage( ShortMessage.CONTROL_CHANGE, ch, cc, val );
-      midiOut.send( sm, -1 );
-    } catch( InvalidMidiDataException e ) {
-      e.printStackTrace();
-      return false;
-    }    
-    return true;
+  synchronized void sendControlChange( int cc, int val, int ch ) {
+    SendMsg msg = new SendMsg();
+    msg.msgType = SendMsg.MsgType.CC;
+    msg.cc = cc;
+    msg.value = val;
+    msg.channel = ch;
+    sharedData.sendQ.add( msg );
   }
   
   synchronized boolean sendLiveControl( int lsb, int msb, int cValue ) {
@@ -315,18 +279,9 @@ public class MidiHandler {
   }
   
   synchronized void sendSystemReset() {
-    try {
-      System.out.println( "DEBUG - MidiHandler sending System Reset to EWI" );
-      ShortMessage sm = new ShortMessage( ShortMessage.SYSTEM_RESET );
-      midiOut.send(  sm,  -1 );
-    } catch( InvalidMidiDataException e ) {
-      e.printStackTrace();
-    } 
-    try {
-      Thread.sleep( 3000 );
-    } catch( InterruptedException e ) {
-      e.printStackTrace();
-    }
+    SendMsg msg = new SendMsg();
+    msg.msgType = SendMsg.MsgType.SYSTEM_RESET;
+    sharedData.sendQ.add( msg );
   }
   
 }
