@@ -348,16 +348,6 @@ public class EWI4000sPatch { // extends Observable {
     
   }
   
-  /* return a copy of all but the first byte of the blob
-   * 
-   */
-  public byte[] sendableBlob() {
-    byte[] sendable = new byte[EWI_PATCH_LENGTH - 1];
-    for (int b = 1; b < EWI_PATCH_LENGTH; b++)
-      sendable[b-1] = patchBlob[b];
-    return sendable;
-  }
-  
   public static String toHex( byte[] blob, boolean addSpaces ) {
     String fmt, hexStr = "";
     if (blob.length < EWI_PATCH_LENGTH) return "Too short";
