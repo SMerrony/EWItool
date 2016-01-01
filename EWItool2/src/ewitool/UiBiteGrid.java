@@ -33,7 +33,7 @@ public class UiBiteGrid extends GridPane {
   
   Slider vibratoSlider, tremoloSlider;
   
-  UiBiteGrid(SharedData sharedData, MidiHandler midiHandler) {
+  UiBiteGrid(EWI4000sPatch editPatch, MidiHandler midiHandler) {
     
     setId( "editor-grid" );
 
@@ -54,7 +54,7 @@ public class UiBiteGrid extends GridPane {
     vibratoSlider.setMajorTickUnit( 32.0 );
     vibratoSlider.valueProperty().addListener( (observable, oldVal, newVal)-> {
       midiHandler.sendLiveControl( 2, 81, newVal.intValue() );
-      sharedData.editPatch.biteVibrato = newVal.intValue();
+      editPatch.biteVibrato = newVal.intValue();
     });
     add( vibratoSlider, 0, 2 );
     add( new BoundBelowControlLabel( "Vibrato", HPos.CENTER, vibratoSlider ), 0, 1 );
@@ -65,15 +65,15 @@ public class UiBiteGrid extends GridPane {
     tremoloSlider.setMajorTickUnit( 32.0 );
     tremoloSlider.valueProperty().addListener( (observable, oldVal, newVal)-> {
       midiHandler.sendLiveControl( 0, 88, newVal.intValue() );
-      sharedData.editPatch.biteTremolo = newVal.intValue();
+      editPatch.biteTremolo = newVal.intValue();
     });
     add( tremoloSlider, 0, 4 );
     add( new BoundBelowControlLabel( "Tremolo", HPos.CENTER, tremoloSlider ), 0, 3 );
     
   }
   
-  void setControls( SharedData sharedData ) {
-    vibratoSlider.setValue( sharedData.editPatch.biteVibrato );
-    tremoloSlider.setValue(  sharedData.editPatch.biteTremolo );
+  void setControls( EWI4000sPatch editPatch ) {
+    vibratoSlider.setValue( editPatch.biteVibrato );
+    tremoloSlider.setValue(  editPatch.biteTremolo );
   }
 }

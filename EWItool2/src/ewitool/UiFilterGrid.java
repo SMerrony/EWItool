@@ -37,7 +37,7 @@ public class UiFilterGrid extends GridPane {
          sweepTimeSlider, sweepDepthSlider;
   
 
-  UiFilterGrid( SharedData sharedData, MidiHandler midiHandler, Filter filter ) {
+  UiFilterGrid( EWI4000sPatch editPatch, MidiHandler midiHandler, Filter filter ) {
     
     setId( "editor-grid" );
     
@@ -84,11 +84,11 @@ public class UiFilterGrid extends GridPane {
 	switch( filter ) {
 	case NOISE_PRI:
 	  midiHandler.sendLiveControl( 4, 81, routingChoice.getSelectionModel().getSelectedIndex());
-	  sharedData.editPatch.noiseFilterLink = routingChoice.getSelectionModel().getSelectedIndex(); 
+	  editPatch.noiseFilterLink = routingChoice.getSelectionModel().getSelectedIndex(); 
 	  break;
 	case OSC_PRI:
 	  midiHandler.sendLiveControl( 3, 81, routingChoice.getSelectionModel().getSelectedIndex());
-	  sharedData.editPatch.oscFilterLink = routingChoice.getSelectionModel().getSelectedIndex(); 
+	  editPatch.oscFilterLink = routingChoice.getSelectionModel().getSelectedIndex(); 
 	  break;
 	case NOISE_SEC:
 	  break;
@@ -105,19 +105,19 @@ public class UiFilterGrid extends GridPane {
       switch( filter ) {
       case NOISE_PRI:
 	  midiHandler.sendLiveControl( 0, 74, typeChoice.getSelectionModel().getSelectedIndex());
-	  sharedData.editPatch.noiseFilter1.mode = typeChoice.getSelectionModel().getSelectedIndex(); 
+	  editPatch.noiseFilter1.mode = typeChoice.getSelectionModel().getSelectedIndex(); 
 	break;
       case NOISE_SEC:
 	  midiHandler.sendLiveControl( 0, 75, typeChoice.getSelectionModel().getSelectedIndex());
-	  sharedData.editPatch.noiseFilter2.mode = typeChoice.getSelectionModel().getSelectedIndex(); 
+	  editPatch.noiseFilter2.mode = typeChoice.getSelectionModel().getSelectedIndex(); 
 	break;
       case OSC_PRI:
 	  midiHandler.sendLiveControl( 0, 72, typeChoice.getSelectionModel().getSelectedIndex());
-	  sharedData.editPatch.oscFilter1.mode = typeChoice.getSelectionModel().getSelectedIndex(); 
+	  editPatch.oscFilter1.mode = typeChoice.getSelectionModel().getSelectedIndex(); 
 	break;
       case OSC_SEC:
 	  midiHandler.sendLiveControl( 0, 73, typeChoice.getSelectionModel().getSelectedIndex());
-	  sharedData.editPatch.oscFilter2.mode = typeChoice.getSelectionModel().getSelectedIndex(); 
+	  editPatch.oscFilter2.mode = typeChoice.getSelectionModel().getSelectedIndex(); 
 	break;
       }
     });
@@ -130,19 +130,19 @@ public class UiFilterGrid extends GridPane {
       switch( filter ) {
       case NOISE_PRI:
 	midiHandler.sendLiveControl( 2, 74, newVal.intValue() );
-	sharedData.editPatch.noiseFilter1.q = newVal.intValue();
+	editPatch.noiseFilter1.q = newVal.intValue();
 	break;
       case NOISE_SEC:
 	midiHandler.sendLiveControl( 2, 75, newVal.intValue() );
-	sharedData.editPatch.noiseFilter2.q = newVal.intValue();
+	editPatch.noiseFilter2.q = newVal.intValue();
 	break;
       case OSC_PRI:
 	midiHandler.sendLiveControl( 2, 72, newVal.intValue() );
-	sharedData.editPatch.oscFilter1.q = newVal.intValue();
+	editPatch.oscFilter1.q = newVal.intValue();
 	break;
       case OSC_SEC:
 	midiHandler.sendLiveControl( 2, 73, newVal.intValue() );
-	sharedData.editPatch.oscFilter2.q = newVal.intValue();
+	editPatch.oscFilter2.q = newVal.intValue();
 	break;
       }
     });
@@ -156,19 +156,19 @@ public class UiFilterGrid extends GridPane {
       switch( filter ) {
       case NOISE_PRI:
 	midiHandler.sendLiveControl( 4, 74, newVal.intValue() );
-	sharedData.editPatch.noiseFilter1.breathMod = newVal.intValue();
+	editPatch.noiseFilter1.breathMod = newVal.intValue();
 	break;
       case NOISE_SEC:
 	midiHandler.sendLiveControl( 4, 75, newVal.intValue() );
-	sharedData.editPatch.noiseFilter2.breathMod = newVal.intValue();
+	editPatch.noiseFilter2.breathMod = newVal.intValue();
 	break;
       case OSC_PRI:
 	midiHandler.sendLiveControl( 4, 72, newVal.intValue() );
-	sharedData.editPatch.oscFilter1.breathMod = newVal.intValue();
+	editPatch.oscFilter1.breathMod = newVal.intValue();
 	break;
       case OSC_SEC:
 	midiHandler.sendLiveControl( 4, 73, newVal.intValue() );
-	sharedData.editPatch.oscFilter2.breathMod = newVal.intValue();
+	editPatch.oscFilter2.breathMod = newVal.intValue();
 	break;
       }
     });
@@ -182,19 +182,19 @@ public class UiFilterGrid extends GridPane {
       switch( filter ) {
       case NOISE_PRI:
 	midiHandler.sendLiveControl( 5, 74, newVal.intValue() );
-	sharedData.editPatch.noiseFilter1.lfoFreq = newVal.intValue();
+	editPatch.noiseFilter1.lfoFreq = newVal.intValue();
 	break;
       case NOISE_SEC:
 	midiHandler.sendLiveControl( 5, 75, newVal.intValue() );
-	sharedData.editPatch.noiseFilter2.lfoFreq = newVal.intValue();
+	editPatch.noiseFilter2.lfoFreq = newVal.intValue();
 	break;
       case OSC_PRI:
 	midiHandler.sendLiveControl( 5, 72, newVal.intValue() );
-	sharedData.editPatch.oscFilter1.lfoFreq = newVal.intValue();
+	editPatch.oscFilter1.lfoFreq = newVal.intValue();
 	break;
       case OSC_SEC:
 	midiHandler.sendLiveControl( 5, 73, newVal.intValue() );
-	sharedData.editPatch.oscFilter2.lfoFreq = newVal.intValue();
+	editPatch.oscFilter2.lfoFreq = newVal.intValue();
 	break;
       }
     });
@@ -208,19 +208,19 @@ public class UiFilterGrid extends GridPane {
       switch( filter ) {
       case NOISE_PRI:
 	midiHandler.sendLiveControl( 7, 74, newVal.intValue() );
-	sharedData.editPatch.noiseFilter1.lfoBreath = newVal.intValue();
+	editPatch.noiseFilter1.lfoBreath = newVal.intValue();
 	break;
       case NOISE_SEC:
 	midiHandler.sendLiveControl( 7, 75, newVal.intValue() );
-	sharedData.editPatch.noiseFilter2.lfoBreath = newVal.intValue();
+	editPatch.noiseFilter2.lfoBreath = newVal.intValue();
 	break;
       case OSC_PRI:
 	midiHandler.sendLiveControl( 7, 72, newVal.intValue() );
-	sharedData.editPatch.oscFilter1.lfoBreath = newVal.intValue();
+	editPatch.oscFilter1.lfoBreath = newVal.intValue();
 	break;
       case OSC_SEC:
 	midiHandler.sendLiveControl( 7, 73, newVal.intValue() );
-	sharedData.editPatch.oscFilter2.lfoBreath = newVal.intValue();
+	editPatch.oscFilter2.lfoBreath = newVal.intValue();
 	break;
       }
     });
@@ -234,19 +234,19 @@ public class UiFilterGrid extends GridPane {
       switch( filter ) {
       case NOISE_PRI:
 	midiHandler.sendLiveControl( 10, 74, newVal.intValue() );
-	sharedData.editPatch.noiseFilter1.sweepTime = newVal.intValue();
+	editPatch.noiseFilter1.sweepTime = newVal.intValue();
 	break;
       case NOISE_SEC:
 	midiHandler.sendLiveControl( 10, 75, newVal.intValue() );
-	sharedData.editPatch.noiseFilter2.sweepTime = newVal.intValue();
+	editPatch.noiseFilter2.sweepTime = newVal.intValue();
 	break;
       case OSC_PRI:
 	midiHandler.sendLiveControl( 10, 72, newVal.intValue() );
-	sharedData.editPatch.oscFilter1.sweepTime = newVal.intValue();
+	editPatch.oscFilter1.sweepTime = newVal.intValue();
 	break;
       case OSC_SEC:
 	midiHandler.sendLiveControl( 10, 73, newVal.intValue() );
-	sharedData.editPatch.oscFilter2.sweepTime = newVal.intValue();
+	editPatch.oscFilter2.sweepTime = newVal.intValue();
 	break;
       }
     });
@@ -260,19 +260,19 @@ public class UiFilterGrid extends GridPane {
       switch( filter ) {
       case NOISE_PRI:
 	midiHandler.sendLiveControl( 3, 74, newVal.intValue() );
-	sharedData.editPatch.noiseFilter1.keyFollow = newVal.intValue();
+	editPatch.noiseFilter1.keyFollow = newVal.intValue();
 	break;
       case NOISE_SEC:
 	midiHandler.sendLiveControl( 3, 75, newVal.intValue() );
-	sharedData.editPatch.noiseFilter2.keyFollow = newVal.intValue();
+	editPatch.noiseFilter2.keyFollow = newVal.intValue();
 	break;
       case OSC_PRI:
 	midiHandler.sendLiveControl( 3, 72, newVal.intValue() );
-	sharedData.editPatch.oscFilter1.keyFollow = newVal.intValue();
+	editPatch.oscFilter1.keyFollow = newVal.intValue();
 	break;
       case OSC_SEC:
 	midiHandler.sendLiveControl( 3, 73, newVal.intValue() );
-	sharedData.editPatch.oscFilter2.keyFollow = newVal.intValue();
+	editPatch.oscFilter2.keyFollow = newVal.intValue();
 	break;
       }
     });
@@ -286,19 +286,19 @@ public class UiFilterGrid extends GridPane {
       switch( filter ) {
       case NOISE_PRI:
 	midiHandler.sendLiveControl( 1, 74, newVal.intValue() );
-	sharedData.editPatch.noiseFilter1.freq = newVal.intValue();
+	editPatch.noiseFilter1.freq = newVal.intValue();
 	break;
       case NOISE_SEC:
 	midiHandler.sendLiveControl( 1, 75, newVal.intValue() );
-	sharedData.editPatch.noiseFilter2.freq = newVal.intValue();
+	editPatch.noiseFilter2.freq = newVal.intValue();
 	break;
       case OSC_PRI:
 	midiHandler.sendLiveControl( 1, 72, newVal.intValue() );
-	sharedData.editPatch.oscFilter1.freq = newVal.intValue();
+	editPatch.oscFilter1.freq = newVal.intValue();
 	break;
       case OSC_SEC:
 	midiHandler.sendLiveControl( 1, 73, newVal.intValue() );
-	sharedData.editPatch.oscFilter2.freq = newVal.intValue();
+	editPatch.oscFilter2.freq = newVal.intValue();
 	break;
       }
     });
@@ -312,19 +312,19 @@ public class UiFilterGrid extends GridPane {
       switch( filter ) {
       case NOISE_PRI:
 	midiHandler.sendLiveControl( 11, 74, newVal.intValue() );
-	sharedData.editPatch.noiseFilter1.breathCurve = newVal.intValue();
+	editPatch.noiseFilter1.breathCurve = newVal.intValue();
 	break;
       case NOISE_SEC:
 	midiHandler.sendLiveControl( 11, 75, newVal.intValue() );
-	sharedData.editPatch.noiseFilter2.breathCurve = newVal.intValue();
+	editPatch.noiseFilter2.breathCurve = newVal.intValue();
 	break;
       case OSC_PRI:
 	midiHandler.sendLiveControl( 11, 72, newVal.intValue() );
-	sharedData.editPatch.oscFilter1.breathCurve = newVal.intValue();
+	editPatch.oscFilter1.breathCurve = newVal.intValue();
 	break;
       case OSC_SEC:
 	midiHandler.sendLiveControl( 11, 73, newVal.intValue() );
-	sharedData.editPatch.oscFilter2.breathCurve = newVal.intValue();
+	editPatch.oscFilter2.breathCurve = newVal.intValue();
 	break;
       }
     });
@@ -338,19 +338,19 @@ public class UiFilterGrid extends GridPane {
       switch( filter ) {
       case NOISE_PRI:
 	midiHandler.sendLiveControl( 6, 74, newVal.intValue() );
-	sharedData.editPatch.noiseFilter1.lfoDepth = newVal.intValue();
+	editPatch.noiseFilter1.lfoDepth = newVal.intValue();
 	break;
       case NOISE_SEC:
 	midiHandler.sendLiveControl( 6, 75, newVal.intValue() );
-	sharedData.editPatch.noiseFilter2.lfoDepth = newVal.intValue();
+	editPatch.noiseFilter2.lfoDepth = newVal.intValue();
 	break;
       case OSC_PRI:
 	midiHandler.sendLiveControl( 6, 72, newVal.intValue() );
-	sharedData.editPatch.oscFilter1.lfoDepth = newVal.intValue();
+	editPatch.oscFilter1.lfoDepth = newVal.intValue();
 	break;
       case OSC_SEC:
 	midiHandler.sendLiveControl( 6, 73, newVal.intValue() );
-	sharedData.editPatch.oscFilter2.lfoDepth = newVal.intValue();
+	editPatch.oscFilter2.lfoDepth = newVal.intValue();
 	break;
       }
     });
@@ -364,19 +364,19 @@ public class UiFilterGrid extends GridPane {
       switch( filter ) {
       case NOISE_PRI:
 	midiHandler.sendLiveControl( 8, 74, newVal.intValue() );
-	sharedData.editPatch.noiseFilter1.lfoThreshold = newVal.intValue();
+	editPatch.noiseFilter1.lfoThreshold = newVal.intValue();
 	break;
       case NOISE_SEC:
 	midiHandler.sendLiveControl( 8, 75, newVal.intValue() );
-	sharedData.editPatch.noiseFilter2.lfoThreshold = newVal.intValue();
+	editPatch.noiseFilter2.lfoThreshold = newVal.intValue();
 	break;
       case OSC_PRI:
 	midiHandler.sendLiveControl( 8, 72, newVal.intValue() );
-	sharedData.editPatch.oscFilter1.lfoThreshold = newVal.intValue();
+	editPatch.oscFilter1.lfoThreshold = newVal.intValue();
 	break;
       case OSC_SEC:
 	midiHandler.sendLiveControl( 8, 73, newVal.intValue() );
-	sharedData.editPatch.oscFilter2.lfoThreshold = newVal.intValue();
+	editPatch.oscFilter2.lfoThreshold = newVal.intValue();
 	break;
       }
     });
@@ -391,19 +391,19 @@ public class UiFilterGrid extends GridPane {
       switch( filter ) {
       case NOISE_PRI:
 	midiHandler.sendLiveControl( 9, 74, newVal.intValue() );
-	sharedData.editPatch.noiseFilter1.sweepDepth = newVal.intValue();
+	editPatch.noiseFilter1.sweepDepth = newVal.intValue();
 	break;
       case NOISE_SEC:
 	midiHandler.sendLiveControl( 9, 75, newVal.intValue() );
-	sharedData.editPatch.noiseFilter2.sweepDepth = newVal.intValue();
+	editPatch.noiseFilter2.sweepDepth = newVal.intValue();
 	break;
       case OSC_PRI:
 	midiHandler.sendLiveControl( 9, 72, newVal.intValue() );
-	sharedData.editPatch.oscFilter1.sweepDepth = newVal.intValue();
+	editPatch.oscFilter1.sweepDepth = newVal.intValue();
 	break;
       case OSC_SEC:
 	midiHandler.sendLiveControl( 9, 73, newVal.intValue() );
-	sharedData.editPatch.oscFilter2.sweepDepth = newVal.intValue();
+	editPatch.oscFilter2.sweepDepth = newVal.intValue();
 	break;
       }
     });
@@ -411,65 +411,65 @@ public class UiFilterGrid extends GridPane {
     
   }
   
-  void setControls( SharedData sharedData, Filter filter ) {
+  void setControls( EWI4000sPatch editPatch, Filter filter ) {
     switch( filter ) {
     case NOISE_PRI:
-      routingChoice.getSelectionModel().select( sharedData.editPatch.noiseFilterLink );
-      typeChoice.getSelectionModel().select( sharedData.editPatch.noiseFilter1.mode );
-      qSlider.setValue( sharedData.editPatch.noiseFilter1.q );
-      brModSlider.setValue( sharedData.editPatch.noiseFilter1.breathMod );
-      lfoFreqSlider.setValue( sharedData.editPatch.noiseFilter1.lfoFreq );
-      lfoBreathSlider.setValue( sharedData.editPatch.noiseFilter1.lfoBreath );
-      sweepTimeSlider.setValue( sharedData.editPatch.noiseFilter1.sweepTime );
-      keyFollowSlider.setValue( sharedData.editPatch.noiseFilter1.keyFollow );
-      cutoffFreqSlider.setValue( sharedData.editPatch.noiseFilter1.freq );
-      brCurveSlider.setValue( sharedData.editPatch.noiseFilter1.breathCurve );
-      lfoDepthSlider.setValue( sharedData.editPatch.noiseFilter1.lfoDepth );
-      lfoThresholdSlider.setValue( sharedData.editPatch.noiseFilter1.lfoThreshold );
-      sweepDepthSlider.setValue( sharedData.editPatch.noiseFilter1.sweepDepth );
+      routingChoice.getSelectionModel().select( editPatch.noiseFilterLink );
+      typeChoice.getSelectionModel().select( editPatch.noiseFilter1.mode );
+      qSlider.setValue( editPatch.noiseFilter1.q );
+      brModSlider.setValue( editPatch.noiseFilter1.breathMod );
+      lfoFreqSlider.setValue( editPatch.noiseFilter1.lfoFreq );
+      lfoBreathSlider.setValue( editPatch.noiseFilter1.lfoBreath );
+      sweepTimeSlider.setValue( editPatch.noiseFilter1.sweepTime );
+      keyFollowSlider.setValue( editPatch.noiseFilter1.keyFollow );
+      cutoffFreqSlider.setValue( editPatch.noiseFilter1.freq );
+      brCurveSlider.setValue( editPatch.noiseFilter1.breathCurve );
+      lfoDepthSlider.setValue( editPatch.noiseFilter1.lfoDepth );
+      lfoThresholdSlider.setValue( editPatch.noiseFilter1.lfoThreshold );
+      sweepDepthSlider.setValue( editPatch.noiseFilter1.sweepDepth );
       break;
     case NOISE_SEC:
-      typeChoice.getSelectionModel().select( sharedData.editPatch.noiseFilter2.mode );
-      qSlider.setValue( sharedData.editPatch.noiseFilter2.q );
-      brModSlider.setValue( sharedData.editPatch.noiseFilter2.breathMod );
-      lfoFreqSlider.setValue( sharedData.editPatch.noiseFilter2.lfoFreq );
-      lfoBreathSlider.setValue( sharedData.editPatch.noiseFilter2.lfoBreath );
-      sweepTimeSlider.setValue( sharedData.editPatch.noiseFilter2.sweepTime );
-      keyFollowSlider.setValue( sharedData.editPatch.noiseFilter2.keyFollow );
-      cutoffFreqSlider.setValue( sharedData.editPatch.noiseFilter2.freq );
-      brCurveSlider.setValue( sharedData.editPatch.noiseFilter2.breathCurve );
-      lfoDepthSlider.setValue( sharedData.editPatch.noiseFilter2.lfoDepth );
-      lfoThresholdSlider.setValue( sharedData.editPatch.noiseFilter2.lfoThreshold );
-      sweepDepthSlider.setValue( sharedData.editPatch.noiseFilter2.sweepDepth );
+      typeChoice.getSelectionModel().select( editPatch.noiseFilter2.mode );
+      qSlider.setValue( editPatch.noiseFilter2.q );
+      brModSlider.setValue( editPatch.noiseFilter2.breathMod );
+      lfoFreqSlider.setValue( editPatch.noiseFilter2.lfoFreq );
+      lfoBreathSlider.setValue( editPatch.noiseFilter2.lfoBreath );
+      sweepTimeSlider.setValue( editPatch.noiseFilter2.sweepTime );
+      keyFollowSlider.setValue( editPatch.noiseFilter2.keyFollow );
+      cutoffFreqSlider.setValue( editPatch.noiseFilter2.freq );
+      brCurveSlider.setValue( editPatch.noiseFilter2.breathCurve );
+      lfoDepthSlider.setValue( editPatch.noiseFilter2.lfoDepth );
+      lfoThresholdSlider.setValue( editPatch.noiseFilter2.lfoThreshold );
+      sweepDepthSlider.setValue( editPatch.noiseFilter2.sweepDepth );
       break;
     case OSC_PRI:
-      routingChoice.getSelectionModel().select( sharedData.editPatch.oscFilterLink );
-      typeChoice.getSelectionModel().select( sharedData.editPatch.oscFilter1.mode );
-      qSlider.setValue( sharedData.editPatch.oscFilter1.q );
-      brModSlider.setValue( sharedData.editPatch.oscFilter1.breathMod );
-      lfoFreqSlider.setValue( sharedData.editPatch.oscFilter1.lfoFreq );
-      lfoBreathSlider.setValue( sharedData.editPatch.oscFilter1.lfoBreath );
-      sweepTimeSlider.setValue( sharedData.editPatch.oscFilter1.sweepTime );
-      keyFollowSlider.setValue( sharedData.editPatch.oscFilter1.keyFollow );
-      cutoffFreqSlider.setValue( sharedData.editPatch.oscFilter1.freq );
-      brCurveSlider.setValue( sharedData.editPatch.oscFilter1.breathCurve );
-      lfoDepthSlider.setValue( sharedData.editPatch.oscFilter1.lfoDepth );
-      lfoThresholdSlider.setValue( sharedData.editPatch.oscFilter1.lfoThreshold );
-      sweepDepthSlider.setValue( sharedData.editPatch.oscFilter1.sweepDepth );
+      routingChoice.getSelectionModel().select( editPatch.oscFilterLink );
+      typeChoice.getSelectionModel().select( editPatch.oscFilter1.mode );
+      qSlider.setValue( editPatch.oscFilter1.q );
+      brModSlider.setValue( editPatch.oscFilter1.breathMod );
+      lfoFreqSlider.setValue( editPatch.oscFilter1.lfoFreq );
+      lfoBreathSlider.setValue( editPatch.oscFilter1.lfoBreath );
+      sweepTimeSlider.setValue( editPatch.oscFilter1.sweepTime );
+      keyFollowSlider.setValue( editPatch.oscFilter1.keyFollow );
+      cutoffFreqSlider.setValue( editPatch.oscFilter1.freq );
+      brCurveSlider.setValue( editPatch.oscFilter1.breathCurve );
+      lfoDepthSlider.setValue( editPatch.oscFilter1.lfoDepth );
+      lfoThresholdSlider.setValue( editPatch.oscFilter1.lfoThreshold );
+      sweepDepthSlider.setValue( editPatch.oscFilter1.sweepDepth );
       break;
     case OSC_SEC:
-      typeChoice.getSelectionModel().select( sharedData.editPatch.oscFilter2.mode );
-      qSlider.setValue( sharedData.editPatch.oscFilter2.q );
-      brModSlider.setValue( sharedData.editPatch.oscFilter2.breathMod );
-      lfoFreqSlider.setValue( sharedData.editPatch.oscFilter2.lfoFreq );
-      lfoBreathSlider.setValue( sharedData.editPatch.oscFilter2.lfoBreath );
-      sweepTimeSlider.setValue( sharedData.editPatch.oscFilter2.sweepTime );
-      keyFollowSlider.setValue( sharedData.editPatch.oscFilter2.keyFollow );
-      cutoffFreqSlider.setValue( sharedData.editPatch.oscFilter2.freq );
-      brCurveSlider.setValue( sharedData.editPatch.oscFilter2.breathCurve );
-      lfoDepthSlider.setValue( sharedData.editPatch.oscFilter2.lfoDepth );
-      lfoThresholdSlider.setValue( sharedData.editPatch.oscFilter2.lfoThreshold );
-      sweepDepthSlider.setValue( sharedData.editPatch.oscFilter2.sweepDepth );
+      typeChoice.getSelectionModel().select( editPatch.oscFilter2.mode );
+      qSlider.setValue( editPatch.oscFilter2.q );
+      brModSlider.setValue( editPatch.oscFilter2.breathMod );
+      lfoFreqSlider.setValue( editPatch.oscFilter2.lfoFreq );
+      lfoBreathSlider.setValue( editPatch.oscFilter2.lfoBreath );
+      sweepTimeSlider.setValue( editPatch.oscFilter2.sweepTime );
+      keyFollowSlider.setValue( editPatch.oscFilter2.keyFollow );
+      cutoffFreqSlider.setValue( editPatch.oscFilter2.freq );
+      brCurveSlider.setValue( editPatch.oscFilter2.breathCurve );
+      lfoDepthSlider.setValue( editPatch.oscFilter2.lfoDepth );
+      lfoThresholdSlider.setValue( editPatch.oscFilter2.lfoThreshold );
+      sweepDepthSlider.setValue( editPatch.oscFilter2.sweepDepth );
       break;
     }
     

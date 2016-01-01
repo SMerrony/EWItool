@@ -33,7 +33,7 @@ public class UiLevelsGrid extends GridPane {
   
   Slider masterSlider, octaveSlider;
   
-  UiLevelsGrid(SharedData sharedData, MidiHandler midiHandler) {
+  UiLevelsGrid(EWI4000sPatch editPatch, MidiHandler midiHandler) {
     
     setId( "editor-grid" );
     
@@ -55,7 +55,7 @@ public class UiLevelsGrid extends GridPane {
     masterSlider.valueProperty().addListener( (observable, oldVal, newVal) -> {
       //System.out.println( "DEBUG - UiLevelsGrid - Master Slider changed to " + newVal.intValue() );
       midiHandler.sendLiveControl( 1, 88, newVal.intValue() );
-      sharedData.editPatch.ampLevel = newVal.intValue();
+      editPatch.ampLevel = newVal.intValue();
     });
     add( masterSlider, 0, 2 );
     add( new BoundBelowControlLabel( "Master", HPos.CENTER, masterSlider ), 0, 1 );
@@ -65,15 +65,15 @@ public class UiLevelsGrid extends GridPane {
     octaveSlider.setMajorTickUnit( 32.0 );
     octaveSlider.valueProperty().addListener( (observable, oldVal, newVal)-> {
       midiHandler.sendLiveControl( 2, 88, newVal.intValue() );
-      sharedData.editPatch.octaveLevel = newVal.intValue();
+      editPatch.octaveLevel = newVal.intValue();
     });
     GridPane.setRowSpan( octaveSlider, 3 );
     add( octaveSlider, 1, 2 );
     add( new BoundBelowControlLabel( "Octave", HPos.CENTER, octaveSlider ), 1, 1 );
   }
   
-  void setControls( SharedData sharedData ) {
-    masterSlider.setValue( sharedData.editPatch.ampLevel );
-    octaveSlider.setValue( sharedData.editPatch.octaveLevel );
+  void setControls( EWI4000sPatch editPatch ) {
+    masterSlider.setValue( editPatch.ampLevel );
+    octaveSlider.setValue( editPatch.octaveLevel );
   }
 }

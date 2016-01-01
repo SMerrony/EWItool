@@ -33,8 +33,7 @@ public class SharedData extends Observable {
   public final static int EDIT_PATCH   = 2;
   public final static int EWI_CONNECTION = 3;
   
-  private volatile int lastPatchLoaded,
-                       editingPatchNumber;
+  private volatile int lastPatchLoaded;
   private volatile boolean ewiAttached;
   
   enum DeviceIdResponse { WRONG_LENGTH, NOT_AKAI, NOT_EWI4000S, IS_EWI4000S }
@@ -52,8 +51,6 @@ public class SharedData extends Observable {
   
   SharedData() {
     lastPatchLoaded = NONE;
-    editingPatchNumber = NONE;
-    editPatch = new EWI4000sPatch();
     ewiPatchList = new ArrayList<EWI4000sPatch>(); //FXCollections.observableArrayList();
     patchQ = new LinkedBlockingQueue<Integer>();
     keyPatchQ = new LinkedBlockingQueue<Integer>();
@@ -64,8 +61,6 @@ public class SharedData extends Observable {
   public void clear() {
     ewiPatchList.clear();
     setLastPatchLoaded( NONE );
-    setEditingPatchNumber( NONE );
-    patchQ.clear();
   }
   
   public int getLastPatchLoaded() {
@@ -88,19 +83,6 @@ public class SharedData extends Observable {
       ewiAttached = isIt;
       setChanged();
       notifyObservers( EWI_CONNECTION );
-    }
-  }
-
-  public int getEditingPatchNumber() {
-    return editingPatchNumber;
-  }
-  
-  public void setEditingPatchNumber( int p ) {
-    if (p != NONE) {
-      editingPatchNumber = p;
-      editPatch = ewiPatchList.get( editingPatchNumber );
-      setChanged();
-      notifyObservers( EDIT_PATCH );
     }
   }
 }

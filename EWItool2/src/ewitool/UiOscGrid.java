@@ -39,7 +39,7 @@ public class UiOscGrid extends GridPane {
    ChoiceBox<Integer> octaveChoice, semitoneChoice;
    CheckBox crossFadeCheck; 
    
-  UiOscGrid( SharedData sharedData, MidiHandler midiHandler, Osc osc ) {
+  UiOscGrid( EWI4000sPatch editPatch, MidiHandler midiHandler, Osc osc ) {
     
     setId( "editor-grid" );
     
@@ -75,11 +75,11 @@ public class UiOscGrid extends GridPane {
       switch( osc ) {
       case OSC1:
 	midiHandler.sendLiveControl( 0, 64, octaveChoice.getSelectionModel().getSelectedIndex() + 62);
-	sharedData.editPatch.osc1.octave = octaveChoice.getSelectionModel().getSelectedIndex() + 62; 
+	editPatch.osc1.octave = octaveChoice.getSelectionModel().getSelectedIndex() + 62; 
 	break;
       case OSC2:
 	midiHandler.sendLiveControl( 0, 65, octaveChoice.getSelectionModel().getSelectedIndex() + 62);
-	sharedData.editPatch.osc2.octave = octaveChoice.getSelectionModel().getSelectedIndex() + 62; 
+	editPatch.osc2.octave = octaveChoice.getSelectionModel().getSelectedIndex() + 62; 
 	break;
       }
     });
@@ -92,11 +92,11 @@ public class UiOscGrid extends GridPane {
       switch( osc ) {
       case OSC1:
 	midiHandler.sendLiveControl( 2, 64, newVal.intValue() );
-	sharedData.editPatch.osc1.fine = newVal.intValue();
+	editPatch.osc1.fine = newVal.intValue();
 	break;
       case OSC2:
 	midiHandler.sendLiveControl( 2, 65, newVal.intValue() );
-	sharedData.editPatch.osc2.fine = newVal.intValue();
+	editPatch.osc2.fine = newVal.intValue();
 	break;
       }
     });
@@ -110,11 +110,11 @@ public class UiOscGrid extends GridPane {
       switch( osc ) {
       case OSC1:
 	midiHandler.sendLiveControl( 1, 64, octaveChoice.getSelectionModel().getSelectedIndex() + 52);
-	sharedData.editPatch.osc1.semitone = octaveChoice.getSelectionModel().getSelectedIndex() + 52; 
+	editPatch.osc1.semitone = octaveChoice.getSelectionModel().getSelectedIndex() + 52; 
 	break;
       case OSC2:
 	midiHandler.sendLiveControl( 1, 65, octaveChoice.getSelectionModel().getSelectedIndex() + 52);
-	sharedData.editPatch.osc2.semitone = octaveChoice.getSelectionModel().getSelectedIndex() + 52; 
+	editPatch.osc2.semitone = octaveChoice.getSelectionModel().getSelectedIndex() + 52; 
 	break;
       }
     });
@@ -127,11 +127,11 @@ public class UiOscGrid extends GridPane {
       switch( osc ) {
       case OSC1:
 	midiHandler.sendLiveControl( 3, 64, newVal.intValue() );
-	sharedData.editPatch.osc1.beat = newVal.intValue();
+	editPatch.osc1.beat = newVal.intValue();
 	break;
       case OSC2:
 	midiHandler.sendLiveControl( 3, 65, newVal.intValue() );
-	sharedData.editPatch.osc2.beat = newVal.intValue();
+	editPatch.osc2.beat = newVal.intValue();
 	break;
       }
     });
@@ -145,11 +145,11 @@ public class UiOscGrid extends GridPane {
       switch( osc ) {
       case OSC1:
 	midiHandler.sendLiveControl( 5, 64, newVal.intValue() );
-	sharedData.editPatch.osc1.sawtooth = newVal.intValue();
+	editPatch.osc1.sawtooth = newVal.intValue();
 	break;
       case OSC2:
 	midiHandler.sendLiveControl( 5, 65, newVal.intValue() );
-	sharedData.editPatch.osc2.sawtooth = newVal.intValue();
+	editPatch.osc2.sawtooth = newVal.intValue();
 	break;
       }
     });
@@ -165,11 +165,11 @@ public class UiOscGrid extends GridPane {
       switch( osc ) {
       case OSC1:
 	midiHandler.sendLiveControl( 6, 64, newVal.intValue() );
-	sharedData.editPatch.osc1.triangle = newVal.intValue();
+	editPatch.osc1.triangle = newVal.intValue();
 	break;
       case OSC2:
 	midiHandler.sendLiveControl( 6, 65, newVal.intValue() );
-	sharedData.editPatch.osc2.triangle = newVal.intValue();
+	editPatch.osc2.triangle = newVal.intValue();
 	break;
       }
     });
@@ -184,11 +184,11 @@ public class UiOscGrid extends GridPane {
       switch( osc ) {
       case OSC1:
 	midiHandler.sendLiveControl( 7, 64, newVal.intValue() );
-	sharedData.editPatch.osc1.square = newVal.intValue();
+	editPatch.osc1.square = newVal.intValue();
 	break;
       case OSC2:
 	midiHandler.sendLiveControl( 7, 65, newVal.intValue() );
-	sharedData.editPatch.osc2.square = newVal.intValue();
+	editPatch.osc2.square = newVal.intValue();
 	break;
       }
     });
@@ -200,10 +200,10 @@ public class UiOscGrid extends GridPane {
       crossFadeCheck.setOnAction( (event) -> {
 	if (crossFadeCheck.isSelected()) {
 	  midiHandler.sendLiveControl( 6, 81, 1 );
-	  sharedData.editPatch.osc2Xfade = 1;
+	  editPatch.osc2Xfade = 1;
 	} else {
 	  midiHandler.sendLiveControl( 6, 81, 0 );
-	  sharedData.editPatch.osc2Xfade = 0;
+	  editPatch.osc2Xfade = 0;
 	}
       });
       add( crossFadeCheck, 5, 0 );
@@ -217,11 +217,11 @@ public class UiOscGrid extends GridPane {
       switch( osc ) {
       case OSC1:
 	midiHandler.sendLiveControl( 8, 64, newVal.intValue() );
-	sharedData.editPatch.osc1.pulseWidth = newVal.intValue();
+	editPatch.osc1.pulseWidth = newVal.intValue();
 	break;
       case OSC2:
 	midiHandler.sendLiveControl( 8, 65, newVal.intValue() );
-	sharedData.editPatch.osc2.pulseWidth = newVal.intValue();
+	editPatch.osc2.pulseWidth = newVal.intValue();
 	break;
       }
     });
@@ -235,11 +235,11 @@ public class UiOscGrid extends GridPane {
       switch( osc ) {
       case OSC1:
 	midiHandler.sendLiveControl( 9, 64, newVal.intValue() );
-	sharedData.editPatch.osc1.pwmFreq = newVal.intValue();
+	editPatch.osc1.pwmFreq = newVal.intValue();
 	break;
       case OSC2:
 	midiHandler.sendLiveControl( 9, 65, newVal.intValue() );
-	sharedData.editPatch.osc2.pwmFreq = newVal.intValue();
+	editPatch.osc2.pwmFreq = newVal.intValue();
 	break;
       }
     });
@@ -253,11 +253,11 @@ public class UiOscGrid extends GridPane {
       switch( osc ) {
       case OSC1:
 	midiHandler.sendLiveControl( 10, 64, newVal.intValue() );
-	sharedData.editPatch.osc1.pwmDepth = newVal.intValue();
+	editPatch.osc1.pwmDepth = newVal.intValue();
 	break;
       case OSC2:
 	midiHandler.sendLiveControl( 10, 65, newVal.intValue() );
-	sharedData.editPatch.osc2.pwmDepth = newVal.intValue();
+	editPatch.osc2.pwmDepth = newVal.intValue();
 	break;
       }
     });
@@ -271,11 +271,11 @@ public class UiOscGrid extends GridPane {
       switch( osc ) {
       case OSC1:
 	midiHandler.sendLiveControl( 12, 64, newVal.intValue() );
-	sharedData.editPatch.osc1.sweepTime = newVal.intValue();
+	editPatch.osc1.sweepTime = newVal.intValue();
 	break;
       case OSC2:
 	midiHandler.sendLiveControl( 12, 65, newVal.intValue() );
-	sharedData.editPatch.osc2.sweepTime = newVal.intValue();
+	editPatch.osc2.sweepTime = newVal.intValue();
 	break;
       }
     });
@@ -289,11 +289,11 @@ public class UiOscGrid extends GridPane {
       switch( osc ) {
       case OSC1:
 	midiHandler.sendLiveControl( 11, 64, newVal.intValue() );
-	sharedData.editPatch.osc1.sweepDepth = newVal.intValue();
+	editPatch.osc1.sweepDepth = newVal.intValue();
 	break;
       case OSC2:
 	midiHandler.sendLiveControl( 11, 65, newVal.intValue() );
-	sharedData.editPatch.osc2.sweepDepth = newVal.intValue();
+	editPatch.osc2.sweepDepth = newVal.intValue();
 	break;
       }
     });
@@ -307,11 +307,11 @@ public class UiOscGrid extends GridPane {
       switch( osc ) {
       case OSC1:
 	midiHandler.sendLiveControl( 14, 64, newVal.intValue() );
-	sharedData.editPatch.osc1.breathAttain = newVal.intValue();
+	editPatch.osc1.breathAttain = newVal.intValue();
 	break;
       case OSC2:
 	midiHandler.sendLiveControl( 14, 65, newVal.intValue() );
-	sharedData.editPatch.osc2.breathAttain = newVal.intValue();
+	editPatch.osc2.breathAttain = newVal.intValue();
 	break;
       }
     });
@@ -325,11 +325,11 @@ public class UiOscGrid extends GridPane {
       switch( osc ) {
       case OSC1:
 	midiHandler.sendLiveControl( 16, 64, newVal.intValue() );
-	sharedData.editPatch.osc1.breathThreshold = newVal.intValue();
+	editPatch.osc1.breathThreshold = newVal.intValue();
 	break;
       case OSC2:
 	midiHandler.sendLiveControl( 16, 65, newVal.intValue() );
-	sharedData.editPatch.osc2.breathThreshold = newVal.intValue();
+	editPatch.osc2.breathThreshold = newVal.intValue();
 	break;
       }
     });
@@ -343,11 +343,11 @@ public class UiOscGrid extends GridPane {
       switch( osc ) {
       case OSC1:
 	midiHandler.sendLiveControl( 15, 64, newVal.intValue() );
-	sharedData.editPatch.osc1.breathCurve = newVal.intValue();
+	editPatch.osc1.breathCurve = newVal.intValue();
 	break;
       case OSC2:
 	midiHandler.sendLiveControl( 15, 65, newVal.intValue() );
-	sharedData.editPatch.osc2.breathCurve = newVal.intValue();
+	editPatch.osc2.breathCurve = newVal.intValue();
 	break;
       }
     });
@@ -361,11 +361,11 @@ public class UiOscGrid extends GridPane {
       switch( osc ) {
       case OSC1:
 	midiHandler.sendLiveControl( 13, 64, newVal.intValue() );
-	sharedData.editPatch.osc1.breathDepth = newVal.intValue();
+	editPatch.osc1.breathDepth = newVal.intValue();
 	break;
       case OSC2:
 	midiHandler.sendLiveControl( 13, 65, newVal.intValue() );
-	sharedData.editPatch.osc2.breathDepth = newVal.intValue();
+	editPatch.osc2.breathDepth = newVal.intValue();
 	break;
       }
     });
@@ -379,11 +379,11 @@ public class UiOscGrid extends GridPane {
       switch( osc ) {
       case OSC1:
 	midiHandler.sendLiveControl( 17, 64, newVal.intValue() );
-	sharedData.editPatch.osc1.level = newVal.intValue();
+	editPatch.osc1.level = newVal.intValue();
 	break;
       case OSC2:
 	midiHandler.sendLiveControl( 17, 65, newVal.intValue() );
-	sharedData.editPatch.osc2.level = newVal.intValue();
+	editPatch.osc2.level = newVal.intValue();
 	break;
       }
     });
@@ -393,46 +393,46 @@ public class UiOscGrid extends GridPane {
     
   }
   
-  void setControls( SharedData sharedData, Osc osc ) {
+  void setControls( EWI4000sPatch editPatch, Osc osc ) {
     switch( osc ) {
     case OSC1:
-      octaveChoice.getSelectionModel().select( sharedData.editPatch.osc1.octave - 62 );
-      semitoneChoice.getSelectionModel().select( sharedData.editPatch.osc1.semitone - 52);
-      fineSlider.setValue( sharedData.editPatch.osc1.fine );
-      beatSlider.setValue( sharedData.editPatch.osc1.beat );
-      sawSlider.setValue( sharedData.editPatch.osc1.sawtooth );
-      triSlider.setValue( sharedData.editPatch.osc1.triangle );
-      sqrSlider.setValue( sharedData.editPatch.osc1.square );
-      pwmWidthSlider.setValue( sharedData.editPatch.osc1.pulseWidth );
-      pwmFreqSlider.setValue( sharedData.editPatch.osc1.pwmFreq );
-      pwmDepthSlider.setValue( sharedData.editPatch.osc1.pwmDepth );
-      sweepTimeSlider.setValue( sharedData.editPatch.osc1.sweepTime );
-      sweepDepthSlider.setValue( sharedData.editPatch.osc1.sweepDepth );
-      brAttainSlider.setValue( sharedData.editPatch.osc1.breathAttain );
-      brThreshSlider.setValue( sharedData.editPatch.osc1.breathThreshold );
-      brDepthSlider.setValue( sharedData.editPatch.osc1.breathDepth );
-      brCurveSlider.setValue( sharedData.editPatch.osc1.breathCurve );
-      volSlider.setValue( sharedData.editPatch.osc1.level );
+      octaveChoice.getSelectionModel().select( editPatch.osc1.octave - 62 );
+      semitoneChoice.getSelectionModel().select( editPatch.osc1.semitone - 52);
+      fineSlider.setValue( editPatch.osc1.fine );
+      beatSlider.setValue( editPatch.osc1.beat );
+      sawSlider.setValue( editPatch.osc1.sawtooth );
+      triSlider.setValue( editPatch.osc1.triangle );
+      sqrSlider.setValue( editPatch.osc1.square );
+      pwmWidthSlider.setValue( editPatch.osc1.pulseWidth );
+      pwmFreqSlider.setValue( editPatch.osc1.pwmFreq );
+      pwmDepthSlider.setValue( editPatch.osc1.pwmDepth );
+      sweepTimeSlider.setValue( editPatch.osc1.sweepTime );
+      sweepDepthSlider.setValue( editPatch.osc1.sweepDepth );
+      brAttainSlider.setValue( editPatch.osc1.breathAttain );
+      brThreshSlider.setValue( editPatch.osc1.breathThreshold );
+      brDepthSlider.setValue( editPatch.osc1.breathDepth );
+      brCurveSlider.setValue( editPatch.osc1.breathCurve );
+      volSlider.setValue( editPatch.osc1.level );
       break;
     case OSC2:
-      octaveChoice.getSelectionModel().select( sharedData.editPatch.osc2.octave - 62 );
-      semitoneChoice.getSelectionModel().select( sharedData.editPatch.osc2.semitone - 52 );
-      fineSlider.setValue( sharedData.editPatch.osc2.fine );
-      beatSlider.setValue( sharedData.editPatch.osc2.beat );
-      sawSlider.setValue( sharedData.editPatch.osc2.sawtooth );
-      triSlider.setValue( sharedData.editPatch.osc2.triangle );
-      sqrSlider.setValue( sharedData.editPatch.osc2.square );
-      pwmWidthSlider.setValue( sharedData.editPatch.osc2.pulseWidth );
-      pwmFreqSlider.setValue( sharedData.editPatch.osc2.pwmFreq );
-      pwmDepthSlider.setValue( sharedData.editPatch.osc2.pwmDepth );
-      sweepTimeSlider.setValue( sharedData.editPatch.osc2.sweepTime );
-      sweepDepthSlider.setValue( sharedData.editPatch.osc2.sweepDepth );
-      brAttainSlider.setValue( sharedData.editPatch.osc2.breathAttain );
-      brThreshSlider.setValue( sharedData.editPatch.osc2.breathThreshold );
-      brDepthSlider.setValue( sharedData.editPatch.osc2.breathDepth );
-      brCurveSlider.setValue( sharedData.editPatch.osc2.breathCurve );
-      volSlider.setValue( sharedData.editPatch.osc2.level );
-      crossFadeCheck.setSelected( sharedData.editPatch.osc2Xfade == 1 );
+      octaveChoice.getSelectionModel().select( editPatch.osc2.octave - 62 );
+      semitoneChoice.getSelectionModel().select( editPatch.osc2.semitone - 52 );
+      fineSlider.setValue( editPatch.osc2.fine );
+      beatSlider.setValue( editPatch.osc2.beat );
+      sawSlider.setValue( editPatch.osc2.sawtooth );
+      triSlider.setValue( editPatch.osc2.triangle );
+      sqrSlider.setValue( editPatch.osc2.square );
+      pwmWidthSlider.setValue( editPatch.osc2.pulseWidth );
+      pwmFreqSlider.setValue( editPatch.osc2.pwmFreq );
+      pwmDepthSlider.setValue( editPatch.osc2.pwmDepth );
+      sweepTimeSlider.setValue( editPatch.osc2.sweepTime );
+      sweepDepthSlider.setValue( editPatch.osc2.sweepDepth );
+      brAttainSlider.setValue( editPatch.osc2.breathAttain );
+      brThreshSlider.setValue( editPatch.osc2.breathThreshold );
+      brDepthSlider.setValue( editPatch.osc2.breathDepth );
+      brCurveSlider.setValue( editPatch.osc2.breathCurve );
+      volSlider.setValue( editPatch.osc2.level );
+      crossFadeCheck.setSelected( editPatch.osc2Xfade == 1 );
       break;
 
     }

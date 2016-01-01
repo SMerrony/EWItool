@@ -89,17 +89,17 @@ public class Main extends Application {
       epxTab = new EPXTab();
       tabPane.getTabs().add( epxTab );
       //epxTab.setDisable( true );
+      
+      patchEditorTab = new PatchEditorTab( sharedData, midiHandler );
+      tabPane.getTabs().add( patchEditorTab );
+      patchEditorTab.setDisable( true );
 
-      currentPatchSetTab = new CurrentPatchSetTab( sharedData, scratchPad );
+      currentPatchSetTab = new CurrentPatchSetTab( sharedData, scratchPad, patchEditorTab );
       tabPane.getTabs().add( currentPatchSetTab );
       currentPatchSetTab.setDisable( true );
 
       keyPatchesTab = new KeyPatchesTab();
       tabPane.getTabs().add( keyPatchesTab );
-
-      patchEditorTab = new PatchEditorTab( sharedData, midiHandler );
-      tabPane.getTabs().add( patchEditorTab );
-      patchEditorTab.setDisable( true );
 
       // MIDI port assignment change listeners
       userPrefs.midiInPort.addListener( new ChangeListener<String>() {
@@ -192,18 +192,21 @@ public class Main extends Application {
 	@Override
 	public void handle( ActionEvent ae) {
 	  System.out.println( "DEBUG - Fetch All..." );
-	  // midiHandler.requestDeviceID();
+	  midiHandler.requestDeviceID();
 	  Alert busyAlert = new Alert( AlertType.INFORMATION, "Fetching all patches.  Please wait..." );
 	  busyAlert.setTitle( "EWItool" );
 	  busyAlert.setHeaderText( null );
 	  busyAlert.show();
-	  midiHandler.clearPatches();
+	  sharedData.clear();
 	  for (int p = 0; p < EWI4000sPatch.EWI_NUM_PATCHES; p++) {
 	    midiHandler.requestPatch( p );
+	    busyAlert.setTitle( (p + 1) + " of 100" );
 	  }
 	  busyAlert.close();
 	  ((CurrentPatchSetTab) currentPatchSetTab).updateLabels();
+	  ((PatchEditorTab) patchEditorTab).populateCombo( sharedData );
 	  currentPatchSetTab.setDisable( false );
+	  patchEditorTab.setDisable( false );
 	  tabPane.getSelectionModel().select( currentPatchSetTab );
 	}
       });

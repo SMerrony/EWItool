@@ -35,7 +35,7 @@ public class UiAntiAliasGrid extends GridPane {
   CheckBox enableCheck;
   Slider cutoffSlider, keyFollowSlider;
   
-  UiAntiAliasGrid(SharedData sharedData, MidiHandler midiHandler) {
+  UiAntiAliasGrid(EWI4000sPatch editPatch, MidiHandler midiHandler) {
     
     setId( "editor-grid" );
     
@@ -55,10 +55,10 @@ public class UiAntiAliasGrid extends GridPane {
     enableCheck.setOnAction( (event) -> {
       if (enableCheck.isSelected()) {
 	midiHandler.sendLiveControl( 0, 79, 1 );
-	sharedData.editPatch.antiAliasSwitch = 1;
+	editPatch.antiAliasSwitch = 1;
       } else {
 	midiHandler.sendLiveControl( 0, 79, 0 );
-	sharedData.editPatch.antiAliasSwitch = 0;
+	editPatch.antiAliasSwitch = 0;
       }
     });
 
@@ -69,7 +69,7 @@ public class UiAntiAliasGrid extends GridPane {
     cutoffSlider.setMajorTickUnit( 32.0 );
     cutoffSlider.valueProperty().addListener( (observable, oldVal, newVal)-> {
       midiHandler.sendLiveControl( 1, 79, newVal.intValue() );
-      sharedData.editPatch.antiAliasCutoff = newVal.intValue();
+      editPatch.antiAliasCutoff = newVal.intValue();
     });
     add( cutoffSlider, 0, 3 );
     add( new BoundBelowControlLabel( "Cutoff Freq", HPos.CENTER, cutoffSlider ), 0, 2 );
@@ -80,16 +80,16 @@ public class UiAntiAliasGrid extends GridPane {
     keyFollowSlider.setMajorTickUnit( 32.0 );
     keyFollowSlider.valueProperty().addListener( (observable, oldVal, newVal)-> {
       midiHandler.sendLiveControl( 2, 79, newVal.intValue() );
-      sharedData.editPatch.antiAliasKeyFollow = newVal.intValue();
+      editPatch.antiAliasKeyFollow = newVal.intValue();
     });
     add( keyFollowSlider, 0, 5 );
     add( new BoundBelowControlLabel( "Key Follow", HPos.CENTER, keyFollowSlider ), 0, 4 );
     
   }
   
-  void setControls( SharedData sharedData ) {
-    enableCheck.setSelected( sharedData.editPatch.antiAliasSwitch == 1 );
-    cutoffSlider.setValue( sharedData.editPatch.antiAliasCutoff );
-    keyFollowSlider.setValue( sharedData.editPatch.antiAliasKeyFollow );
+  void setControls( EWI4000sPatch editPatch ) {
+    enableCheck.setSelected( editPatch.antiAliasSwitch == 1 );
+    cutoffSlider.setValue( editPatch.antiAliasCutoff );
+    keyFollowSlider.setValue( editPatch.antiAliasKeyFollow );
   }
 }

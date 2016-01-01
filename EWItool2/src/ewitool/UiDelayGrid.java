@@ -33,7 +33,7 @@ public class UiDelayGrid extends GridPane {
   
   Slider timeSlider, feedbackSlider, dampingSlider, drySlider, volSlider;
   
-  UiDelayGrid(SharedData sharedData, MidiHandler midiHandler) {
+  UiDelayGrid(EWI4000sPatch editPatch, MidiHandler midiHandler) {
     
     setId( "editor-grid" );
 
@@ -54,7 +54,7 @@ public class UiDelayGrid extends GridPane {
     timeSlider.setMajorTickUnit( 32.0 );
     timeSlider.valueProperty().addListener( (observable, oldVal, newVal) -> {
       midiHandler.sendLiveControl( 0, 113, newVal.intValue() );
-      sharedData.editPatch.delayTime = newVal.intValue();
+      editPatch.delayTime = newVal.intValue();
     });
     add( timeSlider, 0, 2 );
     add( new BoundBelowControlLabel( "Time", HPos.CENTER, timeSlider ), 0, 1 );
@@ -64,7 +64,7 @@ public class UiDelayGrid extends GridPane {
     feedbackSlider.setMajorTickUnit( 32.0 );
     feedbackSlider.valueProperty().addListener( (observable, oldVal, newVal) -> {
       midiHandler.sendLiveControl( 1, 113, newVal.intValue() );
-      sharedData.editPatch.delayFeedback = newVal.intValue();
+      editPatch.delayFeedback = newVal.intValue();
     });
     add( feedbackSlider, 1, 2 );
     add( new BoundBelowControlLabel( "Feedback", HPos.CENTER, feedbackSlider ), 1, 1 );
@@ -75,7 +75,7 @@ public class UiDelayGrid extends GridPane {
     GridPane.setRowSpan( volSlider, 4 );
     volSlider.valueProperty().addListener( (observable, oldVal, newVal) -> {
       midiHandler.sendLiveControl( 3, 113, newVal.intValue() );
-      sharedData.editPatch.delayLevel = newVal.intValue();
+      editPatch.delayLevel = newVal.intValue();
     });
     add( volSlider, 2, 1 );
     add( new BoundBelowControlLabel( "Vol", HPos.CENTER, volSlider ), 2, 0 );
@@ -85,7 +85,7 @@ public class UiDelayGrid extends GridPane {
     dampingSlider.setMajorTickUnit( 32.0 );
     dampingSlider.valueProperty().addListener( (observable, oldVal, newVal) -> {
       midiHandler.sendLiveControl( 2, 113, newVal.intValue() );
-      sharedData.editPatch.delayDamp = newVal.intValue();
+      editPatch.delayDamp = newVal.intValue();
     });
     add( dampingSlider, 0, 4 );
     add( new BoundBelowControlLabel( "Damping", HPos.CENTER, dampingSlider ), 0, 3 );
@@ -95,17 +95,17 @@ public class UiDelayGrid extends GridPane {
     drySlider.setMajorTickUnit( 32.0 );
     drySlider.valueProperty().addListener( (observable, oldVal, newVal) -> {
       midiHandler.sendLiveControl( 4, 113, newVal.intValue() );
-      sharedData.editPatch.delayDry = newVal.intValue();
+      editPatch.delayDry = newVal.intValue();
     });
     add( drySlider, 1, 4 );
     add( new BoundBelowControlLabel( "Dry", HPos.CENTER, drySlider ), 1, 3 );
   }
   
-  void setControls( SharedData sharedData ) {
-    timeSlider.setValue( sharedData.editPatch.delayTime );
-    feedbackSlider.setValue( sharedData.editPatch.delayFeedback );
-    volSlider.setValue( sharedData.editPatch.delayLevel );
-    dampingSlider.setValue( sharedData.editPatch.delayDamp );
-    drySlider.setValue( sharedData.editPatch.delayDry );
+  void setControls( EWI4000sPatch editPatch ) {
+    timeSlider.setValue( editPatch.delayTime );
+    feedbackSlider.setValue( editPatch.delayFeedback );
+    volSlider.setValue( editPatch.delayLevel );
+    dampingSlider.setValue( editPatch.delayDamp );
+    drySlider.setValue( editPatch.delayDry );
   }
 }

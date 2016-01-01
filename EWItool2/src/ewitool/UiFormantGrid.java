@@ -30,7 +30,7 @@ public class UiFormantGrid extends GridPane {
   
   ChoiceBox<String> formantChoice;
   
-  UiFormantGrid( SharedData sharedData, MidiHandler midiHandler ) {
+  UiFormantGrid( EWI4000sPatch editPatch, MidiHandler midiHandler ) {
     
     setId( "editor-grid" );
     
@@ -43,12 +43,12 @@ public class UiFormantGrid extends GridPane {
     formantChoice.getItems().addAll( "Off", "Woodwind", "Strings" );
     formantChoice.setOnAction( (event) -> {
       midiHandler.sendLiveControl( 5, 81, formantChoice.getSelectionModel().getSelectedIndex() );
-      sharedData.editPatch.formantFilter = formantChoice.getSelectionModel().getSelectedIndex(); 
+      editPatch.formantFilter = formantChoice.getSelectionModel().getSelectedIndex(); 
     });
     add( formantChoice, 0, 1 );
   }
 
-  void setControls( SharedData sharedData ) {
-    formantChoice.getSelectionModel().select( sharedData.editPatch.formantFilter );
+  void setControls( EWI4000sPatch editPatch ) {
+    formantChoice.getSelectionModel().select( editPatch.formantFilter );
   }
 }

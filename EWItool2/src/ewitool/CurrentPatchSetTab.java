@@ -26,14 +26,16 @@ public class CurrentPatchSetTab extends Tab {
   Button saveButton;
   SharedData sharedData;
   ScratchPad scratchPad;
+  Tab patchEditorTab;
 
-  CurrentPatchSetTab( SharedData pSharedData, ScratchPad pScratchPad ) {
+  CurrentPatchSetTab( SharedData pSharedData, ScratchPad pScratchPad, Tab pPatchEditorTab ) {
 
     setText( "Current Patch Set" );
     setClosable( false );
     
     sharedData = pSharedData;
     scratchPad = pScratchPad;
+    patchEditorTab = pPatchEditorTab;
 
     GridPane gp = new GridPane();
     gp.setPadding( new Insets( 10.0 ) );
@@ -123,8 +125,8 @@ public class CurrentPatchSetTab extends Tab {
       Optional<ButtonType> rc = dialog.showAndWait();
       
       if (rc.get() == editType) {
-        sharedData.setEditingPatchNumber( (int) ((Button)ae.getSource()).getUserData() );
-        // editor tab should detect the change and self-activate
+	((PatchEditorTab) patchEditorTab).patchesCombo.getSelectionModel().select( (int) ((Button)ae.getSource()).getUserData() );
+	patchEditorTab.getTabPane().getSelectionModel().select( patchEditorTab );
       } else if ( rc.get() == copyType) {
         scratchPad.addPatch( sharedData.ewiPatchList.get( (int) ((Button)ae.getSource()).getUserData() ) );
       } else if ( rc.get() == replaceType) {

@@ -33,7 +33,7 @@ public class UiReverbGrid extends GridPane {
   
   Slider timeSlider, densitySlider, dampingSlider, drySlider, volSlider;
   
-  UiReverbGrid(SharedData sharedData, MidiHandler midiHandler) {
+  UiReverbGrid(EWI4000sPatch editPatch, MidiHandler midiHandler) {
     
     setId( "editor-grid" );
     
@@ -54,7 +54,7 @@ public class UiReverbGrid extends GridPane {
     timeSlider.setMajorTickUnit( 32.0 );
     timeSlider.valueProperty().addListener( (observable, oldVal, newVal) -> {
       midiHandler.sendLiveControl( 3, 114, newVal.intValue() );
-      sharedData.editPatch.reverbTime = newVal.intValue();
+      editPatch.reverbTime = newVal.intValue();
     });
     add( timeSlider, 0, 2 );
     add( new BoundBelowControlLabel( "Time", HPos.CENTER, timeSlider ), 0, 1 );
@@ -64,7 +64,7 @@ public class UiReverbGrid extends GridPane {
     densitySlider.setMajorTickUnit( 32.0 );
     densitySlider.valueProperty().addListener( (observable, oldVal, newVal) -> {
       midiHandler.sendLiveControl( 2, 114, newVal.intValue() );
-      sharedData.editPatch.reverbDensity = newVal.intValue();
+      editPatch.reverbDensity = newVal.intValue();
     });
     add( densitySlider, 1, 2 );
     add( new BoundBelowControlLabel( "Density", HPos.CENTER, densitySlider ), 1, 1 );
@@ -74,7 +74,7 @@ public class UiReverbGrid extends GridPane {
     volSlider.setMajorTickUnit( 32.0 );
     volSlider.valueProperty().addListener( (observable, oldVal, newVal) -> {
       midiHandler.sendLiveControl( 1, 114, newVal.intValue() );
-      sharedData.editPatch.reverbLevel = newVal.intValue();
+      editPatch.reverbLevel = newVal.intValue();
     });
     GridPane.setRowSpan( volSlider, 4 );
     add( volSlider, 2, 1 );
@@ -85,7 +85,7 @@ public class UiReverbGrid extends GridPane {
     dampingSlider.setMajorTickUnit( 32.0 );
     dampingSlider.valueProperty().addListener( (observable, oldVal, newVal) -> {
       midiHandler.sendLiveControl( 4, 114, newVal.intValue() );
-      sharedData.editPatch.reverbDamp = newVal.intValue();
+      editPatch.reverbDamp = newVal.intValue();
     });
     add( dampingSlider, 0, 4 );
     add( new BoundBelowControlLabel( "Damping", HPos.CENTER, dampingSlider ), 0, 3 );
@@ -95,17 +95,17 @@ public class UiReverbGrid extends GridPane {
     drySlider.setMajorTickUnit( 32.0 );
     drySlider.valueProperty().addListener( (observable, oldVal, newVal) -> {
       midiHandler.sendLiveControl( 0, 114, newVal.intValue() );
-      sharedData.editPatch.reverbDry = newVal.intValue();
+      editPatch.reverbDry = newVal.intValue();
     });
     add( drySlider, 1, 4 );
     add( new BoundBelowControlLabel( "Dry", HPos.CENTER, drySlider ), 1, 3 );
   }
   
-  void setControls( SharedData sharedData ) {
-    timeSlider.setValue( sharedData.editPatch.reverbTime );
-    densitySlider.setValue( sharedData.editPatch.reverbDensity );
-    volSlider.setValue( sharedData.editPatch.reverbLevel );
-    dampingSlider.setValue( sharedData.editPatch.reverbDamp );
-    drySlider.setValue( sharedData.editPatch.reverbDry );
+  void setControls( EWI4000sPatch editPatch ) {
+    timeSlider.setValue( editPatch.reverbTime );
+    densitySlider.setValue( editPatch.reverbDensity );
+    volSlider.setValue( editPatch.reverbLevel );
+    dampingSlider.setValue( editPatch.reverbDamp );
+    drySlider.setValue( editPatch.reverbDry );
   }
 }

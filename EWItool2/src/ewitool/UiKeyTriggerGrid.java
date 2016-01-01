@@ -29,7 +29,7 @@ public class UiKeyTriggerGrid extends GridPane {
   
   ChoiceBox<String> keyTriggerChoice;
   
-  UiKeyTriggerGrid( SharedData sharedData, MidiHandler midiHandler ) {
+  UiKeyTriggerGrid( EWI4000sPatch editPatch, MidiHandler midiHandler ) {
     
     setId( "editor-grid" );
     
@@ -42,12 +42,12 @@ public class UiKeyTriggerGrid extends GridPane {
     keyTriggerChoice.getItems().addAll( "Single", "Multi" );
     keyTriggerChoice.setOnAction( (event) -> {
       midiHandler.sendLiveControl( 7, 81, keyTriggerChoice.getSelectionModel().getSelectedIndex() );
-      sharedData.editPatch.formantFilter = keyTriggerChoice.getSelectionModel().getSelectedIndex(); 
+      editPatch.formantFilter = keyTriggerChoice.getSelectionModel().getSelectedIndex(); 
     });
     add( keyTriggerChoice, 0, 1 );
     
   }
-  void setControls( SharedData sharedData ) {
-    keyTriggerChoice.getSelectionModel().select( sharedData.editPatch.keyTrigger );
+  void setControls( EWI4000sPatch editPatch ) {
+    keyTriggerChoice.getSelectionModel().select( editPatch.keyTrigger );
   }
 }
