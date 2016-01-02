@@ -50,6 +50,7 @@ public class Main extends Application {
   private static final int     SCENE_PREF_WIDTH = 1100;
   private static final int     SCENE_PREF_HEIGHT = 750;
   private static final String  WINDOW_TITLE = APP_NAME + " - EWI4000s Patch Handling Tool";
+  private static final Double  MINIMUM_JVM_SPEC = 1.8;
 
   MenuBar mainMenuBar;
   TabPane tabPane;
@@ -64,6 +65,7 @@ public class Main extends Application {
   @Override
   public void start(Stage mainStage) {
     try {
+      checkJVMspec();
       BorderPane root = new BorderPane();
       Scene scene = new Scene( root, SCENE_PREF_WIDTH, SCENE_PREF_HEIGHT );
       scene.getStylesheets().add(getClass().getResource("ewitool.css").toExternalForm());
@@ -143,6 +145,16 @@ public class Main extends Application {
     }
   }
 
+  void checkJVMspec() {
+   Double jvmSpec = Double.parseDouble( System.getProperty( "java.specification.version" ) );
+   if ( jvmSpec < MINIMUM_JVM_SPEC) {
+     System.err.println( "Error - EWItool requires at least version " + MINIMUM_JVM_SPEC + " of Java to run." );
+     System.exit( 1 );
+   } else {
+     System.out.println( "DEBUG - JVM Spec. " + jvmSpec + " detected" );
+   }
+  }
+  
   class EditPatchWatcher implements Observer {
     @Override
     public void update( Observable o, Object arg ) {
