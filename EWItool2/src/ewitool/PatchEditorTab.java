@@ -121,7 +121,7 @@ public class PatchEditorTab extends Tab {
 	  antiAliasGrid.setControls( editPatch );
 	  levelsGrid.setControls( editPatch );
 
-	  //	  midiHandler.sendPatch( editPatch, EWI4000sPatch.EWI_EDIT ); FIXME !!!
+	  midiHandler.sendPatch( editPatch, EWI4000sPatch.EWI_EDIT ); 
 
 	}
       }

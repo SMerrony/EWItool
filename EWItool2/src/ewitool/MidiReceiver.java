@@ -61,7 +61,7 @@ public class MidiReceiver implements Receiver {
 	    System.err.println( "Error - Invalid patch number (" + thisPatchNum + ") received from EWI");
 	  } else {
 	    sharedData.ewiPatchList.add( thisPatch );
-	    sharedData.setLastPatchLoaded( thisPatchNum );
+	    if (thisPatchNum == 99) sharedData.setLastPatchLoaded( thisPatchNum );
 	    sharedData.patchQ.add( thisPatchNum );
 	    System.out.println( "DEBUG - MidiReceiver: Patch number: " + thisPatchNum + " received" );
 	  }
@@ -71,7 +71,8 @@ public class MidiReceiver implements Receiver {
       //      case MidiHandler.MIDI_QUICKPC_DUMP:
       //	break;
 
-      if (messageBytes[0] == 0x7e && messageBytes[1] == 0x00) { // DEVICE ID
+      if (messageBytes[0] == 0x7e && 
+	  messageBytes[1] == 0x00) { // DEVICE ID
 	if (messageBytes.length != (MidiHandler.EWI_SYSEX_ID_RESPONSE_LEN - 1)) {
 	  sharedData.deviceIdQ.add( SharedData.DeviceIdResponse.WRONG_LENGTH );
 	  return;
@@ -99,6 +100,4 @@ public class MidiReceiver implements Receiver {
     
   }
 
-
- 
 }
