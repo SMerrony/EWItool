@@ -19,12 +19,15 @@ package ewitool;
 
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Tab;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -37,20 +40,35 @@ public class PatchEditorTab extends Tab {
   enum Osc { OSC1, OSC2 }
   enum Filter { OSC_PRI, OSC_SEC, NOISE_PRI, NOISE_SEC }
   public ComboBox<String> patchesCombo;
-  private EWI4000sPatch editPatch;
+  public Button storeButton, revertButton, toScratchPadButton;
+  private EWI4000sPatch editPatch, uneditedPatch;
     
-  PatchEditorTab(SharedData sharedData, MidiHandler midiHandler) {
+  PatchEditorTab(SharedData sharedData, ScratchPad scratchPad, MidiHandler midiHandler) {
     setText( "Patch Editor" );
     setClosable( false );
     
     editPatch = new EWI4000sPatch();
       
     patchesCombo = new ComboBox<String>();
+    storeButton = new Button( "Store" );
+    storeButton.setTooltip( new Tooltip( "Replace the patch in the EWI with the current version" ) );
+    revertButton = new Button( "Revert" );
+    revertButton.setTooltip( new Tooltip( "Revert any edits and reload the original patch" ) );
+    revertButton.setOnAction( (event) -> {
+      editPatch = uneditedPatch;
+      Event.fireEvent( patchesCombo, new ActionEvent() );
+    });
+    toScratchPadButton = new Button( "Copy to Scratchpad" );
+    toScratchPadButton.setTooltip( new Tooltip( "Copy current state of patch to the ScratchPad" ) );
+    toScratchPadButton.setOnAction( (event) -> {
+      scratchPad.addPatch( editPatch );
+    });
     HBox headerBox = new HBox();
+    headerBox.setId( "editor-header-box" );
     Region lSpaceRegion = new Region(), rSpaceRegion = new Region();
     HBox.setHgrow( lSpaceRegion, Priority.ALWAYS );
     HBox.setHgrow( rSpaceRegion, Priority.ALWAYS );
-    headerBox.getChildren().addAll( lSpaceRegion, patchesCombo, rSpaceRegion );
+    headerBox.getChildren().addAll( lSpaceRegion, patchesCombo, storeButton, revertButton, toScratchPadButton, rSpaceRegion );
     
     UiOscGrid osc1Grid = new UiOscGrid( editPatch, midiHandler, Osc.OSC1 );
     UiOscGrid osc2Grid = new UiOscGrid( editPatch, midiHandler, Osc.OSC2 );
@@ -103,6 +121,7 @@ public class PatchEditorTab extends Tab {
       public void handle( ActionEvent ae ) {
 	if (!patchesCombo.getSelectionModel().isEmpty()) {
 	  editPatch = sharedData.ewiPatchList.get( patchesCombo.getSelectionModel().getSelectedIndex() );
+	  uneditedPatch = editPatch;
 	  System.out.println( "DEBUG - Patch editor selection changed" );
 	  osc1Grid.setControls( editPatch, Osc.OSC1 );
 	  osc2Grid.setControls( editPatch, Osc.OSC2 );
@@ -126,7 +145,10 @@ public class PatchEditorTab extends Tab {
 	}
       }
     });
+
   }
+  
+
   
   public void populateCombo( SharedData sharedData ) {
     patchesCombo.getItems().clear();

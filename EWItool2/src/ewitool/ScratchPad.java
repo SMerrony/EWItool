@@ -84,7 +84,7 @@ public class ScratchPad {
     return false;
   }
 
-  public boolean addPatch( EWI4000sPatch patch ) {
+  public boolean addPatch( EWI4000sPatch patch ) { // TODO - check for duplicate name
     patchList.add( patch );
     store();
     return true;

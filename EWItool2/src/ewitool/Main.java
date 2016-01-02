@@ -90,13 +90,14 @@ public class Main extends Application {
       tabPane.getTabs().add( epxTab );
       //epxTab.setDisable( true );
       
-      patchEditorTab = new PatchEditorTab( sharedData, midiHandler );
-      tabPane.getTabs().add( patchEditorTab );
-      patchEditorTab.setDisable( true );
+      patchEditorTab = new PatchEditorTab( sharedData, scratchPad, midiHandler );
 
       currentPatchSetTab = new CurrentPatchSetTab( sharedData, scratchPad, patchEditorTab );
       tabPane.getTabs().add( currentPatchSetTab );
       currentPatchSetTab.setDisable( true );
+      
+      tabPane.getTabs().add( patchEditorTab );
+      patchEditorTab.setDisable( true );
 
       keyPatchesTab = new KeyPatchesTab();
       tabPane.getTabs().add( keyPatchesTab );
@@ -212,14 +213,15 @@ public class Main extends Application {
       });
       ewiMenu.getItems().addAll( fetchAllItem );
 
-      patchMenu = new Menu( "Patch" );
+      // TODO - I think we can do without this
+      //patchMenu = new Menu( "Patch" );
 
       helpMenu = new Menu( "Help" );
       helpItem = new MenuItem( "Online Help" );
       aboutItem = new MenuItem( "About " + Main.APP_NAME );
       helpMenu.getItems().addAll( helpItem, aboutItem );
 
-      getMenus().addAll( fileMenu, midiMenu, ewiMenu, patchMenu, helpMenu );
+      getMenus().addAll( fileMenu, midiMenu, ewiMenu, helpMenu );
 
     }
 

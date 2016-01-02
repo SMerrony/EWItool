@@ -44,19 +44,22 @@
 	-fx-min-width: 25mm;
 }
 #editor-header-box {
-	-fx-max-height: 25mm;
+  -fx-padding: 2;
+  -fx-spacing: 2;
+	/* -fx-background-color: lightgray; */
 }
 
 #editor-grid {
 	-fx-border-color: darkgray;
 	-fx-padding: 2px;
 	/* visibility: -fx-min-width: 2.0cm; */
+	-fx-pref-width: 25mm;
 	-fx-alignment: center;
 }
 
 #editor-section-label {
 	-fx-font: bold 9pt sans;
-	-fx-alignment: top-left;
+	-fx-alignment: top-left!important;
 }
 
 #editor-group-label {
