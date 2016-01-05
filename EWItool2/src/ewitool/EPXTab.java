@@ -22,29 +22,38 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.RowConstraints;
+import javafx.scene.layout.VBox;
 
 public class EPXTab extends Tab {
 
-  ChoiceBox typeChoice, addedChoice, contribChoice, originChoice;
+  ChoiceBox<String> typeChoice, addedChoice, contribChoice, originChoice;
   TextField qTagsField;
   Button queryButton;
+  TextField uidField, serverField;
+  PasswordField passwdField;
   ListView resultsView;
   TextField nameField, contribField, originField, typeField, privacyField,
             rTagsField, addedField;
   TextArea  descriptionArea;
   Button deleteButton, copyButton;
   
-  EPXTab() {
+  EPX epx;
+  
+  EPXTab( UserPrefs userPrefs ) {
     
     setText( "EWI Patch eXchange" );
     setClosable( false );
+    
+    epx = new EPX( userPrefs );
  
     // for vertically fixed rows in the GridPanes...
     RowConstraints fixedRC = new RowConstraints();
@@ -53,22 +62,29 @@ public class EPXTab extends Tab {
     RowConstraints vgrowRC = new RowConstraints();
     vgrowRC.setVgrow( Priority.ALWAYS );
     
-    // left pane
+    // left top pane
     GridPane queryGrid = new GridPane();
     queryGrid.setVgap( 3.0 );
     
-    queryGrid.add( new Label( "Query" ), 0, 0 );
+    Label querySectionLabel = new Label( "Query" );
+    querySectionLabel.setId( "epx-section-label" );
+    queryGrid.add( querySectionLabel, 0, 0 );
     queryGrid.add( new Label( "Type" ), 0, 1 );
-    typeChoice = new ChoiceBox();
+    typeChoice = new ChoiceBox<String>();
+    typeChoice.getItems().addAll( "All", "Brass", "Percussion", "Strings", "Synthetic", "Woodwind" );
+    typeChoice.getSelectionModel().select( 0 );
     queryGrid.add( typeChoice, 1, 1 );
     queryGrid.add( new Label( "Added in the last..." ), 0, 2 );
-    addedChoice = new ChoiceBox();
+    addedChoice = new ChoiceBox<String>();
+    addedChoice.getItems().addAll( "Forever", "Day", "Week", "Month", "Quarter", "Year" );
+    addedChoice.getSelectionModel().select( 0 );
     queryGrid.add( addedChoice, 1, 2 );
     queryGrid.add( new Label( "Contributor" ), 0, 3 );
-    contribChoice = new ChoiceBox();
+    contribChoice = new ChoiceBox<String>();
+    contribChoice.getItems().addAll( "All" ); // more added programatically
     queryGrid.add( contribChoice, 1, 3 );
     queryGrid.add( new Label( "Origin" ), 0, 4 );
-    originChoice = new ChoiceBox();
+    originChoice = new ChoiceBox<String>();
     queryGrid.add( originChoice, 1, 4 );
     queryGrid.add( new Label( "Tags" ), 0, 5 );
     qTagsField = new TextField();
@@ -76,11 +92,16 @@ public class EPXTab extends Tab {
     
     queryButton = new Button( "Query" );
     queryGrid.add( queryButton, 1, 6 );
+    
+    // left bottom pane
+    GridPane settingsGrid = new UiEPXSettingsGrid( userPrefs, epx );
      
     // centre pane
     GridPane resultsGrid = new GridPane();
     
-    resultsGrid.add( new Label( "Results" ), 0, 0 );
+    Label resultsSectionLabel = new Label( "Results" );
+    resultsSectionLabel.setId( "epx-section-label" );
+    resultsGrid.add( resultsSectionLabel, 0, 0 );
     resultsGrid.getRowConstraints().add( fixedRC );
     
     resultsView = new ListView();
@@ -90,7 +111,9 @@ public class EPXTab extends Tab {
     // right pane
     GridPane detailGrid = new GridPane();
 
-    detailGrid.add( new Label( "Details" ), 0, 0 );
+    Label detailsSectionLabel = new Label( "Details" );
+    detailsSectionLabel.setId( "epx-section-label" );
+    detailGrid.add( detailsSectionLabel, 0, 0 );
     detailGrid.getRowConstraints().add( fixedRC );
     
     detailGrid.add( new Label( "Name" ), 0, 1 );
@@ -140,10 +163,15 @@ public class EPXTab extends Tab {
     detailGrid.add( copyButton, 1, 10 );
     detailGrid.getRowConstraints().add( vgrowRC );
     
+    VBox lhVBox = new VBox();
+    Region vSpaceRegion = new Region();
+    VBox.setVgrow( vSpaceRegion, Priority.ALWAYS );
+    lhVBox.getChildren().addAll( queryGrid, vSpaceRegion, settingsGrid );
+    
     HBox hBox = new HBox();
     hBox.setPadding( new Insets( 4.0 ) );
     hBox.setSpacing( 8.0 );
-    hBox.getChildren().addAll( queryGrid, resultsGrid, detailGrid );
+    hBox.getChildren().addAll( lhVBox, resultsGrid, detailGrid );
     
     setContent( hBox );
 

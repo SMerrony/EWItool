@@ -43,7 +43,7 @@ public class Main extends Application {
 
   static final String  APP_NAME = "EWItool";
   static final double  VERSION = 0.1;
-  static final int     COPYRIGHT_YEAR = 2015;
+  static final int     COPYRIGHT_YEAR = 2016;
   static final String  RELEASE_STATUS = "Alpha";
 
   private static final String  ICON = "/resources/EWItoolLogo1.png";
@@ -88,7 +88,7 @@ public class Main extends Application {
       patchSetsTab = new PatchSetsTab( scratchPad, userPrefs );
       tabPane.getTabs().add( patchSetsTab );
 
-      epxTab = new EPXTab();
+      epxTab = new EPXTab( userPrefs );
       tabPane.getTabs().add( epxTab );
       //epxTab.setDisable( true );
       
@@ -102,6 +102,7 @@ public class Main extends Application {
       patchEditorTab.setDisable( true );
 
       keyPatchesTab = new KeyPatchesTab();
+      keyPatchesTab.setDisable( true );
       tabPane.getTabs().add( keyPatchesTab );
 
       // MIDI port assignment change listeners
@@ -169,7 +170,7 @@ public class Main extends Application {
   class MainMenuBar extends MenuBar {
 
     Menu fileMenu, midiMenu, ewiMenu, patchMenu, helpMenu;
-    MenuItem printItem, preferencesItem, quitItem,
+    MenuItem printItem, quitItem,
     portsItem, panicItem, 
     fetchAllItem,
     helpItem, aboutItem;
@@ -178,7 +179,6 @@ public class Main extends Application {
 
       fileMenu = new Menu( "File" );
       printItem = new MenuItem( "Print" );
-      preferencesItem = new MenuItem( "Preferences" );
       quitItem = new MenuItem( "Quit" );
       quitItem.setOnAction( new EventHandler<ActionEvent>() {
 	@Override
@@ -189,7 +189,7 @@ public class Main extends Application {
 	  System.exit( 0 );           
 	}
       });
-      fileMenu.getItems().addAll( printItem, preferencesItem, quitItem );
+      fileMenu.getItems().addAll( printItem, quitItem );
 
       midiMenu = new Menu( "MIDI" );
       portsItem = new MenuItem( "Ports" );

@@ -43,6 +43,12 @@
 #scratchpad-grid .button {
 	-fx-min-width: 25mm;
 }
+
+#epx-section-label {
+	-fx-font: bold 9pt sans;
+	-fx-alignment: top-left;
+}
+
 #editor-header-box {
   -fx-padding: 2;
   -fx-spacing: 2;
