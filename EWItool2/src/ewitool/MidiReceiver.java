@@ -63,7 +63,7 @@ public class MidiReceiver implements Receiver {
 	    sharedData.ewiPatchList.add( thisPatch );
 	    if (thisPatchNum == 99) sharedData.setLastPatchLoaded( thisPatchNum );
 	    sharedData.patchQ.add( thisPatchNum );
-	    System.out.println( "DEBUG - MidiReceiver: Patch number: " + thisPatchNum + " received" );
+	    Debugger.log( "DEBUG - MidiReceiver: Patch number: " + thisPatchNum + " received" );
 	  }
 	}
 	return;
@@ -86,7 +86,7 @@ public class MidiReceiver implements Receiver {
 	  return;
 	}
 	// Could get firmware version here too if needed...
-	System.out.println( "DEBUG - MidiReceiver got correct EWI4000s Device ID" );
+	Debugger.log( "DEBUG - MidiReceiver got correct EWI4000s Device ID" );
 	sharedData.deviceIdQ.add( SharedData.DeviceIdResponse.IS_EWI4000S);
 	return;
       }

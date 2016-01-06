@@ -122,7 +122,7 @@ public class PatchEditorTab extends Tab {
 	if (!patchesCombo.getSelectionModel().isEmpty()) {
 	  editPatch = sharedData.ewiPatchList.get( patchesCombo.getSelectionModel().getSelectedIndex() );
 	  uneditedPatch = editPatch;
-	  System.out.println( "DEBUG - Patch editor selection changed" );
+	  Debugger.log( "DEBUG - Patch editor selection changed" );
 	  osc1Grid.setControls( editPatch, Osc.OSC1 );
 	  osc2Grid.setControls( editPatch, Osc.OSC2 );
 	  formantGrid.setControls( editPatch );

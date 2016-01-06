@@ -63,10 +63,10 @@ public class MidiPortsEventHandler implements EventHandler<ActionEvent>
         if (!(device instanceof Sequencer) && !(device instanceof Synthesizer)) {
           if (device.getMaxReceivers() != 0) {
             outPorts.add( infos[d].getName() );
-            System.out.println( "Debug - OUT Port: " + infos[d].getName());
+            Debugger.log( "Debug - OUT Port: " + infos[d].getName());
           } else if (device.getMaxTransmitters() != 0) {
             inPorts.add( infos[d].getName() );
-            System.out.println( "Debug - IN Port: " + infos[d].getName() );
+            Debugger.log( "Debug - IN Port: " + infos[d].getName() );
           }
         }
         

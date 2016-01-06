@@ -33,9 +33,10 @@ import javafx.scene.layout.VBox;
 
 public class KeyPatchesTab extends Tab {
   
-  ChoiceBox[] keyChoices;
+  ChoiceBox<String>[] keyChoices;
   Button fetchButton, storeButton;
   
+
   KeyPatchesTab() {
     
     setText( "Key Patches" );
@@ -66,62 +67,62 @@ public class KeyPatchesTab extends Tab {
     keyChoices = new ChoiceBox[12];
     
     gp.add( new Label( "B" ), 0, 1 );
-    keyChoices[0] = new ChoiceBox();
+    keyChoices[0] = new ChoiceBox<String>();
     gp.add( keyChoices[0], 1, 1 );
     gp.getRowConstraints().add( vgrowRC );
     
     gp.add( new Label( "Bb/A#" ), 0, 2 );
-    keyChoices[1] = new ChoiceBox();
+    keyChoices[1] = new ChoiceBox<String>();
     gp.add( keyChoices[1], 1, 2 );
     gp.getRowConstraints().add( vgrowRC );
  
     gp.add( new Label( "A" ), 0, 3 );
-    keyChoices[2] = new ChoiceBox();
+    keyChoices[2] = new ChoiceBox<String>();
     gp.add( keyChoices[2], 1, 3 );
     gp.getRowConstraints().add( vgrowRC );
  
     gp.add( new Label( "Ab/G#" ), 0, 4 );
-    keyChoices[3] = new ChoiceBox();
+    keyChoices[3] = new ChoiceBox<String>();
     gp.add( keyChoices[3], 1, 4 );
     gp.getRowConstraints().add( vgrowRC );
  
     gp.add( new Label( "G" ), 0, 5 );
-    keyChoices[4] = new ChoiceBox();
+    keyChoices[4] = new ChoiceBox<String>();
     gp.add( keyChoices[4], 1, 5 );
     gp.getRowConstraints().add( vgrowRC );
  
     gp.add( new Label( "Gb/F#" ), 0, 6 );
-    keyChoices[5] = new ChoiceBox();
+    keyChoices[5] = new ChoiceBox<String>();
     gp.add( keyChoices[5], 1, 6 );
     gp.getRowConstraints().add( vgrowRC );
  
     gp.add( new Label( "F" ), 0, 7 );
-    keyChoices[6] = new ChoiceBox();
+    keyChoices[6] = new ChoiceBox<String>();
     gp.add( keyChoices[6], 1, 7 );
     gp.getRowConstraints().add( vgrowRC );
  
     gp.add( new Label( "E" ), 0, 8 );
-    keyChoices[7] = new ChoiceBox();
+    keyChoices[7] = new ChoiceBox<String>();
     gp.add( keyChoices[7], 1, 8 );
     gp.getRowConstraints().add( vgrowRC );
  
     gp.add( new Label( "Eb/D#" ), 0, 9 );
-    keyChoices[8] = new ChoiceBox();
+    keyChoices[8] = new ChoiceBox<String>();
     gp.add( keyChoices[8], 1, 9 );
     gp.getRowConstraints().add( vgrowRC );
  
     gp.add( new Label( "D" ), 0, 10 );
-    keyChoices[9] = new ChoiceBox();
+    keyChoices[9] = new ChoiceBox<String>();
     gp.add( keyChoices[9], 1, 10 );
     gp.getRowConstraints().add( vgrowRC );
  
     gp.add( new Label( "Db/C#" ), 0, 11 );
-    keyChoices[10] = new ChoiceBox();
+    keyChoices[10] = new ChoiceBox<String>();
     gp.add( keyChoices[10], 1, 11 );
     gp.getRowConstraints().add( vgrowRC );
  
     gp.add( new Label( "C" ), 0, 12 );
-    keyChoices[11] = new ChoiceBox();
+    keyChoices[11] = new ChoiceBox<String>();
     gp.add( keyChoices[11], 1, 12 );
     gp.getRowConstraints().add( vgrowRC );
  

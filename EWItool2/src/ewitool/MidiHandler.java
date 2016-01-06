@@ -102,7 +102,7 @@ public class MidiHandler {
 
 	      (sendThread = new Thread( new MidiSender( sharedData.sendQ, outDev ) )).start();
 	      sendThread.setName( "EWItool MIDI Sender" );
-	      System.out.println( "Debug - OUT Port: " + infos[d].getName());
+	      Debugger.log( "Debug - OUT Port: " + infos[d].getName());
 	    }
 	  } else if (device.getMaxTransmitters() != 0) {
 	    if (infos[d].getName().equals( userPrefs.midiInPort.getValue() )) {
@@ -120,7 +120,7 @@ public class MidiHandler {
 	      }
 	      midiIn = new MidiReceiver( sharedData );
 	      inDev.getTransmitter().setReceiver( midiIn );
-	      System.out.println( "Debug - IN Port: " + infos[d].getName() );
+	      Debugger.log( "Debug - IN Port: " + infos[d].getName() );
 	    }
 	  }
 	}  
@@ -171,18 +171,18 @@ public class MidiHandler {
     boolean gotIt = false;
     try {
       while (!gotIt) {
-	System.out.println( "DEBUG - MidiHandler Sending request for patch: " + p );
+	Debugger.log( "DEBUG - MidiHandler Sending request for patch: " + p );
 	sendSysEx( reqMsg.clone() );
 	// wait for a patch to be received, or timeout
 	Integer pGot = sharedData.patchQ.poll( MIDI_TIMEOUT_MS, TimeUnit.MILLISECONDS );
 	if (pGot == null)  {
-	  System.out.println( "DEBUG - MidiHandler patch request timed out" );
+	  Debugger.log( "DEBUG - MidiHandler patch request timed out" );
 	  sharedData.patchQ.clear();
 	  // sendSystemReset();
 	} else 	if (pGot == p) {
 	  gotIt = true;
 	} else if (pGot != p) {
-	  System.out.println( "DEBUG - MidiHandler Got out-of-sync patch: " + p );
+	  Debugger.log( "DEBUG - MidiHandler Got out-of-sync patch: " + p );
 	  sharedData.patchQ.clear();
 	} 
       }
@@ -218,23 +218,23 @@ public class MidiHandler {
     reqMsg[3] = MIDI_SYSEX_GEN_INFO;
     reqMsg[4] = MIDI_SYSEX_ID_REQ;
     reqMsg[5] = MIDI_SYSEX_TRAILER;
-    System.out.println( "DEBUG - MidiHandler requesting Device ID" );
+    Debugger.log( "DEBUG - MidiHandler requesting Device ID" );
     sendSysEx( reqMsg.clone() );
     try {
       SharedData.DeviceIdResponse dId = sharedData.deviceIdQ.poll( MIDI_TIMEOUT_MS, TimeUnit.MILLISECONDS );
       if (dId == SharedData.DeviceIdResponse.IS_EWI4000S) {
-	System.out.println( "DEBUG - MidiHandler found EWI4000s" );
+	Debugger.log( "DEBUG - MidiHandler found EWI4000s" );
 	sharedData.setEwiAttached( true );
 	return true;
       } else if (dId == null) {
-	System.out.println( "DEBUG - MidiHandler did not find EWI4000s and timed out" );
+	Debugger.log( "DEBUG - MidiHandler did not find EWI4000s and timed out" );
 	sharedData.setEwiAttached( false );
       } else {
-	System.out.println( "DEBUG - MidiHandler did not find EWI4000s and got unexpected response" );
+	Debugger.log( "DEBUG - MidiHandler did not find EWI4000s and got unexpected response" );
 	sharedData.setEwiAttached( false );
       }
     } catch( InterruptedException e ) {
-      System.out.println( "DEBUG - MidiHandler did not EWI4000s and was interrupted" );
+      Debugger.log( "DEBUG - MidiHandler did not EWI4000s and was interrupted" );
     }
     requestDeviceID();
     return false;

@@ -17,8 +17,11 @@
 
 package ewitool;
 
+import java.util.LinkedList;
+
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -40,15 +43,17 @@ public class EPXTab extends Tab {
   Button queryButton;
   TextField uidField, serverField;
   PasswordField passwdField;
-  ListView resultsView;
-  TextField nameField, contribField, originField, typeField, privacyField,
+  ListView<String> resultsView;
+  TextField nameField, contribField, originField, typeField,
             rTagsField, addedField;
+  CheckBox privacyCheckBox;
   TextArea  descriptionArea;
   Button deleteButton, copyButton;
+  String hexPatch;
   
   EPX epx;
   
-  EPXTab( UserPrefs userPrefs ) {
+  EPXTab( ScratchPad scratchPad, UserPrefs userPrefs ) {
     
     setText( "EWI Patch eXchange" );
     setClosable( false );
@@ -71,30 +76,46 @@ public class EPXTab extends Tab {
     queryGrid.add( querySectionLabel, 0, 0 );
     queryGrid.add( new Label( "Type" ), 0, 1 );
     typeChoice = new ChoiceBox<String>();
-    typeChoice.getItems().addAll( "All", "Brass", "Percussion", "Strings", "Synthetic", "Woodwind" );
+    typeChoice.getItems().addAll( "All" );
     typeChoice.getSelectionModel().select( 0 );
     queryGrid.add( typeChoice, 1, 1 );
     queryGrid.add( new Label( "Added in the last..." ), 0, 2 );
     addedChoice = new ChoiceBox<String>();
-    addedChoice.getItems().addAll( "Forever", "Day", "Week", "Month", "Quarter", "Year" );
+    addedChoice.getItems().addAll( "All", "1 day", "7 days", "1 month", "3 months", "1 year" );
     addedChoice.getSelectionModel().select( 0 );
     queryGrid.add( addedChoice, 1, 2 );
     queryGrid.add( new Label( "Contributor" ), 0, 3 );
     contribChoice = new ChoiceBox<String>();
     contribChoice.getItems().addAll( "All" ); // more added programatically
+    contribChoice.getSelectionModel().select( 0 );
     queryGrid.add( contribChoice, 1, 3 );
     queryGrid.add( new Label( "Origin" ), 0, 4 );
     originChoice = new ChoiceBox<String>();
+    originChoice.getItems().addAll( "All" ); // more added programatically
+    originChoice.getSelectionModel().select( 0 );
     queryGrid.add( originChoice, 1, 4 );
     queryGrid.add( new Label( "Tags" ), 0, 5 );
     qTagsField = new TextField();
     queryGrid.add( qTagsField, 1, 5 );
     
     queryButton = new Button( "Query" );
+    queryButton.setOnAction( (ae) -> {
+      LinkedList<EPX.QueryResult> lqr = epx.query( typeChoice.getSelectionModel().getSelectedItem(),
+                                                   addedChoice.getSelectionModel().getSelectedItem(),
+                                                   contribChoice.getSelectionModel().getSelectedItem(),
+                                                   originChoice.getSelectionModel().getSelectedItem(),
+                                                   qTagsField.getText()
+                                                 );
+      resultsView.getItems().clear();
+      for (EPX.QueryResult qr : lqr) {
+        resultsView.getItems().add( qr.name_user + " #" + qr.epx_id );
+      }
+    });
     queryGrid.add( queryButton, 1, 6 );
+    queryGrid.setDisable( true );  // disabled until we know we can connect
     
     // left bottom pane
-    GridPane settingsGrid = new UiEPXSettingsGrid( userPrefs, epx );
+    GridPane settingsGrid = new UiEPXSettingsGrid( userPrefs, epx, queryGrid );
      
     // centre pane
     GridPane resultsGrid = new GridPane();
@@ -104,7 +125,30 @@ public class EPXTab extends Tab {
     resultsGrid.add( resultsSectionLabel, 0, 0 );
     resultsGrid.getRowConstraints().add( fixedRC );
     
-    resultsView = new ListView();
+    resultsView = new ListView<String>();
+    resultsView.getSelectionModel().selectedItemProperty().addListener( (item)-> {
+      if (resultsView.getSelectionModel().getSelectedIndex() != -1){
+        String selected = resultsView.getSelectionModel().getSelectedItem();
+        int epxId = Integer.parseInt( selected.substring( selected.lastIndexOf( '#' ) + 1 ) );
+        EPX.DetailsResult dr = epx.getDetails( epxId );
+        if (dr != null) {
+          nameField.setText( dr.name );
+          contribField.setText( dr.contrib );
+          originField.setText( dr.origin );
+          typeField.setText( dr.type );
+          privacyCheckBox.setSelected( dr.privateFlag );
+          descriptionArea.setText( dr.desc );
+          rTagsField.setText( dr.tags );
+          addedField.setText( dr.added );
+          if (dr.contrib.contentEquals( userPrefs.getEpxUserid() ))
+            deleteButton.setDisable( false );
+          else
+            deleteButton.setDisable( true );
+          copyButton.setDisable( false );
+          hexPatch = dr.hex;
+        }
+      }
+    });
     resultsGrid.add( resultsView, 0, 1 );
     resultsGrid.getRowConstraints().add( vgrowRC );
     
@@ -136,13 +180,14 @@ public class EPXTab extends Tab {
     detailGrid.add( typeField, 1, 4 );
     detailGrid.getRowConstraints().add( vgrowRC );
     
-    detailGrid.add( new Label( "Privacy" ), 0, 5 );
-    privacyField = new TextField();
-    detailGrid.add( privacyField, 1, 5 );
+    detailGrid.add( new Label( "Private" ), 0, 5 );
+    privacyCheckBox = new CheckBox();
+    detailGrid.add( privacyCheckBox, 1, 5 );
     detailGrid.getRowConstraints().add( vgrowRC );
     
     detailGrid.add( new Label( "Description" ), 0, 6 );
     descriptionArea = new TextArea();
+    descriptionArea.setWrapText( true );
     detailGrid.add( descriptionArea, 0, 7 );
     GridPane.setColumnSpan( descriptionArea, 2 );
     detailGrid.getRowConstraints().add( vgrowRC );
@@ -158,8 +203,17 @@ public class EPXTab extends Tab {
     detailGrid.getRowConstraints().add( vgrowRC );
     
     deleteButton = new Button( "Delete" );
+    deleteButton.setDisable( true );
+    deleteButton.setOnAction( (ae) -> {
+      // TODO 
+    });
     detailGrid.add( deleteButton, 0, 10 );
     copyButton = new Button( "Copy to Scratchpad" );
+    copyButton.setDisable( true );
+    copyButton.setOnAction( (ae) -> {
+      EWI4000sPatch tmpPatch = new EWI4000sPatch( hexPatch );
+      scratchPad.addPatch( tmpPatch );
+    });
     detailGrid.add( copyButton, 1, 10 );
     detailGrid.getRowConstraints().add( vgrowRC );
     
@@ -174,6 +228,15 @@ public class EPXTab extends Tab {
     hBox.getChildren().addAll( lhVBox, resultsGrid, detailGrid );
     
     setContent( hBox );
+    
+    // enable the query grid if we can connect with user's credentials to EPX
+    if (epx.testConnection() && epx.testUser()) {
+      queryGrid.setDisable( false );
+      String[] dropdownData = epx.getDropdowns();
+      typeChoice.getItems().addAll( dropdownData[0].split( "," ) );
+      contribChoice.getItems().addAll( dropdownData[1].split( "," ) );
+      originChoice.getItems().addAll( dropdownData[2].split( "," ) );
+    }
 
   }
 }

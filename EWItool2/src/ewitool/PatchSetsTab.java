@@ -95,19 +95,19 @@ public class PatchSetsTab extends Tab {
     patchSetList.getSelectionModel().selectedItemProperty().addListener( new ChangeListener<String>() {
       @Override
       public void changed( ObservableValue< ? extends String > observable, String oldValue, String newValue ) {
-        System.out.println( "DEBUG - changed - " + newValue + " chosen" );
+        Debugger.log( "DEBUG - changed - " + newValue + " chosen" );
         patchesInSetOL.clear();
         Path path = Paths.get( userPrefs.getLibraryLocation(), newValue );
         try {
           byte[] allBytes = Files.readAllBytes( path );
           if ((allBytes != null) && allBytes.length > 200 ) {
-            System.out.println( "DEBUG - bytes read: " + allBytes.length );
+            Debugger.log( "DEBUG - bytes read: " + allBytes.length );
             for (int byteOffset = 0; byteOffset < allBytes.length; byteOffset += EWI4000sPatch.EWI_PATCH_LENGTH ) {
               EWI4000sPatch ep = new EWI4000sPatch();
               ep.patchBlob = Arrays.copyOfRange( allBytes, byteOffset, byteOffset + EWI4000sPatch.EWI_PATCH_LENGTH  );
               ep.decodeBlob();
               patchesInSetOL.add( ep );
-              //System.out.println( "DEBUG - patch loaded" );
+              //Debugger.log( "DEBUG - patch loaded" );
             }
             patchListView.setItems( null );
             patchListView.setItems( patchesInSetOL );
@@ -149,7 +149,7 @@ public class PatchSetsTab extends Tab {
             super.updateItem( ep, bln );
             if (ep != null) {
               String patchName = new String( ep.name );
-              // System.out.println( "DEBUG - patch loaded - " + patchName );
+              // Debugger.log( "DEBUG - patch loaded - " + patchName );
               setText( patchName );
             }
           }
@@ -164,7 +164,7 @@ public class PatchSetsTab extends Tab {
       public void changed( ObservableValue< ? extends EWI4000sPatch > observable, EWI4000sPatch oldValue,
           EWI4000sPatch newValue ) {
         if (newValue != null) {
-          System.out.println( "DEBUG - Patch selected: " + new String( newValue.name ) );
+          Debugger.log( "DEBUG - Patch selected: " + new String( newValue.name ) );
           copyButton.setDisable( false );
         }
       }   
@@ -172,11 +172,9 @@ public class PatchSetsTab extends Tab {
 
     copyButton = new Button( "Copy to Scratchpad" );
     copyButton.setDisable( true );
-    copyButton.setOnAction( new EventHandler<ActionEvent>() {
-      @Override public void handle( ActionEvent ae ) {
-        if (patchListView.getSelectionModel().getSelectedIndex() != -1) {
-          scratchPad.addPatch( patchListView.getSelectionModel().getSelectedItem() );
-        }
+    copyButton.setOnAction( (ae) -> {
+      if (patchListView.getSelectionModel().getSelectedIndex() != -1) {
+        scratchPad.addPatch( patchListView.getSelectionModel().getSelectedItem() );
       }
     });
     gp.add( copyButton, 3, 3 );

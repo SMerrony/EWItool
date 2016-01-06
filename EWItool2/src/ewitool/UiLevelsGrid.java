@@ -53,7 +53,6 @@ public class UiLevelsGrid extends GridPane {
     masterSlider.setMajorTickUnit( 32.0 );
     GridPane.setRowSpan( masterSlider, 3 );
     masterSlider.valueProperty().addListener( (observable, oldVal, newVal) -> {
-      //System.out.println( "DEBUG - UiLevelsGrid - Master Slider changed to " + newVal.intValue() );
       midiHandler.sendLiveControl( 1, 88, newVal.intValue() );
       editPatch.ampLevel = newVal.intValue();
     });

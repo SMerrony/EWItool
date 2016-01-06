@@ -69,7 +69,7 @@ public class MidiSender implements Runnable {
 	  break;
 	case SYSEX:
 	  try {
-	    System.out.println( "DBEUG - MidiSender thread got SysEx to send.  Length: " + msg.bytes.length );
+	    Debugger.log( "DBEUG - MidiSender thread got SysEx to send.  Length: " + msg.bytes.length );
 	    if (msg.bytes[0] != MidiHandler.MIDI_SYSEX_HEADER) {
 	      System.err.println( "Error - MidiSender received invalid SysEx send request" );
 	      System.exit( 1 );
@@ -88,7 +88,7 @@ public class MidiSender implements Runnable {
 	  break;
 	case SYSTEM_RESET:
 	    try {
-	      System.out.println( "DEBUG - MidiSender sending System Reset to EWI" );
+	      Debugger.log( "DEBUG - MidiSender sending System Reset to EWI" );
 	      ShortMessage sm = new ShortMessage( ShortMessage.SYSTEM_RESET );
 	      receiver.send(  sm,  NOW );
 	    } catch( InvalidMidiDataException e ) {
@@ -103,7 +103,7 @@ public class MidiSender implements Runnable {
 
 	}
       } catch( InterruptedException e ) {
-	System.out.println( "DEBUG - MidiSender closing" );
+	Debugger.log( "DEBUG - MidiSender closing" );
 	receiver.close();
 	outDev.close();
       }

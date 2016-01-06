@@ -28,6 +28,8 @@ package ewitool;
 
 import java.util.Arrays;
 
+import javax.xml.bind.DatatypeConverter;
+
 public class EWI4000sPatch { // extends Observable {
   
   public final static int EWI_NUM_PATCHES  = 100;  // 0..99
@@ -218,11 +220,26 @@ public class EWI4000sPatch { // extends Observable {
     setEmpty( true );
   }
   
+  /*** Construct from byte[], i.e. blob
+   *  
+   * @param blob
+   */
   EWI4000sPatch( byte[] blob ) {
     this();
     patchBlob = blob;
-    setEmpty( false );
     decodeBlob();
+    setEmpty( false );
+  }
+  
+  /*** Construct from String of hex digits
+   * 
+   * @param hexString
+   */
+  EWI4000sPatch( String hexString ) {
+    this();
+    patchBlob = DatatypeConverter.parseHexBinary( hexString );
+    decodeBlob();
+    setEmpty( false );
   }
   
   public boolean isEmpty() {

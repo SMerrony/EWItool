@@ -80,13 +80,13 @@ public class PortsItemEventHandler implements EventHandler<ActionEvent> {
             outPorts.add( infos[d].getName() );
             if (infos[d].getName().equals( lastOutDevice ))
               outView.getSelectionModel().clearAndSelect( opIx );
-            //System.out.println( "Debug - OUT Port: " + infos[d].getName());
+            //Debugger.log( "Debug - OUT Port: " + infos[d].getName());
           } else if (device.getMaxTransmitters() != 0) {
             ipIx++;
             inPorts.add( infos[d].getName() );
             if (infos[d].getName().equals( lastInDevice )) 
               inView.getSelectionModel().clearAndSelect( ipIx );
-            //System.out.println( "Debug - IN Port: " + infos[d].getName() );
+            //Debugger.log( "Debug - IN Port: " + infos[d].getName() );
           }
         }
         

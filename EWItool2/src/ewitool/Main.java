@@ -88,7 +88,7 @@ public class Main extends Application {
       patchSetsTab = new PatchSetsTab( scratchPad, userPrefs );
       tabPane.getTabs().add( patchSetsTab );
 
-      epxTab = new EPXTab( userPrefs );
+      epxTab = new EPXTab( scratchPad, userPrefs );
       tabPane.getTabs().add( epxTab );
       //epxTab.setDisable( true );
       
@@ -109,14 +109,14 @@ public class Main extends Application {
       userPrefs.midiInPort.addListener( new ChangeListener<String>() {
 	@Override
 	public void changed( ObservableValue<? extends String> observable, String oldValue, String newValue ) {
-	  System.out.println( "Debug - Noticed that IN Port Changed to : " + newValue );
+	  Debugger.log( "Debug - Noticed that IN Port Changed to : " + newValue );
 	  midiHandler.restart();
 	}
       });
       userPrefs.midiOutPort.addListener( new ChangeListener<String>() {
 	@Override
 	public void changed( ObservableValue<? extends String> observable, String oldValue, String newValue ) {
-	  System.out.println( "Debug - Noticed that OUT Port Changed to : " + newValue );
+	  Debugger.log( "Debug - Noticed that OUT Port Changed to : " + newValue );
 	  midiHandler.restart();
 	}
       });
@@ -130,7 +130,7 @@ public class Main extends Application {
       mainStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 	@Override
 	public void handle( WindowEvent we ) {
-	  System.out.println( "DEBUG - clean exit" );
+	  Debugger.log( "DEBUG - clean exit" );
 	  midiHandler.close();
 	  Platform.exit();
 	  System.exit( 0 );           
@@ -152,7 +152,7 @@ public class Main extends Application {
      System.err.println( "Error - EWItool requires at least version " + MINIMUM_JVM_SPEC + " of Java to run." );
      System.exit( 1 );
    } else {
-     System.out.println( "DEBUG - JVM Spec. " + jvmSpec + " detected" );
+     Debugger.log( "DEBUG - JVM Spec. " + jvmSpec + " detected" );
    }
   }
   
@@ -160,7 +160,7 @@ public class Main extends Application {
     @Override
     public void update( Observable o, Object arg ) {
       if ((int)arg == SharedData.EDIT_PATCH) {
-	System.out.println( "DEBUG - Main: noticed shared data change" );
+	Debugger.log( "DEBUG - Main: noticed shared data change" );
 	patchEditorTab.setDisable( false );
 	tabPane.getSelectionModel().select( patchEditorTab );
       }
@@ -183,7 +183,7 @@ public class Main extends Application {
       quitItem.setOnAction( new EventHandler<ActionEvent>() {
 	@Override
 	public void handle( ActionEvent ae) {
-	  System.out.println( "DEBUG - clean exit" );
+	  Debugger.log( "DEBUG - clean exit" );
 	  midiHandler.close();
 	  Platform.exit();
 	  System.exit( 0 );           
@@ -204,7 +204,7 @@ public class Main extends Application {
       fetchAllItem.setOnAction( new EventHandler<ActionEvent>() {
 	@Override
 	public void handle( ActionEvent ae) {
-	  System.out.println( "DEBUG - Fetch All..." );
+	  Debugger.log( "DEBUG - Fetch All..." );
 	  midiHandler.requestDeviceID();
 	  Alert busyAlert = new Alert( AlertType.INFORMATION, "Fetching all patches.  Please wait..." );
 	  busyAlert.setTitle( "EWItool" );
