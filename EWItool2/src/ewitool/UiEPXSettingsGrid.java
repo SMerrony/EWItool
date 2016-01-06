@@ -31,7 +31,7 @@ import javafx.scene.layout.GridPane;
  */
 public class UiEPXSettingsGrid extends GridPane {
 
-  UiEPXSettingsGrid( UserPrefs userPrefs, EPX epx ) {
+  UiEPXSettingsGrid( UserPrefs userPrefs, EPX epx, GridPane queryGrid ) {
     Label settingsSectionLabel = new Label( "EPX Settings" );
     settingsSectionLabel.setId( "epx-section-label" );
     add( settingsSectionLabel, 0, 0 );
@@ -96,6 +96,7 @@ public class UiEPXSettingsGrid extends GridPane {
             okAlert.setTitle( "EWItool - EPX OK" );
             okAlert.setContentText( "Connection, user ID and password all OK - EPX credentials stored" );
             okAlert.showAndWait();
+            queryGrid.setDisable( false );
           }
         }
       }   
