@@ -20,7 +20,6 @@ package ewitool;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -28,27 +27,38 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Tab;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 
 public class PatchEditorTab extends Tab {
-  
+
   enum Osc { OSC1, OSC2 }
   enum Filter { OSC_PRI, OSC_SEC, NOISE_PRI, NOISE_SEC }
   public ComboBox<String> patchesCombo;
   public Button storeButton, revertButton, toScratchPadButton;
   private EWI4000sPatch editPatch, uneditedPatch;
-    
+
   PatchEditorTab(SharedData sharedData, ScratchPad scratchPad, MidiHandler midiHandler) {
     setText( "Patch Editor" );
     setClosable( false );
-    
+
     editPatch = new EWI4000sPatch();
-      
+
+    GridPane peGrid = new GridPane();
+    ColumnConstraints ccsGrowable = new ColumnConstraints( 40.0, 90.0, Double.MAX_VALUE );
+    RowConstraints rcsFixed = new RowConstraints(), rcsGrowable = new RowConstraints();
+    ccsGrowable.setHgrow( Priority.ALWAYS );
+    rcsFixed.setVgrow( Priority.NEVER );
+    rcsGrowable.setVgrow( Priority.ALWAYS );
+    for (int col = 0; col < 12; col++) peGrid.getColumnConstraints().add( ccsGrowable );
+    peGrid.getRowConstraints().addAll( rcsFixed, rcsGrowable, rcsGrowable, rcsGrowable, rcsGrowable );
+
     patchesCombo = new ComboBox<String>();
     storeButton = new Button( "Store" );
     storeButton.setTooltip( new Tooltip( "Replace the patch in the EWI with the current version" ) );
@@ -69,30 +79,23 @@ public class PatchEditorTab extends Tab {
     HBox.setHgrow( lSpaceRegion, Priority.ALWAYS );
     HBox.setHgrow( rSpaceRegion, Priority.ALWAYS );
     headerBox.getChildren().addAll( lSpaceRegion, patchesCombo, storeButton, revertButton, toScratchPadButton, rSpaceRegion );
-    
+
     UiOscGrid osc1Grid = new UiOscGrid( editPatch, midiHandler, Osc.OSC1 );
     UiOscGrid osc2Grid = new UiOscGrid( editPatch, midiHandler, Osc.OSC2 );
-    HBox oscBox = new HBox();
-    oscBox.getChildren().addAll( osc1Grid, osc2Grid );
-    
+
     UiFormantGrid formantGrid = new UiFormantGrid( editPatch, midiHandler );
     UiKeyTriggerGrid keyTriggerGrid = new UiKeyTriggerGrid( editPatch, midiHandler );
     VBox subVbox = new VBox();
     VBox.setVgrow( formantGrid, Priority.ALWAYS );
     VBox.setVgrow( keyTriggerGrid, Priority.ALWAYS );
     subVbox.getChildren().addAll( formantGrid, keyTriggerGrid );
-    subVbox.setMinWidth( 80.0 );
     UiFilterGrid oscPriFilterGrid = new UiFilterGrid( editPatch, midiHandler, Filter.OSC_PRI );
     UiFilterGrid oscSecFilterGrid = new UiFilterGrid( editPatch, midiHandler, Filter.OSC_SEC );
-    HBox filterBox = new HBox();    
-    filterBox.getChildren().addAll( subVbox, oscPriFilterGrid, oscSecFilterGrid );
 
     UiNoiseGrid noiseGrid = new UiNoiseGrid( editPatch, midiHandler );
     UiFilterGrid noisePriFilterGrid = new UiFilterGrid( editPatch, midiHandler, Filter.NOISE_PRI );
     UiFilterGrid noiseSecFilterGrid = new UiFilterGrid( editPatch, midiHandler, Filter.NOISE_SEC );
-    HBox noiseBox = new HBox();
-    noiseBox.getChildren().addAll( noiseGrid, noisePriFilterGrid, noiseSecFilterGrid );
-    
+
     UiChorusGrid chorusGrid = new UiChorusGrid( editPatch, midiHandler);
     UiDelayGrid delayGrid = new UiDelayGrid( editPatch, midiHandler );
     UiReverbGrid reverbGrid = new UiReverbGrid( editPatch, midiHandler );
@@ -100,56 +103,69 @@ public class PatchEditorTab extends Tab {
     UiPitchBendGrid pitchBendGrid = new UiPitchBendGrid( editPatch, midiHandler);
     UiAntiAliasGrid antiAliasGrid = new UiAntiAliasGrid( editPatch, midiHandler);
     UiLevelsGrid levelsGrid = new UiLevelsGrid( editPatch, midiHandler );
-    HBox multiBox = new HBox();
-    multiBox.getChildren().addAll( chorusGrid, delayGrid, reverbGrid, biteGrid, 
-                                   pitchBendGrid, antiAliasGrid, levelsGrid );
 
-    // all-encompassing VBox
-    VBox vBox = new VBox();
-    VBox.setVgrow( headerBox, Priority.NEVER );
-    VBox.setVgrow( oscBox, Priority.ALWAYS );
-    VBox.setVgrow( filterBox, Priority.ALWAYS );
-    VBox.setVgrow( noiseBox, Priority.ALWAYS );
-    VBox.setVgrow( multiBox, Priority.ALWAYS );
-    vBox.getChildren().addAll( headerBox, oscBox, filterBox, noiseBox, multiBox );
-    
-    setContent( vBox );
+    GridPane.setColumnSpan( headerBox, 12 );
+    peGrid.add( headerBox, 0, 0 );
+
+    GridPane.setColumnSpan( osc1Grid, 6 );
+    peGrid.add( osc1Grid, 0, 1 );
+    GridPane.setColumnSpan( osc2Grid, 6 );
+    peGrid.add( osc2Grid, 6, 1 );
+
+    GridPane.setColumnSpan( subVbox, 2 );
+    peGrid.add( subVbox, 0, 2 );
+    GridPane.setColumnSpan( oscPriFilterGrid, 5 );
+    peGrid.add( oscPriFilterGrid, 2, 2 );
+    GridPane.setColumnSpan( oscSecFilterGrid, 5 );
+    peGrid.add( oscSecFilterGrid, 7, 2 );
+
+    GridPane.setColumnSpan( noiseGrid, 2 );
+    peGrid.add( noiseGrid, 0, 3 );
+    GridPane.setColumnSpan( noisePriFilterGrid, 5 );
+    peGrid.add( noisePriFilterGrid, 2, 3 );
+    GridPane.setColumnSpan( noiseSecFilterGrid, 5 );
+    peGrid.add( noiseSecFilterGrid, 7, 3 );
+
+    GridPane.setColumnSpan( chorusGrid, 4 );
+    peGrid.add( chorusGrid, 0, 4 );
+    GridPane.setColumnSpan( delayGrid, 2 );
+    peGrid.add( delayGrid, 4, 4 );
+    GridPane.setColumnSpan( reverbGrid, 2 );
+    peGrid.add( reverbGrid, 6, 4 );
+    peGrid.add( biteGrid, 8, 4 );
+    peGrid.add( pitchBendGrid, 9, 4 );
+    peGrid.add( antiAliasGrid, 10, 4 );
+    peGrid.add( levelsGrid, 11, 4 );
+
+    setContent( peGrid );
 
     // what to do when the combo is changed...
-    patchesCombo.setOnAction( new EventHandler<ActionEvent>() {
-      @Override
-      public void handle( ActionEvent ae ) {
-	if (!patchesCombo.getSelectionModel().isEmpty()) {
-	  editPatch = sharedData.ewiPatchList.get( patchesCombo.getSelectionModel().getSelectedIndex() );
-	  uneditedPatch = editPatch;
-	  Debugger.log( "DEBUG - Patch editor selection changed" );
-	  osc1Grid.setControls( editPatch, Osc.OSC1 );
-	  osc2Grid.setControls( editPatch, Osc.OSC2 );
-	  formantGrid.setControls( editPatch );
-	  keyTriggerGrid.setControls( editPatch );
-	  oscPriFilterGrid.setControls( editPatch, Filter.OSC_PRI );
-	  oscSecFilterGrid.setControls( editPatch, Filter.OSC_SEC );
-	  noiseGrid.setControls( editPatch );
-	  noisePriFilterGrid.setControls( editPatch, Filter.NOISE_PRI );
-	  noiseSecFilterGrid.setControls( editPatch, Filter.NOISE_SEC );
-	  chorusGrid.setControls( editPatch );
-	  delayGrid.setControls( editPatch );
-	  reverbGrid.setControls( editPatch );
-	  biteGrid.setControls( editPatch );
-	  pitchBendGrid.setControls( editPatch );
-	  antiAliasGrid.setControls( editPatch );
-	  levelsGrid.setControls( editPatch );
-
-	  midiHandler.sendPatch( editPatch, EWI4000sPatch.EWI_EDIT ); 
-
-	}
+    patchesCombo.setOnAction( (ae) -> {
+      if (!patchesCombo.getSelectionModel().isEmpty()) {
+        editPatch = sharedData.ewiPatchList.get( patchesCombo.getSelectionModel().getSelectedIndex() );
+        uneditedPatch = editPatch;
+        Debugger.log( "DEBUG - Patch editor selection changed" );
+        osc1Grid.setControls( editPatch, Osc.OSC1 );
+        osc2Grid.setControls( editPatch, Osc.OSC2 );
+        formantGrid.setControls( editPatch );
+        keyTriggerGrid.setControls( editPatch );
+        oscPriFilterGrid.setControls( editPatch, Filter.OSC_PRI );
+        oscSecFilterGrid.setControls( editPatch, Filter.OSC_SEC );
+        noiseGrid.setControls( editPatch );
+        noisePriFilterGrid.setControls( editPatch, Filter.NOISE_PRI );
+        noiseSecFilterGrid.setControls( editPatch, Filter.NOISE_SEC );
+        chorusGrid.setControls( editPatch );
+        delayGrid.setControls( editPatch );
+        reverbGrid.setControls( editPatch );
+        biteGrid.setControls( editPatch );
+        pitchBendGrid.setControls( editPatch );
+        antiAliasGrid.setControls( editPatch );
+        levelsGrid.setControls( editPatch );
+        midiHandler.sendPatch( editPatch, EWI4000sPatch.EWI_EDIT ); 
       }
     });
-
   }
-  
 
-  
   public void populateCombo( SharedData sharedData ) {
     patchesCombo.getItems().clear();
     for (int p = 0; p < EWI4000sPatch.EWI_NUM_PATCHES; p++) {
