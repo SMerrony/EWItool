@@ -24,12 +24,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -62,17 +59,15 @@ public class PatchSetsTab extends Tab {
     gp.add( libLocLabel, 1, 0 );
     Button libLocButton = new Button( "Change" );
     gp.add( libLocButton, 2, 0 );
-    libLocButton.setOnAction( new EventHandler<ActionEvent>() {
-      @Override public void handle( ActionEvent ae ) {
-        DirectoryChooser dc = new DirectoryChooser();
-        dc.setTitle( "Choose EWI Patch Set Library location" );
-        if (!userPrefs.getLibraryLocation().equals( "<Not Chosen>" ))
-          dc.setInitialDirectory( new File( userPrefs.getLibraryLocation() ) );
-        File chosenLLdirFile = dc.showDialog( null );
-        if (chosenLLdirFile != null) {
-          userPrefs.setLibraryLocation( chosenLLdirFile.getAbsolutePath() );
-          libLocLabel.setText( chosenLLdirFile.getAbsolutePath() );
-        }
+    libLocButton.setOnAction( (ae) -> {
+      DirectoryChooser dc = new DirectoryChooser();
+      dc.setTitle( "Choose EWI Patch Set Library location" );
+      if (!userPrefs.getLibraryLocation().equals( "<Not Chosen>" ))
+        dc.setInitialDirectory( new File( userPrefs.getLibraryLocation() ) );
+      File chosenLLdirFile = dc.showDialog( null );
+      if (chosenLLdirFile != null) {
+        userPrefs.setLibraryLocation( chosenLLdirFile.getAbsolutePath() );
+        libLocLabel.setText( chosenLLdirFile.getAbsolutePath() );
       }
     });
 
@@ -92,36 +87,33 @@ public class PatchSetsTab extends Tab {
     } 
     
     // Handle changes to the set list selection
-    patchSetList.getSelectionModel().selectedItemProperty().addListener( new ChangeListener<String>() {
-      @Override
-      public void changed( ObservableValue< ? extends String > observable, String oldValue, String newValue ) {
-        Debugger.log( "DEBUG - changed - " + newValue + " chosen" );
-        patchesInSetOL.clear();
-        Path path = Paths.get( userPrefs.getLibraryLocation(), newValue );
-        try {
-          byte[] allBytes = Files.readAllBytes( path );
-          if ((allBytes != null) && allBytes.length > 200 ) {
-            Debugger.log( "DEBUG - bytes read: " + allBytes.length );
-            for (int byteOffset = 0; byteOffset < allBytes.length; byteOffset += EWI4000sPatch.EWI_PATCH_LENGTH ) {
-              EWI4000sPatch ep = new EWI4000sPatch();
-              ep.patchBlob = Arrays.copyOfRange( allBytes, byteOffset, byteOffset + EWI4000sPatch.EWI_PATCH_LENGTH  );
-              ep.decodeBlob();
-              patchesInSetOL.add( ep );
-              //Debugger.log( "DEBUG - patch loaded" );
+    patchSetList.getSelectionModel().selectedItemProperty().addListener( 
+        (ObservableValue< ? extends String > observable, String oldValue, String newValue ) -> {
+          Debugger.log( "DEBUG - changed - " + newValue + " chosen" );
+          patchesInSetOL.clear();
+          Path path = Paths.get( userPrefs.getLibraryLocation(), newValue );
+          try {
+            byte[] allBytes = Files.readAllBytes( path );
+            if ((allBytes != null) && allBytes.length > 200 ) {
+              Debugger.log( "DEBUG - bytes read: " + allBytes.length );
+              for (int byteOffset = 0; byteOffset < allBytes.length; byteOffset += EWI4000sPatch.EWI_PATCH_LENGTH ) {
+                EWI4000sPatch ep = new EWI4000sPatch();
+                ep.patchBlob = Arrays.copyOfRange( allBytes, byteOffset, byteOffset + EWI4000sPatch.EWI_PATCH_LENGTH  );
+                ep.decodeBlob();
+                patchesInSetOL.add( ep );
+                //Debugger.log( "DEBUG - patch loaded" );
+              }
+              patchListView.setItems( null );
+              patchListView.setItems( patchesInSetOL );
+              loadEwiButton.setDisable( false );
+              deleteButton.setDisable( false );
+              copyButton.setDisable( true );
             }
-            patchListView.setItems( null );
-            patchListView.setItems( patchesInSetOL );
-            loadEwiButton.setDisable( false );
-            deleteButton.setDisable( false );
-            copyButton.setDisable( true );
-          }
-        } catch( IOException e ) {
-          // TODO Auto-generated catch block
-          e.printStackTrace();
-        }
-
-      }   
-    }); 
+          } catch( IOException e ) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+          } 
+        }); 
   
     importButton = new Button( "Import" );
     gp.add( importButton, 0, 3 );
@@ -159,16 +151,13 @@ public class PatchSetsTab extends Tab {
     });
     
     // Handle changes to the patch list selection
-    patchListView.getSelectionModel().selectedItemProperty().addListener( new ChangeListener<EWI4000sPatch>() {
-      @Override
-      public void changed( ObservableValue< ? extends EWI4000sPatch > observable, EWI4000sPatch oldValue,
-          EWI4000sPatch newValue ) {
-        if (newValue != null) {
-          Debugger.log( "DEBUG - Patch selected: " + new String( newValue.name ) );
-          copyButton.setDisable( false );
-        }
-      }   
-    }); 
+    patchListView.getSelectionModel().selectedItemProperty().addListener( 
+        (ObservableValue< ? extends EWI4000sPatch > observable, EWI4000sPatch oldValue, EWI4000sPatch newValue ) -> {
+          if (newValue != null) {
+            Debugger.log( "DEBUG - Patch selected: " + new String( newValue.name ) );
+            copyButton.setDisable( false );
+          }
+        }); 
 
     copyButton = new Button( "Copy to Scratchpad" );
     copyButton.setDisable( true );
