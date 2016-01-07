@@ -19,8 +19,6 @@ package ewitool;
 
 import java.util.Optional;
 
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.VPos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -51,7 +49,7 @@ public class ScratchPadTab extends Tab {
       Alert warnAlert = new Alert( AlertType.WARNING );
       warnAlert.setTitle( "EWItool - Warning" );
       warnAlert.setContentText( "Cannot load Scratchpad.  It could be that the Library Path is not set or the directory is inaccessible.  " + 
-	  			"Please check the location on the Patch Set Library tab before continuing." );
+          "Please check the location on the Patch Set Library tab before continuing." );
       warnAlert.showAndWait();
     }
 
@@ -71,18 +69,18 @@ public class ScratchPadTab extends Tab {
     patchList.setCellFactory( new Callback<ListView<EWI4000sPatch>, ListCell<EWI4000sPatch>>(){
       @Override 
       public ListCell<EWI4000sPatch> call( ListView<EWI4000sPatch> p ) {
-	ListCell<EWI4000sPatch> cell = new ListCell<EWI4000sPatch>() {
-	  @Override
-	  protected void updateItem( EWI4000sPatch ep, boolean bln ) {
-	    super.updateItem( ep, bln );
-	    if (ep != null) {
-	      setText( ep.getName() );
-	    } else {
-	      setText( "" );
-	    }
-	  }
-	};
-	return cell;
+        ListCell<EWI4000sPatch> cell = new ListCell<EWI4000sPatch>() {
+          @Override
+          protected void updateItem( EWI4000sPatch ep, boolean bln ) {
+            super.updateItem( ep, bln );
+            if (ep != null) {
+              setText( ep.getName() );
+            } else {
+              setText( "" );
+            }
+          }
+        };
+        return cell;
       }
     });
 
@@ -93,41 +91,37 @@ public class ScratchPadTab extends Tab {
     GridPane.setValignment( clearButton, VPos.CENTER );
 
     deleteButton = new Button( "Delete" );
-    deleteButton.setOnAction( new EventHandler<ActionEvent>() {
-      @Override public void handle( ActionEvent ae ) {
-	if (patchList.getSelectionModel().getSelectedIndex() != -1) {
-	  scratchPad.removePatch( patchList.getSelectionModel().getSelectedIndex() );
-	}
+    deleteButton.setOnAction( (ae) -> {
+      if (patchList.getSelectionModel().getSelectedIndex() != -1) {
+        scratchPad.removePatch( patchList.getSelectionModel().getSelectedIndex() );
       }
-    });
+    } );
     gp.add( deleteButton, 2, 0 );
 
     renameButton = new Button( "Rename" );
-    renameButton.setOnAction( new EventHandler<ActionEvent>() {
-      @Override public void handle( ActionEvent ae ) {
-	if (patchList.getSelectionModel().getSelectedIndex() != -1) {
-	  TextInputDialog tid = new TextInputDialog();
-	  tid.setTitle( "EWItool - Rename" );
-	  tid.setHeaderText( "Rename patch on Scratchpad" );
-	  tid.setContentText( "New name:" );
-	  Optional<String> result = tid.showAndWait();
-	  if (result.isPresent()) {
-	    scratchPad.renamePatch( patchList.getSelectionModel().getSelectedIndex(), result.get() );
-	    patchList.refresh();
-	  }
-	}
+    renameButton.setOnAction( (ae) -> {
+      if (patchList.getSelectionModel().getSelectedIndex() != -1) {
+        TextInputDialog tid = new TextInputDialog();
+        tid.setTitle( "EWItool - Rename" );
+        tid.setHeaderText( "Rename patch on Scratchpad" );
+        tid.setContentText( "New name:" );
+        Optional<String> result = tid.showAndWait();
+        if (result.isPresent()) {
+          scratchPad.renamePatch( patchList.getSelectionModel().getSelectedIndex(), result.get() );
+          patchList.refresh();
+        }
       }
-    });
+    } );
     gp.add( renameButton, 3, 0 );	
 
     viewHexButton = new Button( "View in Hex" );
     viewHexButton.setOnAction( (event) -> {
       if (patchList.getSelectionModel().getSelectedIndex() != -1) {
-	byte[] blob = scratchPad.patchList.get( patchList.getSelectionModel().getSelectedIndex() ).patchBlob;
+        byte[] blob = scratchPad.patchList.get( patchList.getSelectionModel().getSelectedIndex() ).patchBlob;
         UiHexViewDialog hexDialog = new UiHexViewDialog( blob );
         hexDialog.showAndWait();
       }
-    }); 
+    } ); 
     gp.add( viewHexButton, 1, 1 );
 
     exchangeButton = new Button( "Prepare to Exchange" );
