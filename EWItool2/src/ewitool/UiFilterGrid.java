@@ -279,7 +279,7 @@ public class UiFilterGrid extends GridPane {
     add( keyFollowSlider, 0, 4 );   
     add( new BoundRightControlLabel( "Key Follow", HPos.CENTER, keyFollowSlider ), 0, 3 );
     
-    cutoffFreqSlider = new Slider( 0.0, 127.0, 0.0 );
+    cutoffFreqSlider = new Slider( 36.0, 124.0, 0.0 );
     cutoffFreqSlider.setOrientation( Orientation.HORIZONTAL );
     cutoffFreqSlider.setMajorTickUnit( 32.0 );
     cutoffFreqSlider.valueProperty().addListener( (observable, oldVal, newVal) -> {

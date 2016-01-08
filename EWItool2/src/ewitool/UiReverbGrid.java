@@ -49,7 +49,7 @@ public class UiReverbGrid extends GridPane {
     mainLabel.setId( "editor-section-label" );
     add( mainLabel, 0, 0 );
  
-    timeSlider = new Slider( 0.0, 127.0, 0.0 );
+    timeSlider = new Slider( 10.0, 50.0, 0.0 ); // Val. 10-50
     timeSlider.setOrientation( Orientation.HORIZONTAL );
     timeSlider.setMajorTickUnit( 32.0 );
     timeSlider.valueProperty().addListener( (observable, oldVal, newVal) -> {
