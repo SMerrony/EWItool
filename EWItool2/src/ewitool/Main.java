@@ -22,9 +22,7 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Menu;
@@ -39,15 +37,17 @@ import javafx.scene.layout.BorderPane;
 public class Main extends Application {
 
   static final String  APP_NAME = "EWItool";
-  static final double  VERSION = 0.8;
+  static final double  APP_VERSION = 0.8;
   static final int     COPYRIGHT_YEAR = 2016;
   static final String  RELEASE_STATUS = "Alpha";
+  static final String  LEAD_AUTHOR = "S.Merrony";
 
   private static final String  ICON = "/resources/EWItoolLogo1.png";
   private static final int     SCENE_PREF_WIDTH = 1100;
   private static final int     SCENE_PREF_HEIGHT = 750;
   private static final String  WINDOW_TITLE = APP_NAME + " - EWI4000s Patch Handling Tool";
   private static final Double  MINIMUM_JVM_SPEC = 1.8;
+  private static final String  ONLINE_HELP = "https://github.com/SMerrony/EWItool2/wiki";
 
   MenuBar mainMenuBar;
   TabPane tabPane;
@@ -123,20 +123,14 @@ public class Main extends Application {
         }
       });
 
-//      EditPatchWatcher editPatchWatcher = new EditPatchWatcher();
-//      sharedData.addObserver( editPatchWatcher );			
-
       // customise icon
       mainStage.getIcons().add( new Image( this.getClass().getResourceAsStream( ICON )));
 
-      mainStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-        @Override
-        public void handle( WindowEvent we ) {
-          Debugger.log( "DEBUG - clean exit" );
-          midiHandler.close();
-          Platform.exit();
-          System.exit( 0 );           
-        }
+      mainStage.setOnCloseRequest( (we) -> {
+        Debugger.log( "DEBUG - clean exit" );
+        midiHandler.close();
+        Platform.exit();
+        System.exit( 0 );           
       });
 
       root.setCenter( tabPane );
@@ -157,17 +151,6 @@ public class Main extends Application {
     }
   }
 
-//  class EditPatchWatcher implements Observer {
-//    @Override
-//    public void update( Observable o, Object arg ) {
-//      if ((int)arg == SharedData.EDIT_PATCH) {
-//        Debugger.log( "DEBUG - Main: noticed shared data change" );
-//        patchEditorTab.setDisable( false );
-//        tabPane.getSelectionModel().select( patchEditorTab );
-//      }
-//    }
-//  }
-
   class MainMenuBar extends MenuBar {
 
     Menu fileMenu, midiMenu, ewiMenu, patchMenu, helpMenu;
@@ -181,14 +164,11 @@ public class Main extends Application {
       fileMenu = new Menu( "File" );
       printItem = new MenuItem( "Print" );
       quitItem = new MenuItem( "Quit" );
-      quitItem.setOnAction( new EventHandler<ActionEvent>() {
-        @Override
-        public void handle( ActionEvent ae) {
-          Debugger.log( "DEBUG - clean exit" );
-          midiHandler.close();
-          Platform.exit();
-          System.exit( 0 );           
-        }
+      quitItem.setOnAction( (ae) -> {
+        Debugger.log( "DEBUG - clean exit" );
+        midiHandler.close();
+        Platform.exit();
+        System.exit( 0 );           
       });
       fileMenu.getItems().addAll( printItem, quitItem );
 
@@ -202,27 +182,24 @@ public class Main extends Application {
 
       ewiMenu = new Menu( "EWI" );
       fetchAllItem = new MenuItem( "Fetch All Patches" );
-      fetchAllItem.setOnAction( new EventHandler<ActionEvent>() {
-        @Override
-        public void handle( ActionEvent ae) {
-          Debugger.log( "DEBUG - Fetch All..." );
-          midiHandler.requestDeviceID();
-          Alert busyAlert = new Alert( AlertType.INFORMATION, "Fetching all patches.  Please wait..." );
-          busyAlert.setTitle( "EWItool" );
-          busyAlert.setHeaderText( null );
-          busyAlert.show();
-          sharedData.clear();
-          for (int p = 0; p < EWI4000sPatch.EWI_NUM_PATCHES; p++) {
-            midiHandler.requestPatch( p );
-            busyAlert.setTitle( (p + 1) + " of 100" );
-          }
-          busyAlert.close();
-          ((CurrentPatchSetTab) currentPatchSetTab).updateLabels();
-          ((PatchEditorTab) patchEditorTab).populateCombo( sharedData );
-          currentPatchSetTab.setDisable( false );
-          patchEditorTab.setDisable( false );
-          tabPane.getSelectionModel().select( currentPatchSetTab );
+      fetchAllItem.setOnAction( (ae) -> {
+        Debugger.log( "DEBUG - Fetch All..." );
+        midiHandler.requestDeviceID();
+        Alert busyAlert = new Alert( AlertType.INFORMATION, "Fetching all patches.  Please wait..." );
+        busyAlert.setTitle( "EWItool" );
+        busyAlert.setHeaderText( null );
+        busyAlert.show();
+        sharedData.clear();
+        for (int p = 0; p < EWI4000sPatch.EWI_NUM_PATCHES; p++) {
+          midiHandler.requestPatch( p );
+          busyAlert.setTitle( (p + 1) + " of 100" );
         }
+        busyAlert.close();
+        ((CurrentPatchSetTab) currentPatchSetTab).updateLabels();
+        ((PatchEditorTab) patchEditorTab).populateCombo( sharedData );
+        currentPatchSetTab.setDisable( false );
+        patchEditorTab.setDisable( false );
+        tabPane.getSelectionModel().select( currentPatchSetTab );
       });
       ewiMenu.getItems().addAll( fetchAllItem );
 
@@ -231,7 +208,17 @@ public class Main extends Application {
 
       helpMenu = new Menu( "Help" );
       helpItem = new MenuItem( "Online Help" );
+      helpItem.setOnAction( (ae) -> {
+        getHostServices().showDocument( ONLINE_HELP );
+      });
       aboutItem = new MenuItem( "About " + Main.APP_NAME );
+      aboutItem.setOnAction( (ae) -> {
+        Alert aboutAlert = new Alert( AlertType.INFORMATION );
+        aboutAlert.setTitle( "About EWItool" );
+        aboutAlert.setHeaderText( "EWItool version " + APP_VERSION + " (" + RELEASE_STATUS + ")" );
+        aboutAlert.setContentText( "Copyright " + COPYRIGHT_YEAR + " " + LEAD_AUTHOR );
+        aboutAlert.showAndWait();
+      });
       helpMenu.getItems().addAll( helpItem, aboutItem );
 
       getMenus().addAll( fileMenu, midiMenu, ewiMenu, helpMenu );

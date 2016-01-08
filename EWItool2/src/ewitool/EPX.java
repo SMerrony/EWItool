@@ -32,7 +32,7 @@ import java.util.LinkedList;
  */
 public class EPX {
   
-  public static final String USER_AGENT = Main.APP_NAME + "/" + Main.VERSION;
+  public static final String USER_AGENT = Main.APP_NAME + "/" + Main.APP_VERSION;
   public static final String PROTOCOL = "http://";
   public static final String BASE_REQ = "/EPX/epx.php?action=";
   public static final String URL_ENCODING = "UTF-8";
