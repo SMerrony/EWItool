@@ -17,9 +17,6 @@
 
 package ewitool;
 
-import java.util.Observable;
-import java.util.Observer;
-
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -42,7 +39,7 @@ import javafx.scene.layout.BorderPane;
 public class Main extends Application {
 
   static final String  APP_NAME = "EWItool";
-  static final double  VERSION = 0.1;
+  static final double  VERSION = 0.8;
   static final int     COPYRIGHT_YEAR = 2016;
   static final String  RELEASE_STATUS = "Alpha";
 
@@ -54,7 +51,8 @@ public class Main extends Application {
 
   MenuBar mainMenuBar;
   TabPane tabPane;
-  Tab statusTab, scratchPadTab, patchSetsTab, epxTab, currentPatchSetTab, keyPatchesTab, patchEditorTab; 
+  Tab scratchPadTab, patchSetsTab, epxTab, currentPatchSetTab, keyPatchesTab, patchEditorTab; 
+  UiStatusBar statusBar;
   MidiHandler midiHandler;
   volatile SharedData sharedData;
 
@@ -74,12 +72,16 @@ public class Main extends Application {
       UserPrefs userPrefs = new UserPrefs();
       ScratchPad scratchPad = new ScratchPad( userPrefs );
       sharedData = new SharedData();
+      
+      statusBar = new UiStatusBar( sharedData );
+      sharedData.addObserver( statusBar );
+      root.setBottom( statusBar );
 
-      midiHandler = new MidiHandler( sharedData, userPrefs ); 
+      midiHandler = new MidiHandler( sharedData, userPrefs );
 
       mainMenuBar = new MainMenuBar( mainStage, userPrefs, midiHandler );
       root.setTop( mainMenuBar );
-
+      
       tabPane = new TabPane();
 
       scratchPadTab = new ScratchPadTab( scratchPad );
@@ -88,16 +90,16 @@ public class Main extends Application {
       patchSetsTab = new PatchSetsTab( scratchPad, userPrefs );
       tabPane.getTabs().add( patchSetsTab );
 
-      epxTab = new EPXTab( scratchPad, userPrefs );
+      epxTab = new EPXTab( sharedData, scratchPad, userPrefs );
       tabPane.getTabs().add( epxTab );
       //epxTab.setDisable( true );
-      
+
       patchEditorTab = new PatchEditorTab( sharedData, scratchPad, midiHandler );
 
       currentPatchSetTab = new CurrentPatchSetTab( sharedData, scratchPad, patchEditorTab );
       tabPane.getTabs().add( currentPatchSetTab );
       currentPatchSetTab.setDisable( true );
-      
+
       tabPane.getTabs().add( patchEditorTab );
       patchEditorTab.setDisable( true );
 
@@ -107,36 +109,35 @@ public class Main extends Application {
 
       // MIDI port assignment change listeners
       userPrefs.midiInPort.addListener( new ChangeListener<String>() {
-	@Override
-	public void changed( ObservableValue<? extends String> observable, String oldValue, String newValue ) {
-	  Debugger.log( "Debug - Noticed that IN Port Changed to : " + newValue );
-	  midiHandler.restart();
-	}
+        @Override
+        public void changed( ObservableValue<? extends String> observable, String oldValue, String newValue ) {
+          Debugger.log( "Debug - Noticed that IN Port Changed to : " + newValue );
+          midiHandler.restart();
+        }
       });
       userPrefs.midiOutPort.addListener( new ChangeListener<String>() {
-	@Override
-	public void changed( ObservableValue<? extends String> observable, String oldValue, String newValue ) {
-	  Debugger.log( "Debug - Noticed that OUT Port Changed to : " + newValue );
-	  midiHandler.restart();
-	}
+        @Override
+        public void changed( ObservableValue<? extends String> observable, String oldValue, String newValue ) {
+          Debugger.log( "Debug - Noticed that OUT Port Changed to : " + newValue );
+          midiHandler.restart();
+        }
       });
 
-      EditPatchWatcher editPatchWatcher = new EditPatchWatcher();
-      sharedData.addObserver( editPatchWatcher );			
+//      EditPatchWatcher editPatchWatcher = new EditPatchWatcher();
+//      sharedData.addObserver( editPatchWatcher );			
 
       // customise icon
       mainStage.getIcons().add( new Image( this.getClass().getResourceAsStream( ICON )));
 
       mainStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-	@Override
-	public void handle( WindowEvent we ) {
-	  Debugger.log( "DEBUG - clean exit" );
-	  midiHandler.close();
-	  Platform.exit();
-	  System.exit( 0 );           
-	}
+        @Override
+        public void handle( WindowEvent we ) {
+          Debugger.log( "DEBUG - clean exit" );
+          midiHandler.close();
+          Platform.exit();
+          System.exit( 0 );           
+        }
       });
-
 
       root.setCenter( tabPane );
       mainStage.setScene(scene);
@@ -147,25 +148,25 @@ public class Main extends Application {
   }
 
   void checkJVMspec() {
-   Double jvmSpec = Double.parseDouble( System.getProperty( "java.specification.version" ) );
-   if ( jvmSpec < MINIMUM_JVM_SPEC) {
-     System.err.println( "Error - EWItool requires at least version " + MINIMUM_JVM_SPEC + " of Java to run." );
-     System.exit( 1 );
-   } else {
-     Debugger.log( "DEBUG - JVM Spec. " + jvmSpec + " detected" );
-   }
-  }
-  
-  class EditPatchWatcher implements Observer {
-    @Override
-    public void update( Observable o, Object arg ) {
-      if ((int)arg == SharedData.EDIT_PATCH) {
-	Debugger.log( "DEBUG - Main: noticed shared data change" );
-	patchEditorTab.setDisable( false );
-	tabPane.getSelectionModel().select( patchEditorTab );
-      }
+    Double jvmSpec = Double.parseDouble( System.getProperty( "java.specification.version" ) );
+    if ( jvmSpec < MINIMUM_JVM_SPEC) {
+      System.err.println( "Error - EWItool requires at least version " + MINIMUM_JVM_SPEC + " of Java to run." );
+      System.exit( 1 );
+    } else {
+      Debugger.log( "DEBUG - JVM Spec. " + jvmSpec + " detected" );
     }
   }
+
+//  class EditPatchWatcher implements Observer {
+//    @Override
+//    public void update( Observable o, Object arg ) {
+//      if ((int)arg == SharedData.EDIT_PATCH) {
+//        Debugger.log( "DEBUG - Main: noticed shared data change" );
+//        patchEditorTab.setDisable( false );
+//        tabPane.getSelectionModel().select( patchEditorTab );
+//      }
+//    }
+//  }
 
   class MainMenuBar extends MenuBar {
 
@@ -181,13 +182,13 @@ public class Main extends Application {
       printItem = new MenuItem( "Print" );
       quitItem = new MenuItem( "Quit" );
       quitItem.setOnAction( new EventHandler<ActionEvent>() {
-	@Override
-	public void handle( ActionEvent ae) {
-	  Debugger.log( "DEBUG - clean exit" );
-	  midiHandler.close();
-	  Platform.exit();
-	  System.exit( 0 );           
-	}
+        @Override
+        public void handle( ActionEvent ae) {
+          Debugger.log( "DEBUG - clean exit" );
+          midiHandler.close();
+          Platform.exit();
+          System.exit( 0 );           
+        }
       });
       fileMenu.getItems().addAll( printItem, quitItem );
 
@@ -202,26 +203,26 @@ public class Main extends Application {
       ewiMenu = new Menu( "EWI" );
       fetchAllItem = new MenuItem( "Fetch All Patches" );
       fetchAllItem.setOnAction( new EventHandler<ActionEvent>() {
-	@Override
-	public void handle( ActionEvent ae) {
-	  Debugger.log( "DEBUG - Fetch All..." );
-	  midiHandler.requestDeviceID();
-	  Alert busyAlert = new Alert( AlertType.INFORMATION, "Fetching all patches.  Please wait..." );
-	  busyAlert.setTitle( "EWItool" );
-	  busyAlert.setHeaderText( null );
-	  busyAlert.show();
-	  sharedData.clear();
-	  for (int p = 0; p < EWI4000sPatch.EWI_NUM_PATCHES; p++) {
-	    midiHandler.requestPatch( p );
-	    busyAlert.setTitle( (p + 1) + " of 100" );
-	  }
-	  busyAlert.close();
-	  ((CurrentPatchSetTab) currentPatchSetTab).updateLabels();
-	  ((PatchEditorTab) patchEditorTab).populateCombo( sharedData );
-	  currentPatchSetTab.setDisable( false );
-	  patchEditorTab.setDisable( false );
-	  tabPane.getSelectionModel().select( currentPatchSetTab );
-	}
+        @Override
+        public void handle( ActionEvent ae) {
+          Debugger.log( "DEBUG - Fetch All..." );
+          midiHandler.requestDeviceID();
+          Alert busyAlert = new Alert( AlertType.INFORMATION, "Fetching all patches.  Please wait..." );
+          busyAlert.setTitle( "EWItool" );
+          busyAlert.setHeaderText( null );
+          busyAlert.show();
+          sharedData.clear();
+          for (int p = 0; p < EWI4000sPatch.EWI_NUM_PATCHES; p++) {
+            midiHandler.requestPatch( p );
+            busyAlert.setTitle( (p + 1) + " of 100" );
+          }
+          busyAlert.close();
+          ((CurrentPatchSetTab) currentPatchSetTab).updateLabels();
+          ((PatchEditorTab) patchEditorTab).populateCombo( sharedData );
+          currentPatchSetTab.setDisable( false );
+          patchEditorTab.setDisable( false );
+          tabPane.getSelectionModel().select( currentPatchSetTab );
+        }
       });
       ewiMenu.getItems().addAll( fetchAllItem );
 

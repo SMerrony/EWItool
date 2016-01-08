@@ -33,7 +33,7 @@ import javax.sound.midi.Synthesizer;
 import javax.sound.midi.SysexMessage;
 
 public class MidiHandler {
-   
+
   //SysEx commands from Akai
   public final static byte MIDI_PRESET_DUMP      = 0x00;
   public final static byte MIDI_PRESET_DUMP_REQ  = 0x40;
@@ -58,7 +58,7 @@ public class MidiHandler {
   public final static byte MIDI_CC_DATA_ENTRY    = 0x06;
   public final static byte MIDI_CC_NRPN_LSB      = 0x62;
   public final static byte MIDI_CC_NRPN_MSB      = 0x63;
-  
+
   public final static int  MAX_SYSEX_LENGTH      = 262144;
   public final static int  EWI_SYSEX_PRESET_DUMP_LEN = EWI4000sPatch.EWI_PATCH_LENGTH;
   public final static int  EWI_SYSEX_QUICKPC_DUMP_LEN = 91;
@@ -67,15 +67,15 @@ public class MidiHandler {
   // otherwise send & receive can get out of sync
   public final static int  MIDI_MESSAGE_SPACER_MS = 100;
   public final static int  MIDI_TIMEOUT_MS       = 3000;
-  
+
   SharedData sharedData;
   UserPrefs userPrefs;
   Thread sendThread;
   MidiDevice inDev = null, outDev = null;
   Receiver midiIn, midiOut;
-  
+
   MidiHandler( SharedData pSharedData, UserPrefs pUserPrefs ) {
-    
+
     sharedData = pSharedData;
     userPrefs = pUserPrefs;
     MidiDevice device;
@@ -83,50 +83,52 @@ public class MidiHandler {
     for (int d = 0; d < infos.length; d++) {
 
       try {
-	device = MidiSystem.getMidiDevice( infos[d] );
-	if (!(device instanceof Sequencer) && !(device instanceof Synthesizer)) {
-	  if (device.getMaxReceivers() != 0) {
-	    if (infos[d].getName().equals( userPrefs.midiOutPort.getValue() )) {
-	      try {
-		outDev = MidiSystem.getMidiDevice( infos[d] );
-	      } catch( MidiUnavailableException e ) {
-		e.printStackTrace();
-		System.err.println( "Error - MidiHandler() could not obtain chosen MIDI OUT device info" );
-	      }
-	      try {
-		outDev.open();
-	      } catch( MidiUnavailableException e1 ) {
-		e1.printStackTrace();
-		System.err.println( "Error - MidiHandler() could not open chosen MIDI OUT device" );
-	      }
+        device = MidiSystem.getMidiDevice( infos[d] );
+        if (!(device instanceof Sequencer) && !(device instanceof Synthesizer)) {
+          if (device.getMaxReceivers() != 0) {
+            if (infos[d].getName().equals( userPrefs.midiOutPort.getValue() )) {
+              try {
+                outDev = MidiSystem.getMidiDevice( infos[d] );
+              } catch( MidiUnavailableException e ) {
+                e.printStackTrace();
+                System.err.println( "Error - MidiHandler() could not obtain chosen MIDI OUT device info" );
+              }
+              try {
+                outDev.open();
+              } catch( MidiUnavailableException e1 ) {
+                e1.printStackTrace();
+                System.err.println( "Error - MidiHandler() could not open chosen MIDI OUT device" );
+              }
 
-	      (sendThread = new Thread( new MidiSender( sharedData.sendQ, outDev ) )).start();
-	      sendThread.setName( "EWItool MIDI Sender" );
-	      Debugger.log( "Debug - OUT Port: " + infos[d].getName());
-	    }
-	  } else if (device.getMaxTransmitters() != 0) {
-	    if (infos[d].getName().equals( userPrefs.midiInPort.getValue() )) {
-	      try {
-	        inDev = MidiSystem.getMidiDevice( infos[d] );
-	      } catch( MidiUnavailableException e ) {
-		e.printStackTrace();
-		System.err.println( "Error - MidiHandler() could not obtain chosen MIDI IN device info" );
-	      }
-	      try {
-	        inDev.open(); 
-	      } catch( MidiUnavailableException e1 ) {
-		e1.printStackTrace();
-		System.err.println( "Error - MidiHandler() could not open chosen MIDI IN device" );
-	      }
-	      midiIn = new MidiReceiver( sharedData );
-	      inDev.getTransmitter().setReceiver( midiIn );
-	      Debugger.log( "Debug - IN Port: " + infos[d].getName() );
-	    }
-	  }
-	}  
+              (sendThread = new Thread( new MidiSender( sharedData.sendQ, outDev ) )).start();
+              sendThread.setName( "EWItool MIDI Sender" );
+              Debugger.log( "Debug - OUT Port: " + infos[d].getName());
+              sharedData.setMidiOutDev( infos[d].getName() );
+            }
+          } else if (device.getMaxTransmitters() != 0) {
+            if (infos[d].getName().equals( userPrefs.midiInPort.getValue() )) {
+              try {
+                inDev = MidiSystem.getMidiDevice( infos[d] );
+              } catch( MidiUnavailableException e ) {
+                e.printStackTrace();
+                System.err.println( "Error - MidiHandler() could not obtain chosen MIDI IN device info" );
+              }
+              try {
+                inDev.open(); 
+              } catch( MidiUnavailableException e1 ) {
+                e1.printStackTrace();
+                System.err.println( "Error - MidiHandler() could not open chosen MIDI IN device" );
+              }
+              midiIn = new MidiReceiver( sharedData );
+              inDev.getTransmitter().setReceiver( midiIn );
+              Debugger.log( "Debug - IN Port: " + infos[d].getName() );
+              sharedData.setMidiInDev( infos[d].getName() );
+            }
+          }
+        }  
       } catch( MidiUnavailableException e ) {
-	e.printStackTrace();
-	System.err.println( "Error - MidiHandler() could not obtain MIDI devices info" );
+        e.printStackTrace();
+        System.err.println( "Error - MidiHandler() could not obtain MIDI devices info" );
       }
     }
 
@@ -135,6 +137,7 @@ public class MidiHandler {
   public void close() {
     if (sendThread != null && sendThread.isAlive()) sendThread.interrupt();
     if (inDev !=null && inDev.isOpen()) { midiIn.close(); inDev.close(); }
+    sharedData.setEwiAttached( false );
   }
 
   /**
@@ -143,23 +146,23 @@ public class MidiHandler {
   public void restart() {
 
     close();
-    
+
     // TODO Restart MIDI connections
     System.err.println( "Error - MidiHandler.restart() not yet implemented" );
 
   }
-  
+
   void clearPatches() {
     sharedData.clear();
   }
-  
+
   void requestPatch( final int p ) {
-    
+
     if (p < 0 || p >= EWI4000sPatch.EWI_NUM_PATCHES) {
       System.err.println( "Error - Attempt to request out-of-range patch (" + p + ")" );
       System.exit( 1 );
     }
-    
+
     byte[] reqMsg = new byte[7];
     reqMsg[0] = MIDI_SYSEX_HEADER;
     reqMsg[1] = MIDI_SYSEX_AKAI_ID;	// 0x47 71.
@@ -171,20 +174,20 @@ public class MidiHandler {
     boolean gotIt = false;
     try {
       while (!gotIt) {
-	Debugger.log( "DEBUG - MidiHandler Sending request for patch: " + p );
-	sendSysEx( reqMsg.clone() );
-	// wait for a patch to be received, or timeout
-	Integer pGot = sharedData.patchQ.poll( MIDI_TIMEOUT_MS, TimeUnit.MILLISECONDS );
-	if (pGot == null)  {
-	  Debugger.log( "DEBUG - MidiHandler patch request timed out" );
-	  sharedData.patchQ.clear();
-	  // sendSystemReset();
-	} else 	if (pGot == p) {
-	  gotIt = true;
-	} else if (pGot != p) {
-	  Debugger.log( "DEBUG - MidiHandler Got out-of-sync patch: " + p );
-	  sharedData.patchQ.clear();
-	} 
+        Debugger.log( "DEBUG - MidiHandler Sending request for patch: " + p );
+        sendSysEx( reqMsg.clone() );
+        // wait for a patch to be received, or timeout
+        Integer pGot = sharedData.patchQ.poll( MIDI_TIMEOUT_MS, TimeUnit.MILLISECONDS );
+        if (pGot == null)  {
+          Debugger.log( "DEBUG - MidiHandler patch request timed out" );
+          sharedData.patchQ.clear();
+          // sendSystemReset();
+        } else 	if (pGot == p) {
+          gotIt = true;
+        } else if (pGot != p) {
+          Debugger.log( "DEBUG - MidiHandler Got out-of-sync patch: " + p );
+          sharedData.patchQ.clear();
+        } 
       }
     } catch( InterruptedException e ) {
       e.printStackTrace();
@@ -192,7 +195,7 @@ public class MidiHandler {
   }
 
   synchronized void requestQuickPCs() {
-    
+
     byte[] reqMsg = new byte[6];
     reqMsg[0] = MIDI_SYSEX_AKAI_ID;
     reqMsg[1] = MIDI_SYSEX_AKAI_EWI4K;
@@ -209,7 +212,7 @@ public class MidiHandler {
     }
 
   }
-  
+
   synchronized boolean requestDeviceID() {
     byte[] reqMsg = new byte[6];
     reqMsg[0] = MIDI_SYSEX_HEADER;
@@ -223,15 +226,15 @@ public class MidiHandler {
     try {
       SharedData.DeviceIdResponse dId = sharedData.deviceIdQ.poll( MIDI_TIMEOUT_MS, TimeUnit.MILLISECONDS );
       if (dId == SharedData.DeviceIdResponse.IS_EWI4000S) {
-	Debugger.log( "DEBUG - MidiHandler found EWI4000s" );
-	sharedData.setEwiAttached( true );
-	return true;
+        Debugger.log( "DEBUG - MidiHandler found EWI4000s" );
+        sharedData.setEwiAttached( true );
+        return true;
       } else if (dId == null) {
-	Debugger.log( "DEBUG - MidiHandler did not find EWI4000s and timed out" );
-	sharedData.setEwiAttached( false );
+        Debugger.log( "DEBUG - MidiHandler did not find EWI4000s and timed out" );
+        sharedData.setEwiAttached( false );
       } else {
-	Debugger.log( "DEBUG - MidiHandler did not find EWI4000s and got unexpected response" );
-	sharedData.setEwiAttached( false );
+        Debugger.log( "DEBUG - MidiHandler did not find EWI4000s and got unexpected response" );
+        sharedData.setEwiAttached( false );
       }
     } catch( InterruptedException e ) {
       Debugger.log( "DEBUG - MidiHandler did not EWI4000s and was interrupted" );
@@ -239,13 +242,13 @@ public class MidiHandler {
     requestDeviceID();
     return false;
   }
-  
+
   // all SysEx requests must go via this method - which is synchronised to avoid overlapping requests
   synchronized void sendSysEx( final byte[] sysexBytes ) {
-   SendMsg msg = new SendMsg();
-   msg.msgType = SendMsg.MsgType.SYSEX;
-   msg.bytes = sysexBytes;
-   sharedData.sendQ.add( msg );
+    SendMsg msg = new SendMsg();
+    msg.msgType = SendMsg.MsgType.SYSEX;
+    msg.bytes = sysexBytes;
+    sharedData.sendQ.add( msg );
   }
 
   synchronized boolean sendPatch( EWI4000sPatch patch, final byte mode ) {
@@ -259,7 +262,7 @@ public class MidiHandler {
     }
     return true;
   }
-  
+
   synchronized void sendControlChange( int cc, int val, int ch ) {
     SendMsg msg = new SendMsg();
     msg.msgType = SendMsg.MsgType.CC;
@@ -268,7 +271,7 @@ public class MidiHandler {
     msg.channel = ch;
     sharedData.sendQ.add( msg );
   }
-  
+
   synchronized boolean sendLiveControl( int lsb, int msb, int cValue ) {
     sendControlChange( MIDI_CC_NRPN_LSB, lsb, 0 );
     sendControlChange( MIDI_CC_NRPN_MSB, msb, 0 );
@@ -277,11 +280,11 @@ public class MidiHandler {
     sendControlChange( MIDI_CC_NRPN_MSB, 127, 0 );
     return true;
   }
-  
+
   synchronized void sendSystemReset() {
     SendMsg msg = new SendMsg();
     msg.msgType = SendMsg.MsgType.SYSTEM_RESET;
     sharedData.sendQ.add( msg );
   }
-  
+
 }

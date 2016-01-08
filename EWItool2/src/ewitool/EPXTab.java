@@ -19,7 +19,6 @@ package ewitool;
 
 import java.util.LinkedList;
 
-import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
@@ -29,12 +28,10 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.RowConstraints;
-import javafx.scene.layout.VBox;
 
 public class EPXTab extends Tab {
 
@@ -53,12 +50,12 @@ public class EPXTab extends Tab {
   
   EPX epx;
   
-  EPXTab( ScratchPad scratchPad, UserPrefs userPrefs ) {
+  EPXTab( SharedData sharedData, ScratchPad scratchPad, UserPrefs userPrefs ) {
     
     setText( "EWI Patch eXchange" );
     setClosable( false );
     
-    epx = new EPX( userPrefs );
+    epx = new EPX( sharedData, userPrefs );
  
     // for vertically fixed rows in the GridPanes...
     RowConstraints fixedRC = new RowConstraints();
@@ -69,7 +66,7 @@ public class EPXTab extends Tab {
     
     // left top pane
     GridPane queryGrid = new GridPane();
-    queryGrid.setVgap( 3.0 );
+    queryGrid.setId( "epx-query-grid" );
     
     Label querySectionLabel = new Label( "Query" );
     querySectionLabel.setId( "epx-section-label" );
@@ -116,6 +113,7 @@ public class EPXTab extends Tab {
     
     // left bottom pane
     GridPane settingsGrid = new UiEPXSettingsGrid( userPrefs, epx, queryGrid );
+    settingsGrid.setId( "epx-settings-grid" );
      
     // centre pane
     GridPane resultsGrid = new GridPane();
@@ -154,6 +152,7 @@ public class EPXTab extends Tab {
     
     // right pane
     GridPane detailGrid = new GridPane();
+    detailGrid.setId( "epx-details-grid" );
 
     Label detailsSectionLabel = new Label( "Details" );
     detailsSectionLabel.setId( "epx-section-label" );
@@ -216,18 +215,25 @@ public class EPXTab extends Tab {
     });
     detailGrid.add( copyButton, 1, 10 );
     detailGrid.getRowConstraints().add( vgrowRC );
+        
+    GridPane gp = new GridPane();
+    gp.setId( "epx-grid" );
     
-    VBox lhVBox = new VBox();
-    Region vSpaceRegion = new Region();
-    VBox.setVgrow( vSpaceRegion, Priority.ALWAYS );
-    lhVBox.getChildren().addAll( queryGrid, vSpaceRegion, settingsGrid );
+    ColumnConstraints ccsGrowable = new ColumnConstraints( 40.0, 90.0, Double.MAX_VALUE );
+    RowConstraints rcsGrowable = new RowConstraints();
+    ccsGrowable.setHgrow( Priority.ALWAYS );
+    rcsGrowable.setVgrow( Priority.ALWAYS );
+    gp.getColumnConstraints().addAll( ccsGrowable, ccsGrowable, ccsGrowable );
+    gp.getRowConstraints().addAll( rcsGrowable, rcsGrowable );
     
-    HBox hBox = new HBox();
-    hBox.setPadding( new Insets( 4.0 ) );
-    hBox.setSpacing( 8.0 );
-    hBox.getChildren().addAll( lhVBox, resultsGrid, detailGrid );
+    gp.add( queryGrid, 0, 0 );
+    GridPane.setRowSpan( resultsGrid, 2 );
+    GridPane.setRowSpan( detailGrid, 2 );
+    gp.add( resultsGrid, 1, 0 );
+    gp.add( detailGrid, 2, 0 );
+    gp.add( settingsGrid, 0, 1 );
     
-    setContent( hBox );
+    setContent( gp );
     
     // enable the query grid if we can connect with user's credentials to EPX
     if (epx.testConnection() && epx.testUser()) {

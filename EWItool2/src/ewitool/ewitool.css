@@ -20,6 +20,25 @@
 	/* -fx-background: blue; */
 }
 
+#status-bar {
+	-fx-background-color: lightgray;
+	-fx-padding: 2px;
+}
+
+#status-bar .label {
+	-fx-label-padding: 0.0 1mm 0.0 1mm;
+}
+
+#status-value {
+	-fx-background-color: white;
+	-fx-min-width: 20mm;
+}
+
+#status-message {
+	-fx-background-color: white;
+	-fx-min-width: 80mm;
+}
+
 #status-grid {
 	-fx-padding: 10mm;
 	-fx-hgap: 3.0mm;
@@ -42,6 +61,27 @@
 }
 #scratchpad-grid .button {
 	-fx-min-width: 25mm;
+}
+
+#epx-grid {
+	-fx-padding: 10mm;
+	-fx-hgap: 3mm;
+	-fx-vgap: 3mm;
+}
+
+#epx-query-grid {
+	-fx-hgap: 3mm;
+	-fx-vgap: 3mm;
+}
+
+#epx-settings-grid {
+	-fx-hgap: 3mm;
+	-fx-vgap: 3mm;
+}
+
+#epx-details-grid {
+	-fx-hgap: 3mm;
+	-fx-vgap: 3mm;
 }
 
 #epx-section-label {

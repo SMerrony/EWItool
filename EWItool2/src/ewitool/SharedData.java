@@ -34,20 +34,21 @@ public class SharedData extends Observable {
   public final static int EWI_CONNECTION = 3;
   
   private volatile int lastPatchLoaded;
-  private volatile boolean ewiAttached;
+  private volatile boolean ewiAttached, epxAvailable;
   
   enum DeviceIdResponse { WRONG_LENGTH, NOT_AKAI, NOT_EWI4000S, IS_EWI4000S }
   
   // We ASSUME that there are always NUM_EWI_PATCHES on this list once it is loaded...
   ArrayList<EWI4000sPatch> ewiPatchList;
-  //ObservableList<EWI4000sPatch> ewiPatchList;
   
-  public volatile EWI4000sPatch editPatch;  // This is the patch currently being edited
+  //public volatile EWI4000sPatch editPatch;  // This is the patch currently being edited
   
   // Queues to synchronise requesting/receiving MIDI info
   BlockingQueue<Integer> patchQ, keyPatchQ;
   BlockingQueue<DeviceIdResponse> deviceIdQ;
   BlockingQueue<SendMsg> sendQ;
+  
+  private String midiInDev, midiOutDev;
   
   SharedData() {
     lastPatchLoaded = NONE;
@@ -56,6 +57,10 @@ public class SharedData extends Observable {
     keyPatchQ = new LinkedBlockingQueue<Integer>();
     deviceIdQ = new LinkedBlockingQueue<DeviceIdResponse>();
     sendQ = new LinkedBlockingQueue<SendMsg>();
+    ewiAttached = false;
+    epxAvailable = false;
+    midiInDev = "[Not set]";
+    midiOutDev = "[Not set]";
   }
   
   public void clear() {
@@ -63,26 +68,27 @@ public class SharedData extends Observable {
     setLastPatchLoaded( NONE );
   }
   
-  public int getLastPatchLoaded() {
-    return lastPatchLoaded;
-  }
-  
+  public int getLastPatchLoaded() { return lastPatchLoaded; }
   public void setLastPatchLoaded( int p ) {
     lastPatchLoaded = p;
-    // Notification seems dangerous as it causes GUI updates to occur on the (implicit) MIDI listener thread...
-    //setChanged();
-    //notifyObservers( PATCH_LOADED );
   }
   
-  public boolean getEwiAttached() {
-    return ewiAttached;
-  }
-  
+  public boolean getEwiAttached() { return ewiAttached; }
   public void setEwiAttached( boolean isIt ) {
     if (isIt != ewiAttached) {
-      ewiAttached = isIt;
-      setChanged();
-      notifyObservers( EWI_CONNECTION );
+      ewiAttached = isIt; setChanged(); notifyObservers();
     }
   }
+  public boolean getEpxAvailable() { return epxAvailable; }
+  public void setEpxAvailable( boolean isIt ) {
+    if (isIt != epxAvailable) {
+      epxAvailable = isIt; setChanged(); notifyObservers();
+    }
+  }
+  
+  public String getMidiInDev() { return midiInDev; }
+  public void setMidiInDev( String dev ) { midiInDev = dev; setChanged(); notifyObservers(); }
+  public String getMidiOutDev() { return midiOutDev; }
+  public void setMidiOutDev( String dev ) { midiOutDev = dev; setChanged(); notifyObservers(); }
+  
 }

@@ -31,9 +31,9 @@ public class MidiSender implements Runnable {
   BlockingQueue<SendMsg> msgQ;
   MidiDevice outDev;
   Receiver receiver;
-  
+
   private final static long NOW = -1;
-  
+
   MidiSender( BlockingQueue<SendMsg> pMsgQ, MidiDevice pOutDev ) {
     msgQ = pMsgQ;
     outDev = pOutDev;
@@ -53,59 +53,59 @@ public class MidiSender implements Runnable {
 
     while( true ) {
       try {
-	msg = msgQ.take(); 
-	if (!outDev.isOpen()) {
-	  System.err.println( "Error - MidiSender: MIDI Out device is not open" );
-	  System.exit( 1 );
-	}
-	switch( msg.msgType ) {
-	case CC:
-	    try {
-	      ShortMessage sm = new ShortMessage( ShortMessage.CONTROL_CHANGE, msg.channel, msg.cc, msg.value );
-	      receiver.send( sm, NOW );
-	    } catch( InvalidMidiDataException e ) {
-	      e.printStackTrace();
-	    } 
-	  break;
-	case SYSEX:
-	  try {
-	    Debugger.log( "DBEUG - MidiSender thread got SysEx to send.  Length: " + msg.bytes.length );
-	    if (msg.bytes[0] != MidiHandler.MIDI_SYSEX_HEADER) {
-	      System.err.println( "Error - MidiSender received invalid SysEx send request" );
-	      System.exit( 1 );
-	    }
-	    SysexMessage sysEx = new SysexMessage( msg.bytes, msg.bytes.length );
-	    receiver.send( sysEx, NOW );
-	    // N.B. The final Qt version had a SLEEP(250) here
-	    try {
-	      Thread.sleep( MidiHandler.MIDI_MESSAGE_SPACER_MS );
-	    } catch( InterruptedException e ) {
-	      e.printStackTrace();
-	    }
-	  } catch( InvalidMidiDataException e ) {
-	    e.printStackTrace();
-	  }
-	  break;
-	case SYSTEM_RESET:
-	    try {
-	      Debugger.log( "DEBUG - MidiSender sending System Reset to EWI" );
-	      ShortMessage sm = new ShortMessage( ShortMessage.SYSTEM_RESET );
-	      receiver.send(  sm,  NOW );
-	    } catch( InvalidMidiDataException e ) {
-	      e.printStackTrace();
-	    } 
-	    try {
-	      Thread.sleep( MidiHandler.MIDI_MESSAGE_SPACER_MS );
-	    } catch( InterruptedException e ) {
-	      e.printStackTrace();
-	    }
-	  break;
+        msg = msgQ.take(); 
+        if (!outDev.isOpen()) {
+          System.err.println( "Error - MidiSender: MIDI Out device is not open" );
+          System.exit( 1 );
+        }
+        switch( msg.msgType ) {
+        case CC:
+          try {
+            ShortMessage sm = new ShortMessage( ShortMessage.CONTROL_CHANGE, msg.channel, msg.cc, msg.value );
+            receiver.send( sm, NOW );
+          } catch( InvalidMidiDataException e ) {
+            e.printStackTrace();
+          } 
+          break;
+        case SYSEX:
+          try {
+            Debugger.log( "DBEUG - MidiSender thread got SysEx to send.  Length: " + msg.bytes.length );
+            if (msg.bytes[0] != MidiHandler.MIDI_SYSEX_HEADER) {
+              System.err.println( "Error - MidiSender received invalid SysEx send request" );
+              System.exit( 1 );
+            }
+            SysexMessage sysEx = new SysexMessage( msg.bytes, msg.bytes.length );
+            receiver.send( sysEx, NOW );
+            // N.B. The final Qt version had a SLEEP(250) here
+            try {
+              Thread.sleep( MidiHandler.MIDI_MESSAGE_SPACER_MS );
+            } catch( InterruptedException e ) {
+              e.printStackTrace();
+            }
+          } catch( InvalidMidiDataException e ) {
+            e.printStackTrace();
+          }
+          break;
+        case SYSTEM_RESET:
+          try {
+            Debugger.log( "DEBUG - MidiSender sending System Reset to EWI" );
+            ShortMessage sm = new ShortMessage( ShortMessage.SYSTEM_RESET );
+            receiver.send(  sm,  NOW );
+          } catch( InvalidMidiDataException e ) {
+            e.printStackTrace();
+          } 
+          try {
+            Thread.sleep( MidiHandler.MIDI_MESSAGE_SPACER_MS );
+          } catch( InterruptedException e ) {
+            e.printStackTrace();
+          }
+          break;
 
-	}
+        }
       } catch( InterruptedException e ) {
-	Debugger.log( "DEBUG - MidiSender closing" );
-	receiver.close();
-	outDev.close();
+        Debugger.log( "DEBUG - MidiSender closing" );
+        receiver.close();
+        outDev.close();
       }
 
     }

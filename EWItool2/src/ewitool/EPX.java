@@ -37,6 +37,7 @@ public class EPX {
   public static final String BASE_REQ = "/EPX/epx.php?action=";
   public static final String URL_ENCODING = "UTF-8";
   
+  SharedData sharedData;
   UserPrefs userPrefs;
   
   class QueryResult {
@@ -56,7 +57,8 @@ public class EPX {
     String tags;
   }
   
-  EPX( UserPrefs pUserPrefs ) {
+  EPX( SharedData pSharedData, UserPrefs pUserPrefs ) {
+    sharedData = pSharedData;
     userPrefs = pUserPrefs;
   }
 
@@ -68,18 +70,23 @@ public class EPX {
       con.setRequestProperty( "User-Agent", USER_AGENT );
       int respCode = con.getResponseCode();
       Debugger.log( "DEBUG - EPX: Got response " + respCode + " for connection test" );
-      if (respCode != 200) return false;
-      BufferedReader br = new BufferedReader( new InputStreamReader( con.getInputStream() ) );
-      String line;
-      StringBuffer reply = new StringBuffer();
-      while ((line = br.readLine()) != null) reply.append( line );
-      br.close();
-      if (reply.toString().contains( "Connection: OK" )) return true;
+      if (respCode == 200) {
+        BufferedReader br = new BufferedReader( new InputStreamReader( con.getInputStream() ) );
+        String line;
+        StringBuffer reply = new StringBuffer();
+        while ((line = br.readLine()) != null) reply.append( line );
+        br.close();
+        if (reply.toString().contains( "Connection: OK" )) {
+          sharedData.setEpxAvailable( true );
+          return true;
+        }
+      }
     } catch( MalformedURLException e ) {
       e.printStackTrace();
     } catch( IOException e ) {
       e.printStackTrace();
     }
+    sharedData.setEpxAvailable( false );
     return false;
   }
   
