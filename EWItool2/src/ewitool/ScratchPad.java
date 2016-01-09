@@ -37,11 +37,13 @@ import javafx.collections.ObservableList;
 public class ScratchPad {
   
   ObservableList<EWI4000sPatch> patchList;
+  SharedData sharedData;
   UserPrefs userPrefs;
   
   public static final String SCRATCHPAD_NAME = "SCRATCHPAD.BIN";
   
-  ScratchPad( UserPrefs pPrefs ) {
+  ScratchPad( SharedData pSharedData, UserPrefs pPrefs ) {
+    sharedData = pSharedData;
     userPrefs = pPrefs;
     patchList = FXCollections.observableArrayList();
   }
@@ -61,6 +63,7 @@ public class ScratchPad {
           ep.decodeBlob();
           patchList.add( ep );
         }
+        sharedData.setScratchPadCount( patchList.size() );
       }
     } catch( IOException e ) {
       return false;
@@ -77,11 +80,12 @@ public class ScratchPad {
       for (int p = 0; p < patchList.size(); p++){
         Files.write( spPath, patchList.get( p ).patchBlob, StandardOpenOption.APPEND );
       }
+      sharedData.setScratchPadCount( patchList.size() );
     } catch( IOException e ) {
       e.printStackTrace();
+      return false;
     }
-
-    return false;
+    return true;
   }
 
   public boolean addPatch( EWI4000sPatch patch ) { // TODO - check for duplicate name
@@ -109,7 +113,7 @@ public class ScratchPad {
     try {
       Files.delete( spPath );
       Files.createFile( spPath );
-      
+      sharedData.setScratchPadCount( 0 );
     } catch( IOException e ) {
       e.printStackTrace();
       return false;
@@ -120,6 +124,7 @@ public class ScratchPad {
   
   // does the specified patch name already exist in the scratchpad?
   public boolean exists( String name ) {
+    // TODO: test for extant patch with same name
     return false;
   }
   

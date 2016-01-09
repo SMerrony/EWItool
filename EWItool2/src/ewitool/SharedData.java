@@ -35,6 +35,7 @@ public class SharedData extends Observable {
   
   private volatile int lastPatchLoaded;
   private volatile boolean ewiAttached, epxAvailable;
+  private volatile int scratchPadCount;
   
   enum DeviceIdResponse { WRONG_LENGTH, NOT_AKAI, NOT_EWI4000S, IS_EWI4000S }
   
@@ -61,6 +62,7 @@ public class SharedData extends Observable {
     epxAvailable = false;
     midiInDev = "[Not set]";
     midiOutDev = "[Not set]";
+    scratchPadCount = 0;
   }
   
   public void clear() {
@@ -69,9 +71,7 @@ public class SharedData extends Observable {
   }
   
   public int getLastPatchLoaded() { return lastPatchLoaded; }
-  public void setLastPatchLoaded( int p ) {
-    lastPatchLoaded = p;
-  }
+  public void setLastPatchLoaded( int p ) { lastPatchLoaded = p; }
   
   public boolean getEwiAttached() { return ewiAttached; }
   public void setEwiAttached( boolean isIt ) {
@@ -90,5 +90,8 @@ public class SharedData extends Observable {
   public void setMidiInDev( String dev ) { midiInDev = dev; setChanged(); notifyObservers(); }
   public String getMidiOutDev() { return midiOutDev; }
   public void setMidiOutDev( String dev ) { midiOutDev = dev; setChanged(); notifyObservers(); }
+  
+  public int getScratchPadCount() { return scratchPadCount; }
+  public void setScratchPadCount( int count ) { scratchPadCount = count; setChanged(); notifyObservers(); }
   
 }

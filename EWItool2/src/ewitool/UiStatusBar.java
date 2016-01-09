@@ -34,7 +34,7 @@ import javafx.scene.layout.Region;
  */
 public class UiStatusBar extends HBox implements Observer {
   
-  Label messageLabel, midiInLabel, midiOutLabel, ewiLabel, epxLabel;
+  Label messageLabel, midiInLabel, midiOutLabel, ewiLabel, scratchPadLabel, epxLabel;
   SharedData sharedData;
   
   UiStatusBar(SharedData pSharedData) {
@@ -47,6 +47,8 @@ public class UiStatusBar extends HBox implements Observer {
     midiOutLabel.setId( "status-value" );
     ewiLabel = new Label();
     ewiLabel.setId( "status-value" );
+    scratchPadLabel = new Label();
+    scratchPadLabel.setId( "status-value" );
     epxLabel = new Label();
     epxLabel.setId( "status-value" );
     Region spacerRegion = new Region();
@@ -57,6 +59,7 @@ public class UiStatusBar extends HBox implements Observer {
     getChildren().addAll( new Label( "MIDI In:" ), midiInLabel,
                           new Label( "MIDI Out:" ), midiOutLabel,
                           new Label( "EWI:" ), ewiLabel,
+                          new Label( "Scratchpad Items:" ), scratchPadLabel,
                           new Label( "EPX:" ), epxLabel,
                           spacerRegion,
                           messageLabel
@@ -72,6 +75,7 @@ public class UiStatusBar extends HBox implements Observer {
     } else {
       ewiLabel.setText( "Not detected" );
     }
+    scratchPadLabel.setText( Integer.toString( sharedData.getScratchPadCount() ) );
     if (sharedData.getEpxAvailable()) {
       epxLabel.setText( "Available" );
     } else {
