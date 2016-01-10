@@ -26,16 +26,22 @@ import javax.sound.midi.Receiver;
 import javax.sound.midi.ShortMessage;
 import javax.sound.midi.SysexMessage;
 
+import ewitool.SendMsg.MidiMsgType;
+
 public class MidiSender implements Runnable {
 
+  SharedData sharedData;
   BlockingQueue<SendMsg> msgQ;
   MidiDevice outDev;
   Receiver receiver;
+  
+  MidiMonitorMessage mmsg;
 
   private final static long NOW = -1;
 
-  MidiSender( BlockingQueue<SendMsg> pMsgQ, MidiDevice pOutDev ) {
-    msgQ = pMsgQ;
+  MidiSender( SharedData pSharedData, MidiDevice pOutDev ) {
+    sharedData = pSharedData;
+    msgQ = pSharedData.sendQ;
     outDev = pOutDev;
     try {
       receiver = outDev.getReceiver();
@@ -44,6 +50,8 @@ public class MidiSender implements Runnable {
       System.err.println( "Error - MidiSender() could not obtain chosen MIDI OUT receiver" );
       System.exit( 1 );
     }
+    mmsg = new MidiMonitorMessage();
+    mmsg.direction = MidiMonitorMessage.MidiDirection.SENT;
   }
 
   @Override
@@ -61,8 +69,13 @@ public class MidiSender implements Runnable {
         switch( msg.msgType ) {
         case CC:
           try {
-            ShortMessage sm = new ShortMessage( ShortMessage.CONTROL_CHANGE, msg.channel, msg.cc, msg.value );
+            ShortMessage sm = new ShortMessage( ShortMessage.CONTROL_CHANGE, msg.cc, msg.value );
             receiver.send( sm, NOW );
+            if (sharedData.getMidiMonitoring()) {
+              mmsg.type = MidiMsgType.CC;
+              mmsg.bytes = sm.getMessage();
+              sharedData.monitorQ.add( mmsg );
+            }
           } catch( InvalidMidiDataException e ) {
             e.printStackTrace();
           } 
@@ -76,9 +89,29 @@ public class MidiSender implements Runnable {
             }
             SysexMessage sysEx = new SysexMessage( msg.bytes, msg.bytes.length );
             receiver.send( sysEx, NOW );
+            if (sharedData.getMidiMonitoring()) {
+              mmsg.type = MidiMsgType.SYSEX;
+              mmsg.bytes = sysEx.getMessage();
+              sharedData.monitorQ.add( mmsg );
+            }
             // N.B. The final Qt version had a SLEEP(250) here
             try {
-              Thread.sleep( MidiHandler.MIDI_MESSAGE_SPACER_MS );
+              switch( msg.delay) {
+              case LONG:
+                Debugger.log( "DEBUG - MidiSender: Long pause after SysEx" );
+                Thread.sleep( MidiHandler.MIDI_MESSAGE_LONG_PAUSE_MS );
+                break;
+              case NONE:
+                Debugger.log( "DEBUG - MidiSender: No pause after SysEx" );
+                break;
+              case SHORT:
+                Debugger.log( "DEBUG - MidiSender: Short pause after SysEx" );
+                Thread.sleep( MidiHandler.MIDI_MESSAGE_SHORT_PAUSE_MS );
+                break;
+              default:
+                System.err.println( "ERROR - MidiSender: INVALID pause after SysEx" );
+                break;
+              }
             } catch( InterruptedException e ) {
               e.printStackTrace();
             }
@@ -95,7 +128,7 @@ public class MidiSender implements Runnable {
             e.printStackTrace();
           } 
           try {
-            Thread.sleep( MidiHandler.MIDI_MESSAGE_SPACER_MS );
+            Thread.sleep( MidiHandler.MIDI_MESSAGE_LONG_PAUSE_MS );
           } catch( InterruptedException e ) {
             e.printStackTrace();
           }

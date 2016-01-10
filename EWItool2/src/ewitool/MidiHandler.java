@@ -65,9 +65,12 @@ public class MidiHandler {
   public final static int  EWI_SYSEX_ID_RESPONSE_LEN = 15;
   // N.B. MIDI_TIMEOUT_MS must be significantly longer than MIDI_MESSAGE_SPACER_MS
   // otherwise send & receive can get out of sync
-  public final static int  MIDI_MESSAGE_SPACER_MS = 100;
-  public final static int  MIDI_TIMEOUT_MS       = 3000;
+  public final static int  MIDI_MESSAGE_SHORT_PAUSE_MS = 100;
+  public final static int  MIDI_MESSAGE_LONG_PAUSE_MS  = 250;
+  public final static int  MIDI_TIMEOUT_MS            = 3000;
 
+  public volatile boolean  ignoreEvents;
+  
   SharedData sharedData;
   UserPrefs userPrefs;
   Thread sendThread;
@@ -78,6 +81,7 @@ public class MidiHandler {
 
     sharedData = pSharedData;
     userPrefs = pUserPrefs;
+    ignoreEvents = false;
     MidiDevice device;
     MidiDevice.Info[] infos = MidiSystem.getMidiDeviceInfo();
     for (int d = 0; d < infos.length; d++) {
@@ -100,7 +104,7 @@ public class MidiHandler {
                 System.err.println( "Error - MidiHandler() could not open chosen MIDI OUT device" );
               }
 
-              (sendThread = new Thread( new MidiSender( sharedData.sendQ, outDev ) )).start();
+              (sendThread = new Thread( new MidiSender( sharedData, outDev ) )).start();
               sendThread.setName( "EWItool MIDI Sender" );
               Debugger.log( "Debug - OUT Port: " + infos[d].getName());
               sharedData.setMidiOutDev( infos[d].getName() );
@@ -175,7 +179,7 @@ public class MidiHandler {
     try {
       while (!gotIt) {
         Debugger.log( "DEBUG - MidiHandler Sending request for patch: " + p );
-        sendSysEx( reqMsg.clone() );
+        sendSysEx( reqMsg.clone(), SendMsg.DelayType.SHORT );
         // wait for a patch to be received, or timeout
         Integer pGot = sharedData.patchQ.poll( MIDI_TIMEOUT_MS, TimeUnit.MILLISECONDS );
         if (pGot == null)  {
@@ -222,7 +226,7 @@ public class MidiHandler {
     reqMsg[4] = MIDI_SYSEX_ID_REQ;
     reqMsg[5] = MIDI_SYSEX_TRAILER;
     Debugger.log( "DEBUG - MidiHandler requesting Device ID" );
-    sendSysEx( reqMsg.clone() );
+    sendSysEx( reqMsg.clone(), SendMsg.DelayType.NONE );
     try {
       SharedData.DeviceIdResponse dId = sharedData.deviceIdQ.poll( MIDI_TIMEOUT_MS, TimeUnit.MILLISECONDS );
       if (dId == SharedData.DeviceIdResponse.IS_EWI4000S) {
@@ -244,46 +248,48 @@ public class MidiHandler {
   }
 
   // all SysEx requests must go via this method - which is synchronised to avoid overlapping requests
-  synchronized void sendSysEx( final byte[] sysexBytes ) {
+  synchronized void sendSysEx( final byte[] sysexBytes, SendMsg.DelayType pause ) {
     SendMsg msg = new SendMsg();
-    msg.msgType = SendMsg.MsgType.SYSEX;
+    msg.msgType = SendMsg.MidiMsgType.SYSEX;
     msg.bytes = sysexBytes;
+    msg.delay = pause;
     sharedData.sendQ.add( msg );
   }
 
   synchronized boolean sendPatch( EWI4000sPatch patch, final byte mode ) {
     patch.setPatchMode( mode );
-    sendSysEx( patch.patchBlob );
+    sendSysEx( patch.patchBlob, SendMsg.DelayType.LONG );
     if (mode == EWI4000sPatch.EWI_EDIT) {
       // if we're going to edit we need to send it again as patch 0 with the 
       // edit flag still set...  
       patch.setPatchNum( (byte) 0x00 );
-      sendSysEx( patch.patchBlob );
+      sendSysEx( patch.patchBlob, SendMsg.DelayType.LONG );
     }
     return true;
   }
 
-  synchronized void sendControlChange( int cc, int val, int ch ) {
+  synchronized void sendControlChange( int cc, int val ) {
     SendMsg msg = new SendMsg();
-    msg.msgType = SendMsg.MsgType.CC;
+    msg.msgType = SendMsg.MidiMsgType.CC;
     msg.cc = cc;
     msg.value = val;
-    msg.channel = ch;
     sharedData.sendQ.add( msg );
   }
 
   synchronized boolean sendLiveControl( int lsb, int msb, int cValue ) {
-    sendControlChange( MIDI_CC_NRPN_LSB, lsb, 0 );
-    sendControlChange( MIDI_CC_NRPN_MSB, msb, 0 );
-    sendControlChange( MIDI_CC_DATA_ENTRY, cValue, 0 );
-    sendControlChange( MIDI_CC_NRPN_LSB, 127, 0 );
-    sendControlChange( MIDI_CC_NRPN_MSB, 127, 0 );
+    if (!ignoreEvents) {
+      sendControlChange( MIDI_CC_NRPN_LSB, lsb );
+      sendControlChange( MIDI_CC_NRPN_MSB, msb );
+      sendControlChange( MIDI_CC_DATA_ENTRY, cValue );
+      sendControlChange( MIDI_CC_NRPN_LSB, 127 );
+      sendControlChange( MIDI_CC_NRPN_MSB, 127 );
+    }
     return true;
   }
 
   synchronized void sendSystemReset() {
     SendMsg msg = new SendMsg();
-    msg.msgType = SendMsg.MsgType.SYSTEM_RESET;
+    msg.msgType = SendMsg.MidiMsgType.SYSTEM_RESET;
     sharedData.sendQ.add( msg );
   }
 

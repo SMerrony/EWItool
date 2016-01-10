@@ -2,15 +2,21 @@ package ewitool;
 
 public class SendMsg {
   
-  public static enum MsgType { SYSEX, CC, SYSTEM_RESET };
+  public static enum MidiMsgType { SYSEX, CC, SYSTEM_RESET };
+  public static enum DelayType { NONE, SHORT, LONG };
   
-  public MsgType msgType;
+  public MidiMsgType msgType;
+  public DelayType delay;
   
   // sysex body...
   public byte[]  bytes;
 
   // control change properties...
-  int channel;
-  int cc;
-  int value;
+  public int channel;
+  public int cc;
+  public int value;
+  
+  SendMsg() {
+    delay = DelayType.NONE;
+  }
 }

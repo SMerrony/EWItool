@@ -42,7 +42,7 @@ public class Main extends Application {
   static final String  RELEASE_STATUS = "Alpha";
   static final String  LEAD_AUTHOR = "S.Merrony";
 
-  private static final String  ICON = "/resources/EWItoolLogo1.png";
+  public  static final String  ICON = "/resources/EWItoolLogo1.png";
   private static final int     SCENE_PREF_WIDTH = 1100;
   private static final int     SCENE_PREF_HEIGHT = 750;
   private static final String  WINDOW_TITLE = APP_NAME + " - EWI4000s Patch Handling Tool";
@@ -68,10 +68,11 @@ public class Main extends Application {
       Scene scene = new Scene( root, SCENE_PREF_WIDTH, SCENE_PREF_HEIGHT );
       scene.getStylesheets().add(getClass().getResource("ewitool.css").toExternalForm());
       mainStage.setTitle(WINDOW_TITLE);
-
+      
+      sharedData = new SharedData();  // Create this 1st - holds all info shared across objects
+      
       UserPrefs userPrefs = new UserPrefs();
-      ScratchPad scratchPad = new ScratchPad( userPrefs );
-      sharedData = new SharedData();
+      ScratchPad scratchPad = new ScratchPad( sharedData, userPrefs );
       
       statusBar = new UiStatusBar( sharedData );
       sharedData.addObserver( statusBar );
@@ -155,10 +156,11 @@ public class Main extends Application {
 
     Menu fileMenu, midiMenu, ewiMenu, patchMenu, helpMenu;
     MenuItem printItem, quitItem,
-    portsItem, panicItem, 
+    portsItem, panicItem, // monitorItem,
     fetchAllItem,
     helpItem, aboutItem;
 
+    @SuppressWarnings( "unused" )
     public MainMenuBar( Stage mainStage, UserPrefs userPrefs, MidiHandler midiHandler ) {
 
       fileMenu = new Menu( "File" );
@@ -175,9 +177,11 @@ public class Main extends Application {
       midiMenu = new Menu( "MIDI" );
       portsItem = new MenuItem( "Ports" );
       portsItem.addEventHandler( ActionEvent.ANY, new PortsItemEventHandler( userPrefs ) );
-
       panicItem = new MenuItem( "Panic (All Notes Off)" );
 
+      // this will stream MIDI messages to System.out if debugging is enabled in Debugging class
+      MidiMonitor monitor = new MidiMonitor( sharedData );
+      
       midiMenu.getItems().addAll( portsItem, panicItem );
 
       ewiMenu = new Menu( "EWI" );

@@ -21,28 +21,38 @@ import javax.sound.midi.MidiMessage;
 import javax.sound.midi.Receiver;
 import javax.sound.midi.SysexMessage;
 
+import ewitool.SendMsg.MidiMsgType;
 import javafx.application.Platform;
 
 public class MidiReceiver implements Receiver {
 
   SharedData sharedData;
+  MidiMonitorMessage mmsg;
 
   /**
    * @param ewiPatchList
    */
   public MidiReceiver( SharedData pSharedData ) {
     sharedData = pSharedData;
+    mmsg = new MidiMonitorMessage();
+    mmsg.direction = MidiMonitorMessage.MidiDirection.RECEIVED;
   }
 
   @Override
   public synchronized void send( MidiMessage message, long timeStamp ) {
-
+    
     // we are currently only interested in SysEx messages from the EWI
     // Unfortunately the structure of the SysEx messages is not consistent - we 
     // have to examine the first few bytes...
 
     if (message instanceof SysexMessage) {
       byte[] messageBytes = ((SysexMessage) message).getData();
+      
+      if (sharedData.getMidiMonitoring()) {
+        mmsg.type = MidiMsgType.SYSEX;
+        mmsg.bytes = ((SysexMessage) message).getData();
+        sharedData.monitorQ.add( mmsg );
+      }
 
       if (messageBytes[0] == MidiHandler.MIDI_SYSEX_AKAI_ID && 
           messageBytes[1] == MidiHandler.MIDI_SYSEX_AKAI_EWI4K /* &&

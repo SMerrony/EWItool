@@ -142,6 +142,7 @@ public class PatchEditorTab extends Tab {
     // what to do when the combo is changed...
     patchesCombo.setOnAction( (ae) -> {
       if (!patchesCombo.getSelectionModel().isEmpty()) {
+        midiHandler.ignoreEvents = true;
         editPatch = sharedData.ewiPatchList.get( patchesCombo.getSelectionModel().getSelectedIndex() );
         uneditedPatch = editPatch;
         Debugger.log( "DEBUG - Patch editor selection changed" );
@@ -161,6 +162,7 @@ public class PatchEditorTab extends Tab {
         pitchBendGrid.setControls( editPatch );
         antiAliasGrid.setControls( editPatch );
         levelsGrid.setControls( editPatch );
+        midiHandler.ignoreEvents = false;
         midiHandler.sendPatch( editPatch, EWI4000sPatch.EWI_EDIT ); 
       }
     });

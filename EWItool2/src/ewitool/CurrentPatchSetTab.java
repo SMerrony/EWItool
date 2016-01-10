@@ -32,7 +32,7 @@ public class CurrentPatchSetTab extends Tab {
 
     setText( "Current Patch Set" );
     setClosable( false );
-    
+
     sharedData = pSharedData;
     scratchPad = pScratchPad;
     patchEditorTab = pPatchEditorTab;
@@ -76,7 +76,7 @@ public class CurrentPatchSetTab extends Tab {
         gp.add( patchButtons[ix], (c * 2 ) + 1, r );
       }
     }
-    
+
     saveButton = new Button( "Save to Library" );
     gp.add( saveButton, 5, 20 );
 
@@ -119,14 +119,16 @@ public class CurrentPatchSetTab extends Tab {
         spChoice.getItems().add( scratchPad.patchList.get( p ).getName() );
       }
       gp.add( spChoice, 3, 0 );
-           
+
       dialog.getDialogPane().setContent( gp );
-      
+
       Optional<ButtonType> rc = dialog.showAndWait();
-      
+
       if (rc.get() == editType) {
-	((PatchEditorTab) patchEditorTab).patchesCombo.getSelectionModel().select( (int) ((Button)ae.getSource()).getUserData() );
-	patchEditorTab.getTabPane().getSelectionModel().select( patchEditorTab );
+        // select the patch on the Patch editor tab top combo
+        ((PatchEditorTab) patchEditorTab).patchesCombo.getSelectionModel().select( (int) ((Button)ae.getSource()).getUserData() );
+        // switch to the Patch editor tab
+        patchEditorTab.getTabPane().getSelectionModel().select( patchEditorTab );
       } else if ( rc.get() == copyType) {
         scratchPad.addPatch( sharedData.ewiPatchList.get( (int) ((Button)ae.getSource()).getUserData() ) );
       } else if ( rc.get() == replaceType) {
@@ -138,7 +140,7 @@ public class CurrentPatchSetTab extends Tab {
           Alert alert = new Alert( AlertType.WARNING, "No Patch selected from Scratchpad list" );
           alert.showAndWait();
         }
-        
+
       } else if ( rc.get() == renameType) {
         int pNum = (int) ((Button)ae.getSource()).getUserData();
         if (sharedData.ewiPatchList.get( pNum ).setName( nameField.getText() )) {
@@ -156,5 +158,5 @@ public class CurrentPatchSetTab extends Tab {
       }
     }
   }
-  
+
 }

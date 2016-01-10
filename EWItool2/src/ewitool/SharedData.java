@@ -36,6 +36,7 @@ public class SharedData extends Observable {
   private volatile int lastPatchLoaded;
   private volatile boolean ewiAttached, epxAvailable;
   private volatile int scratchPadCount;
+  private volatile boolean midiMonitoring;
   
   enum DeviceIdResponse { WRONG_LENGTH, NOT_AKAI, NOT_EWI4000S, IS_EWI4000S }
   
@@ -48,6 +49,7 @@ public class SharedData extends Observable {
   BlockingQueue<Integer> patchQ, keyPatchQ;
   BlockingQueue<DeviceIdResponse> deviceIdQ;
   BlockingQueue<SendMsg> sendQ;
+  BlockingQueue<MidiMonitorMessage> monitorQ;
   
   private String midiInDev, midiOutDev;
   
@@ -58,11 +60,13 @@ public class SharedData extends Observable {
     keyPatchQ = new LinkedBlockingQueue<Integer>();
     deviceIdQ = new LinkedBlockingQueue<DeviceIdResponse>();
     sendQ = new LinkedBlockingQueue<SendMsg>();
+    monitorQ = new LinkedBlockingQueue<MidiMonitorMessage>();
     ewiAttached = false;
     epxAvailable = false;
     midiInDev = "[Not set]";
     midiOutDev = "[Not set]";
     scratchPadCount = 0;
+    midiMonitoring = false;
   }
   
   public void clear() {
@@ -93,5 +97,8 @@ public class SharedData extends Observable {
   
   public int getScratchPadCount() { return scratchPadCount; }
   public void setScratchPadCount( int count ) { scratchPadCount = count; setChanged(); notifyObservers(); }
+  
+  public boolean getMidiMonitoring() { return midiMonitoring; }
+  public void setMidiMonitoring( boolean areWe ) { midiMonitoring = areWe; setChanged(); notifyObservers(); }
   
 }
