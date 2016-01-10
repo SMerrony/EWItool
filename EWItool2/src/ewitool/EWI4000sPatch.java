@@ -30,7 +30,7 @@ import java.util.Arrays;
 
 import javax.xml.bind.DatatypeConverter;
 
-public class EWI4000sPatch { // extends Observable {
+public class EWI4000sPatch { 
   
   public final static int EWI_NUM_PATCHES  = 100;  // 0..99
   public final static int EWI_PATCH_LENGTH = 206;  // bytes
@@ -242,21 +242,13 @@ public class EWI4000sPatch { // extends Observable {
     setEmpty( false );
   }
   
-  public boolean isEmpty() {
-    return empty;
-  }
+  public boolean isEmpty() { return empty; }
 
-  public void setEmpty( boolean empty ) {
-    this.empty = empty;
-    //setChanged();
-    //notifyObservers();
-  }
+  public void setEmpty( boolean empty ) { this.empty = empty; }
   
   // the patch name is stored in the patch as a space-padded char[]
   // so it must be converted for use as a normal string
-  public String getName() {
-    return new String( name ).trim();
-  }
+  public String getName() { return new String( name ).trim(); }
   
   // set the patch name (see above) from a normal string
   public boolean setName( String newName ) {
@@ -360,11 +352,7 @@ public class EWI4000sPatch { // extends Observable {
     for (int ix = 12; ix < (12+EWI_PATCHNAME_LENGTH); ix++)
       patchBlob[ix] = (byte) name[ix - 12];
   }
-  
-  void encodeBlob() {
     
-  }
-  
   public static String toHex( byte[] blob, boolean addSpaces ) {
     String fmt, hexStr = "";
     if (blob.length < EWI_PATCH_LENGTH) return "Too short";
