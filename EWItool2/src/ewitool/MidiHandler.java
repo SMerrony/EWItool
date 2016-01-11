@@ -262,8 +262,10 @@ public class MidiHandler {
     if (mode == EWI4000sPatch.EWI_EDIT) {
       // if we're going to edit we need to send it again as patch 0 with the 
       // edit flag still set...  
+      int pNum = patch.patchNum;
       patch.setPatchNum( (byte) 0x00 );
       sendSysEx( patch.patchBlob, SendMsg.DelayType.LONG );
+      patch.setPatchNum( (byte) pNum ); 
     }
     return true;
   }
