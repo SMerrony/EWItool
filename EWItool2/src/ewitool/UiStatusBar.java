@@ -37,6 +37,8 @@ public class UiStatusBar extends HBox implements Observer {
   Label messageLabel, midiInLabel, midiOutLabel, ewiLabel, scratchPadLabel, epxLabel;
   SharedData sharedData;
   
+  private static final long MESSAGE_TIMEOUT_MS = 10 * 1000;  // minimum 10s timeout for textual message
+  
   UiStatusBar(SharedData pSharedData) {
     sharedData = pSharedData;
     setId( "status-bar" );
@@ -66,6 +68,13 @@ public class UiStatusBar extends HBox implements Observer {
                         );
   }
 
+  /* This update method is invoked whenever any of the observable SharedData items change.
+   * It might be necessary to refine this in the future, or replace with a timed scan of 
+   * the items.
+   * 
+   * (non-Javadoc)
+   * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
+   */
   @Override
   public void update( Observable o, Object arg ) {
     midiInLabel.setText( sharedData.getMidiInDev() );
@@ -80,6 +89,11 @@ public class UiStatusBar extends HBox implements Observer {
       epxLabel.setText( "Available" );
     } else {
       epxLabel.setText( "Not connected" );
+    }
+    if (System.currentTimeMillis() - sharedData.getStatusMillis() > MESSAGE_TIMEOUT_MS ) {
+      messageLabel.setText( "" );
+    } else {
+      messageLabel.setText( sharedData.getStatusMessage() );
     }
   }
 }

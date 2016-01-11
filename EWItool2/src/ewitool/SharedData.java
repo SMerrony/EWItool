@@ -36,6 +36,8 @@ public class SharedData extends Observable {
   private volatile int lastPatchLoaded;
   private volatile boolean ewiAttached, epxAvailable;
   private volatile int scratchPadCount;
+  private volatile String statusMessage;
+  private volatile long statusMillis;
   private volatile boolean midiMonitoring;
   
   enum DeviceIdResponse { WRONG_LENGTH, NOT_AKAI, NOT_EWI4000S, IS_EWI4000S }
@@ -65,6 +67,8 @@ public class SharedData extends Observable {
     epxAvailable = false;
     midiInDev = "[Not set]";
     midiOutDev = "[Not set]";
+    statusMessage = "";
+    statusMillis = 0L;
     scratchPadCount = 0;
     midiMonitoring = false;
   }
@@ -100,5 +104,9 @@ public class SharedData extends Observable {
   
   public boolean getMidiMonitoring() { return midiMonitoring; }
   public void setMidiMonitoring( boolean areWe ) { midiMonitoring = areWe; setChanged(); notifyObservers(); }
+  
+  public String getStatusMessage() { return statusMessage; }
+  public void setStatusMessage( String msg ) { statusMessage = msg; statusMillis = System.currentTimeMillis(); setChanged(); notifyObservers(); }
+  public long getStatusMillis() { return statusMillis; }
   
 }
