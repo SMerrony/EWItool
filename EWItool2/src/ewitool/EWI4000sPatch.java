@@ -46,6 +46,14 @@ public class EWI4000sPatch {
       msb = raw[1];
       offset = raw[2];
     }
+    
+    byte[] toBytes() {
+      byte[] blob = new byte[3];
+      blob[0] = lsb;
+      blob[1] = msb;
+      blob[2] = offset;
+      return blob;
+    }
   }
   
   class Osc {
@@ -94,6 +102,30 @@ public class EWI4000sPatch {
       breathThreshold = raw[19];
       level       = raw[20];
     }
+    
+    byte[] toBytes() {
+      byte[] blob = new byte[21];
+      blob = Arrays.copyOf( nrpn.toBytes(), 21 );
+      blob[3] = (byte) octave;
+      blob[4] = (byte) semitone;
+      blob[5] = (byte) fine;
+      blob[6] = (byte) beat;
+      blob[7] = filler1;
+      blob[8] = (byte) sawtooth;
+      blob[9] = (byte) triangle;
+      blob[10] = (byte) square;
+      blob[11] = (byte) pulseWidth;
+      blob[12] = (byte) pwmFreq;
+      blob[13] = (byte) pwmDepth;
+      blob[14] = (byte) sweepDepth;
+      blob[15] = (byte) sweepTime;
+      blob[16] = (byte) breathDepth;
+      blob[17] = (byte) breathAttain;
+      blob[18] = (byte) breathCurve;
+      blob[19] = (byte) breathThreshold;
+      blob[20] = (byte) level;
+      return blob;
+    }
   }
   
   class Filter {
@@ -130,6 +162,25 @@ public class EWI4000sPatch {
       sweepTime     = raw[13];
       breathCurve   = raw[14];
     }
+    
+    byte[] toBytes() {
+      byte[] blob = new byte[15];
+      blob = Arrays.copyOf( nrpn.toBytes(), 21 );
+      blob[3] = (byte) mode;
+      blob[4] = (byte) freq;
+      blob[5] = (byte) q;
+      blob[6] = (byte) keyFollow;
+      blob[7] = (byte) breathMod;
+      blob[8] = (byte) lfoFreq;
+      blob[9] = (byte) lfoDepth;
+      blob[10] = (byte) lfoBreath;
+      blob[11] = (byte) lfoThreshold;
+      blob[12] = (byte) sweepDepth;
+      blob[13] = (byte) sweepTime;
+      blob[14] = (byte) breathCurve;
+      return blob;
+    }
+
   }
   
   byte patchBlob[];
@@ -279,6 +330,7 @@ public class EWI4000sPatch {
     patchBlob[4] = mode;
   }
 
+  // extract the individual properties from the blob
   void decodeBlob() {
      header = Arrays.copyOfRange( patchBlob, 0, 4 );
      mode = patchBlob[4];     // 0x00 to store, 0x20 to edit
@@ -345,8 +397,76 @@ public class EWI4000sPatch {
      trailer_f7     = patchBlob[205];   // 0xf7 !!!  
      
      setEmpty( false );
-
   }
+  
+  // populate the blob from each of the individual properties
+  void encodeBlob() {
+    int ix;
+    byte[] tmpBytes;
+    
+    for (ix = 0; ix < 4; ix++) patchBlob[ix] = header[ix];
+    patchBlob[4] = mode;     // 0x00 to store, 0x20 to edit
+    patchBlob[5] = (byte) patchNum; 
+    patchBlob[6] = filler2;
+    patchBlob[7] = filler3;
+    patchBlob[8] = filler4;
+    patchBlob[9] = filler5;
+    patchBlob[10] = filler6;
+    patchBlob[11] = filler7;
+    for (ix = 0; ix < EWI_PATCHNAME_LENGTH; ix++) patchBlob[12+ix] = (byte) name[ix];
+    tmpBytes = osc1.toBytes(); for (ix = 0; ix < tmpBytes.length; ix++) patchBlob[44+ix] = tmpBytes[ix];
+    tmpBytes = osc2.toBytes(); for (ix = 0; ix < tmpBytes.length; ix++) patchBlob[65+ix] = tmpBytes[ix];
+    tmpBytes = oscFilter1.toBytes(); for (ix = 0; ix < tmpBytes.length; ix++) patchBlob[86+ix] = tmpBytes[ix];
+    tmpBytes = oscFilter2.toBytes(); for (ix = 0; ix < tmpBytes.length; ix++) patchBlob[101+ix] = tmpBytes[ix];
+    tmpBytes = noiseFilter1.toBytes(); for (ix = 0; ix < tmpBytes.length; ix++) patchBlob[116+ix] = tmpBytes[ix];
+    tmpBytes = noiseFilter2.toBytes(); for (ix = 0; ix < tmpBytes.length; ix++) patchBlob[131+ix] = tmpBytes[ix];
+    tmpBytes = antiAliasNRPN.toBytes();  for (ix = 0; ix < tmpBytes.length; ix++) patchBlob[146+ix] = tmpBytes[ix]; 
+    patchBlob[149] = (byte) antiAliasSwitch   ;
+    patchBlob[150] = (byte) antiAliasCutoff   ;
+    patchBlob[151] = (byte) antiAliasKeyFollow;
+    tmpBytes = noiseNRPN.toBytes();  for (ix = 0; ix < tmpBytes.length; ix++) patchBlob[152+ix] = tmpBytes[ix];
+    patchBlob[155] = (byte) noiseTime   ;
+    patchBlob[156] = (byte) noiseBreath ;
+    patchBlob[157] = (byte) noiseLevel  ;
+    tmpBytes = miscNRPN.toBytes();  for (ix = 0; ix < tmpBytes.length; ix++) patchBlob[158+ix] = tmpBytes[ix];
+    patchBlob[161] = (byte) bendRange   ;
+    patchBlob[162] = (byte) bendStepMode;
+    patchBlob[163] = (byte) biteVibrato ;
+    patchBlob[164] = (byte) oscFilterLink;
+    patchBlob[165] = (byte) noiseFilterLink;
+    patchBlob[166] = (byte) formantFilter  ;
+    patchBlob[167] = (byte) osc2Xfade      ;
+    patchBlob[168] = (byte) keyTrigger     ;
+    patchBlob[169] = (byte) filler10       ;
+    patchBlob[170] = (byte) chorusSwitch   ;
+    tmpBytes = ampNRPN.toBytes();  for (ix = 0; ix < tmpBytes.length; ix++) patchBlob[171+ix] = tmpBytes[ix];
+    patchBlob[174] = (byte) biteTremolo   ;
+    patchBlob[175] = (byte) ampLevel    ;
+    patchBlob[176] = (byte) octaveLevel   ;
+    tmpBytes = chorusNRPN.toBytes();  for (ix = 0; ix < tmpBytes.length; ix++) patchBlob[177+ix] = tmpBytes[ix];
+    patchBlob[180] = (byte) chorusDelay1  ;
+    patchBlob[181] = (byte) chorusModLev1 ;
+    patchBlob[182] = (byte) chorusWetLev1 ;
+    patchBlob[183] = (byte) chorusDelay2  ;
+    patchBlob[184] = (byte) chorusModLev2 ;
+    patchBlob[185] = (byte) chorusWetLev2 ;
+    patchBlob[186] = (byte) chorusFeedback;
+    patchBlob[187] = (byte) chorusLFOfreq ;
+    patchBlob[188] = (byte) chorusDryLevel;
+    tmpBytes = delayNRPN.toBytes();  for (ix = 0; ix < tmpBytes.length; ix++) patchBlob[189+ix] = tmpBytes[ix];
+    patchBlob[192] = (byte) delayTime     ;
+    patchBlob[193] = (byte) delayFeedback ;
+    patchBlob[194] = (byte) delayDamp     ;
+    patchBlob[195] = (byte) delayLevel    ;
+    patchBlob[196] = (byte) delayDry      ;
+    tmpBytes = reverbNRPN.toBytes();  for (ix = 0; ix < tmpBytes.length; ix++) patchBlob[197+ix] = tmpBytes[ix];
+    patchBlob[200] = (byte) reverbDry     ;
+    patchBlob[201] = (byte) reverbLevel   ;
+    patchBlob[202] = (byte) reverbDensity ;
+    patchBlob[203] = (byte) reverbTime    ;
+    patchBlob[204] = (byte) reverbDamp    ;
+    patchBlob[205] = trailer_f7    ;
+ }
   
   void nameToBlob() {
     for (int ix = 12; ix < (12+EWI_PATCHNAME_LENGTH); ix++)

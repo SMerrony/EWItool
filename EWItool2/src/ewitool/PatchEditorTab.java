@@ -42,7 +42,7 @@ public class PatchEditorTab extends Tab {
   enum Filter { OSC_PRI, OSC_SEC, NOISE_PRI, NOISE_SEC }
   public ComboBox<String> patchesCombo;
   public Button storeButton, revertButton, toScratchPadButton;
-  private EWI4000sPatch editPatch, uneditedPatch;
+  private volatile EWI4000sPatch editPatch, uneditedPatch;
 
   PatchEditorTab(SharedData sharedData, ScratchPad scratchPad, MidiHandler midiHandler) {
     setText( "Patch Editor" );
@@ -62,6 +62,12 @@ public class PatchEditorTab extends Tab {
     patchesCombo = new ComboBox<String>();
     storeButton = new Button( "Store" );
     storeButton.setTooltip( new Tooltip( "Replace the patch in the EWI with the current version" ) );
+    storeButton.setOnAction( (ae) -> {
+      editPatch.encodeBlob();
+      midiHandler.sendPatch( editPatch, EWI4000sPatch.EWI_SAVE );
+      sharedData.ewiPatchList.set( editPatch.patchNum, editPatch );
+      sharedData.setStatusMessage( "Patch #" + (editPatch.patchNum + 1 ) + " stored in EWI" );
+    });
     revertButton = new Button( "Revert" );
     revertButton.setTooltip( new Tooltip( "Revert any edits and reload the original patch" ) );
     revertButton.setOnAction( (event) -> {
@@ -143,7 +149,8 @@ public class PatchEditorTab extends Tab {
     patchesCombo.setOnAction( (ae) -> {
       if (!patchesCombo.getSelectionModel().isEmpty()) {
         midiHandler.ignoreEvents = true;
-        editPatch = sharedData.ewiPatchList.get( patchesCombo.getSelectionModel().getSelectedIndex() );
+        editPatch.patchBlob = sharedData.ewiPatchList.get( patchesCombo.getSelectionModel().getSelectedIndex() ).patchBlob;
+        editPatch.decodeBlob();
         uneditedPatch = editPatch;
         Debugger.log( "DEBUG - Patch editor selection changed" );
         osc1Grid.setControls( editPatch, Osc.OSC1 );
