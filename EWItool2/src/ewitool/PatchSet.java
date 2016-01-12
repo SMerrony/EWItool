@@ -23,13 +23,13 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.LinkedList;
+import java.util.ArrayList;
 
 public final class PatchSet {
   
   public enum Status { OK, ALREADY_EXISTS, NO_PERMISSION }
   
-  public static Status save( LinkedList<EWI4000sPatch> patchList, String filename ) throws IOException {
+  public static Status save( ArrayList<EWI4000sPatch> patchList, String filename ) throws IOException {
     
     UserPrefs prefs = new UserPrefs();
     Path path = Paths.get( prefs.getLibraryLocation(), filename );

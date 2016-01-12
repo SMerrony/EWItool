@@ -14,6 +14,7 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -78,6 +79,40 @@ public class CurrentPatchSetTab extends Tab {
     }
 
     saveButton = new Button( "Save to Library" );
+    saveButton.setOnAction( (ae) -> {
+      TextInputDialog tid = new TextInputDialog( ".syx" );
+      tid.setTitle( "EWItool - Save Patch Set to Library" );
+      tid.setHeaderText( "Enter filename for Patch Set (end with .syx)" );
+      Optional<String> res = tid.showAndWait();
+      res.ifPresent( setName -> {
+        try {
+          switch( PatchSet.save( sharedData.ewiPatchList, setName )) {
+          case OK:
+            Alert al = new Alert( AlertType.INFORMATION );
+            al.setTitle( "EWItool - Save Patch Set to Library" );
+            al.setContentText( "Patch Set " + setName + " saved to library." );
+            al.showAndWait();
+            sharedData.setStatusMessage( "Patch set " + setName + " saved to library" );
+            break;
+          case ALREADY_EXISTS:
+            Alert aeal = new Alert( AlertType.ERROR );
+            aeal.setTitle( "EWItool - Save Patch Set to Library" );
+            aeal.setContentText( "A Patch set with that name already exists, please use a different name." );
+            aeal.showAndWait();
+            break;
+          case NO_PERMISSION:
+            Alert npal = new Alert( AlertType.ERROR );
+            npal.setTitle( "EWItool - Save Patch Set to Library" );
+            npal.setContentText( "Could not write to Library directory." );
+            npal.showAndWait();
+            break;
+          }
+        } catch( Exception e ) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        }
+      });
+    });
     gp.add( saveButton, 5, 20 );
 
     setContent( gp );   
