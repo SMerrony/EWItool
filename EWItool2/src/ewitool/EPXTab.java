@@ -20,13 +20,11 @@ package ewitool;
 import java.util.LinkedList;
 
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.Tab;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -41,14 +39,13 @@ public class EPXTab extends Tab {
   TextField uidField, serverField;
   PasswordField passwdField;
   ListView<String> resultsView;
-  TextField nameField, contribField, originField, typeField,
-            rTagsField, addedField;
-  CheckBox privacyCheckBox;
-  TextArea  descriptionArea;
-  Button deleteButton, copyButton;
   String hexPatch;
+  GridPane detailGrid;
+  Button deleteButton, copyButton;
   
   EPX epx;
+  
+  private int currentEpxPatchID;
   
   EPXTab( SharedData sharedData, ScratchPad scratchPad, UserPrefs userPrefs ) {
     
@@ -56,6 +53,7 @@ public class EPXTab extends Tab {
     setClosable( false );
     
     epx = new EPX( sharedData, userPrefs );
+    currentEpxPatchID = -1;
  
     // for vertically fixed rows in the GridPanes...
     RowConstraints fixedRC = new RowConstraints();
@@ -127,17 +125,10 @@ public class EPXTab extends Tab {
     resultsView.getSelectionModel().selectedItemProperty().addListener( (item)-> {
       if (resultsView.getSelectionModel().getSelectedIndex() != -1){
         String selected = resultsView.getSelectionModel().getSelectedItem();
-        int epxId = Integer.parseInt( selected.substring( selected.lastIndexOf( '#' ) + 1 ) );
-        EPX.DetailsResult dr = epx.getDetails( epxId );
+        currentEpxPatchID = Integer.parseInt( selected.substring( selected.lastIndexOf( '#' ) + 1 ) );
+        EPX.DetailsResult dr = epx.getDetails( currentEpxPatchID );
         if (dr != null) {
-          nameField.setText( dr.name );
-          contribField.setText( dr.contrib );
-          originField.setText( dr.origin );
-          typeField.setText( dr.type );
-          privacyCheckBox.setSelected( dr.privateFlag );
-          descriptionArea.setText( dr.desc );
-          rTagsField.setText( dr.tags );
-          addedField.setText( dr.added );
+          ((UiEPXDetailsGrid) detailGrid).setFields( dr );
           if (dr.contrib.contentEquals( userPrefs.getEpxUserid() ))
             deleteButton.setDisable( false );
           else
@@ -145,77 +136,34 @@ public class EPXTab extends Tab {
           copyButton.setDisable( false );
           hexPatch = dr.hex;
         }
+      } else {
+        currentEpxPatchID = -1;
       }
     });
     resultsGrid.add( resultsView, 0, 1 );
     resultsGrid.getRowConstraints().add( vgrowRC );
     
     // right pane
-    GridPane detailGrid = new GridPane();
+    detailGrid = new UiEPXDetailsGrid();
     detailGrid.setId( "epx-details-grid" );
 
-    Label detailsSectionLabel = new Label( "Details" );
-    detailsSectionLabel.setId( "epx-section-label" );
-    detailGrid.add( detailsSectionLabel, 0, 0 );
-    detailGrid.getRowConstraints().add( fixedRC );
-    
-    detailGrid.add( new Label( "Name" ), 0, 1 );
-    nameField = new TextField();  
-    detailGrid.add( nameField, 1, 1 );
-    detailGrid.getRowConstraints().add( vgrowRC );
-    
-    detailGrid.add( new Label( "Contributor" ), 0, 2 );
-    contribField = new TextField();
-    detailGrid.add( contribField, 1, 2 );
-    detailGrid.getRowConstraints().add( vgrowRC );
-    
-    detailGrid.add( new Label( "Originator" ), 0, 3 );
-    originField = new TextField();
-    detailGrid.add( originField, 1,3 );
-    detailGrid.getRowConstraints().add( vgrowRC );
-    
-    detailGrid.add( new Label( "Type" ), 0, 4 );
-    typeField = new TextField();
-    detailGrid.add( typeField, 1, 4 );
-    detailGrid.getRowConstraints().add( vgrowRC );
-    
-    detailGrid.add( new Label( "Private" ), 0, 5 );
-    privacyCheckBox = new CheckBox();
-    detailGrid.add( privacyCheckBox, 1, 5 );
-    detailGrid.getRowConstraints().add( vgrowRC );
-    
-    detailGrid.add( new Label( "Description" ), 0, 6 );
-    descriptionArea = new TextArea();
-    descriptionArea.setWrapText( true );
-    detailGrid.add( descriptionArea, 0, 7 );
-    GridPane.setColumnSpan( descriptionArea, 2 );
-    detailGrid.getRowConstraints().add( vgrowRC );
-    
-    detailGrid.add( new Label( "Tags" ), 0, 8 );
-    rTagsField = new TextField();
-    detailGrid.add( rTagsField, 1, 8 );
-    detailGrid.getRowConstraints().add( vgrowRC );
-    
-    detailGrid.add( new Label( "Added" ), 0, 9 );
-    addedField = new TextField();
-    detailGrid.add( addedField, 1, 9 );
-    detailGrid.getRowConstraints().add( vgrowRC );
-    
     deleteButton = new Button( "Delete" );
     deleteButton.setDisable( true );
     deleteButton.setOnAction( (ae) -> {
-      // TODO 
+      if (currentEpxPatchID != -1) {
+        epx.deletePatch( currentEpxPatchID );
+        ((UiEPXDetailsGrid) detailGrid).clearFields();
+        queryButton.fire();
+      }
     });
-    detailGrid.add( deleteButton, 0, 10 );
+
     copyButton = new Button( "Copy to Scratchpad" );
     copyButton.setDisable( true );
     copyButton.setOnAction( (ae) -> {
       EWI4000sPatch tmpPatch = new EWI4000sPatch( hexPatch );
       scratchPad.addPatch( tmpPatch );
     });
-    detailGrid.add( copyButton, 1, 10 );
-    detailGrid.getRowConstraints().add( vgrowRC );
-        
+         
     GridPane gp = new GridPane();
     gp.setId( "epx-grid" );
     
@@ -232,6 +180,8 @@ public class EPXTab extends Tab {
     gp.add( resultsGrid, 1, 0 );
     gp.add( detailGrid, 2, 0 );
     gp.add( settingsGrid, 0, 1 );
+    gp.add( deleteButton, 1, 2 );
+    gp.add( copyButton, 2, 2 );
     
     setContent( gp );
     

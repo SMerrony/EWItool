@@ -224,4 +224,26 @@ public class EPX {
     }
     return dr;
   }
+  
+  public void deletePatch( int id ) {
+    URL url;
+    try {
+      url = new URL( PROTOCOL + userPrefs.getEpxHost() + BASE_REQ + "deletePatch" +
+          "&userid=" + userPrefs.getEpxUserid() + 
+          "&passwd=" + userPrefs.getEpxPassword() +
+          "&id=" + id );
+      HttpURLConnection con = (HttpURLConnection) url.openConnection();
+      con.setRequestProperty( "User-Agent", USER_AGENT );
+      int respCode = con.getResponseCode();
+      Debugger.log( "DEBUG - EPX: Got response " + respCode + " for deletePatch request" );
+
+    } catch( MalformedURLException e ) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch( IOException e ) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+
+  }
 }
