@@ -162,6 +162,7 @@ public class EPXTab extends Tab {
     copyButton.setOnAction( (ae) -> {
       EWI4000sPatch tmpPatch = new EWI4000sPatch( hexPatch );
       scratchPad.addPatch( tmpPatch );
+      sharedData.setStatusMessage( ((UiEPXDetailsGrid) detailGrid).getName() + " copied to Scratchpad" );
     });
          
     GridPane gp = new GridPane();

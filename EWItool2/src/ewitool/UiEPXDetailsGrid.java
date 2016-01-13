@@ -94,7 +94,8 @@ public class UiEPXDetailsGrid extends GridPane {
     
 
   }
-
+  
+  public String getName() { return nameField.getText(); }
 
   /**
    * @param dr
