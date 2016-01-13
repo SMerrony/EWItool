@@ -23,6 +23,7 @@ import javafx.geometry.VPos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Tab;
@@ -87,6 +88,14 @@ public class ScratchPadTab extends Tab {
     gp.add( patchList, 0, 0, 1, 2 );
 
     clearButton = new Button( "Clear" );
+    clearButton.setOnAction( (ae) -> {
+      Alert clrAl = new Alert( AlertType.CONFIRMATION );
+      clrAl.setTitle( "EWItool - Clear Scratchpad" );
+      clrAl.setContentText( "Do you really want to clear the scratchpad?" );
+      clrAl.showAndWait()
+        .filter( response -> response == ButtonType.OK )
+        .ifPresent( response -> scratchPad.clearAll() );
+    });
     gp.add( clearButton, 1, 0 );
     GridPane.setValignment( clearButton, VPos.CENTER );
 
