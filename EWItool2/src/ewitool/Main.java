@@ -155,7 +155,7 @@ public class Main extends Application {
   class MainMenuBar extends MenuBar {
 
     Menu fileMenu, midiMenu, ewiMenu, patchMenu, helpMenu;
-    MenuItem printItem, quitItem,
+    MenuItem quitItem,
     portsItem, panicItem, // monitorItem,
     fetchAllItem,
     helpItem, aboutItem;
@@ -164,7 +164,6 @@ public class Main extends Application {
     public MainMenuBar( Stage mainStage, UserPrefs userPrefs, MidiHandler midiHandler ) {
 
       fileMenu = new Menu( "File" );
-      printItem = new MenuItem( "Print" );
       quitItem = new MenuItem( "Quit" );
       quitItem.setOnAction( (ae) -> {
         Debugger.log( "DEBUG - clean exit" );
@@ -172,7 +171,7 @@ public class Main extends Application {
         Platform.exit();
         System.exit( 0 );           
       });
-      fileMenu.getItems().addAll( printItem, quitItem );
+      fileMenu.getItems().addAll( quitItem );
 
       midiMenu = new Menu( "MIDI" );
       portsItem = new MenuItem( "Ports" );

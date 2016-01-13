@@ -6,6 +6,11 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
+import javafx.print.PageLayout;
+import javafx.print.PageOrientation;
+import javafx.print.Paper;
+import javafx.print.Printer.MarginType;
+import javafx.print.PrinterJob;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -20,11 +25,12 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
+import javafx.scene.transform.Scale;
 
 public class CurrentPatchSetTab extends Tab {
 
   Button[] patchButtons;
-  Button saveButton;
+  Button saveButton, printButton;
   SharedData sharedData;
   ScratchPad scratchPad;
   Tab patchEditorTab;
@@ -108,12 +114,27 @@ public class CurrentPatchSetTab extends Tab {
             break;
           }
         } catch( Exception e ) {
-          // TODO Auto-generated catch block
           e.printStackTrace();
         }
       });
     });
     gp.add( saveButton, 5, 20 );
+    
+    printButton = new Button( "Print" );
+    printButton.setOnAction( (ae) -> {
+      PrinterJob pj = PrinterJob.createPrinterJob();
+      if (pj != null && pj.showPrintDialog( gp.getScene().getWindow() )) {
+        PageLayout layout = pj.getPrinter().createPageLayout( Paper.A4, PageOrientation.LANDSCAPE, MarginType.DEFAULT );
+        double scaleX = layout.getPrintableWidth() / gp.getBoundsInParent().getWidth();
+        double scaleY = layout.getPrintableHeight() / gp.getBoundsInParent().getHeight();
+        gp.getTransforms().add( new Scale( scaleX, scaleY ) );
+        if (pj.printPage( layout, gp ))
+          pj.endJob();       
+        gp.getTransforms().clear();
+      }
+    });
+    
+    gp.add( printButton, 7, 20 );
 
     setContent( gp );   
   }
