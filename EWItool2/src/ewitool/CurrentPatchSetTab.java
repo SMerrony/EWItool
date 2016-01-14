@@ -33,15 +33,17 @@ public class CurrentPatchSetTab extends Tab {
   Button saveButton, printButton;
   SharedData sharedData;
   ScratchPad scratchPad;
+  MidiHandler midiHandler;
   Tab patchEditorTab;
 
-  CurrentPatchSetTab( SharedData pSharedData, ScratchPad pScratchPad, Tab pPatchEditorTab ) {
+  CurrentPatchSetTab( SharedData pSharedData, ScratchPad pScratchPad, MidiHandler pMidiHandler, Tab pPatchEditorTab ) {
 
     setText( "Current Patch Set" );
     setClosable( false );
 
     sharedData = pSharedData;
     scratchPad = pScratchPad;
+    midiHandler = pMidiHandler;
     patchEditorTab = pPatchEditorTab;
 
     GridPane gp = new GridPane();
@@ -74,7 +76,7 @@ public class CurrentPatchSetTab extends Tab {
       for (int c = 0; c < 5; c++) {
         int ix = (c * 20 ) + r;
         gp.add( new Label( Integer.toString( (ix + 1) % 100 ) ), c * 2, r );
-        patchButtons[ix] = new Button( "<Empty>" );  // TODO Create method to do this
+        patchButtons[ix] = new Button( "<Empty>" );  
         patchButtons[ix].setUserData( ix );  // store the patch number 
         patchButtons[ix].setMinWidth( 40.0 );
         patchButtons[ix].setPrefWidth( 90.0 );
@@ -185,13 +187,19 @@ public class CurrentPatchSetTab extends Tab {
         ((PatchEditorTab) patchEditorTab).patchesCombo.getSelectionModel().select( (int) ((Button)ae.getSource()).getUserData() );
         // switch to the Patch editor tab
         patchEditorTab.getTabPane().getSelectionModel().select( patchEditorTab );
+  
       } else if ( rc.get() == copyType) {
         scratchPad.addPatch( sharedData.ewiPatchList.get( (int) ((Button)ae.getSource()).getUserData() ) );
+
       } else if ( rc.get() == replaceType) {
         if (spChoice.getSelectionModel().getSelectedIndex() >= 0) {
           int pNum = (int) ((Button)ae.getSource()).getUserData();
-          sharedData.ewiPatchList.set( pNum, scratchPad.patchList.get( spChoice.getSelectionModel().getSelectedIndex() ) );
-          sharedData.setLastPatchLoaded( pNum );
+          EWI4000sPatch tmpPatch = scratchPad.patchList.get( spChoice.getSelectionModel().getSelectedIndex() );
+          tmpPatch.setPatchNum( (byte) pNum );
+          sharedData.ewiPatchList.set( pNum, tmpPatch );
+          patchButtons[pNum].setText( tmpPatch.getName() );
+          midiHandler.sendPatch( tmpPatch, EWI4000sPatch.EWI_SAVE );
+          sharedData.setStatusMessage( "Patch #" + (pNum+1) + " saved to EWI" );
         } else {
           Alert alert = new Alert( AlertType.WARNING, "No Patch selected from Scratchpad list" );
           alert.showAndWait();
@@ -205,6 +213,8 @@ public class CurrentPatchSetTab extends Tab {
           alert.setTitle( "EWItool - Rename Patch" );
           alert.setHeaderText( "" );
           alert.showAndWait();
+          midiHandler.sendPatch( sharedData.ewiPatchList.get( pNum ), EWI4000sPatch.EWI_SAVE );
+          sharedData.setStatusMessage( "Patch #" + (pNum+1) + " saved to EWI" );
         } else {
           Alert alert = new Alert( AlertType.WARNING, "Could not rename to '" + nameField.getText() + "'" );
           alert.setTitle( "EWItool - Rename Patch" );

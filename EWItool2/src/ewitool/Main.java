@@ -97,7 +97,7 @@ public class Main extends Application {
 
       patchEditorTab = new PatchEditorTab( sharedData, scratchPad, midiHandler );
 
-      currentPatchSetTab = new CurrentPatchSetTab( sharedData, scratchPad, patchEditorTab );
+      currentPatchSetTab = new CurrentPatchSetTab( sharedData, scratchPad, midiHandler, patchEditorTab );
       tabPane.getTabs().add( currentPatchSetTab );
       currentPatchSetTab.setDisable( true );
 
