@@ -32,6 +32,9 @@ import javax.sound.midi.Sequencer;
 import javax.sound.midi.Synthesizer;
 import javax.sound.midi.SysexMessage;
 
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+
 public class MidiHandler {
 
   //SysEx commands from Akai
@@ -102,6 +105,10 @@ public class MidiHandler {
               } catch( MidiUnavailableException e1 ) {
                 e1.printStackTrace();
                 System.err.println( "Error - MidiHandler() could not open chosen MIDI OUT device" );
+                Alert aeal = new Alert( AlertType.ERROR );
+                aeal.setTitle( "EWItool - MIDI" );
+                aeal.setContentText( "The EWItool MidiHandler could not open chosen MIDI OUT device" );
+                aeal.showAndWait();
               }
 
               (sendThread = new Thread( new MidiSender( sharedData, outDev ) )).start();
@@ -116,12 +123,20 @@ public class MidiHandler {
               } catch( MidiUnavailableException e ) {
                 e.printStackTrace();
                 System.err.println( "Error - MidiHandler() could not obtain chosen MIDI IN device info" );
+                Alert aeal = new Alert( AlertType.ERROR );
+                aeal.setTitle( "EWItool - MIDI" );
+                aeal.setContentText( "The EWItool MidiHandler could not open chosen MIDI IN device" );
+                aeal.showAndWait();
               }
               try {
                 inDev.open(); 
               } catch( MidiUnavailableException e1 ) {
                 e1.printStackTrace();
                 System.err.println( "Error - MidiHandler() could not open chosen MIDI IN device" );
+                Alert aeal = new Alert( AlertType.ERROR );
+                aeal.setTitle( "EWItool - MIDI" );
+                aeal.setContentText( "The EWItool MidiHandler could not open chosen MIDI IN device" );
+                aeal.showAndWait();
               }
               midiIn = new MidiReceiver( sharedData );
               inDev.getTransmitter().setReceiver( midiIn );
@@ -133,9 +148,12 @@ public class MidiHandler {
       } catch( MidiUnavailableException e ) {
         e.printStackTrace();
         System.err.println( "Error - MidiHandler() could not obtain MIDI devices info" );
+        Alert aeal = new Alert( AlertType.ERROR );
+        aeal.setTitle( "EWItool - MIDI" );
+        aeal.setContentText( "The EWItool MidiHandler could not open obtain MIDI Device information from the system" );
+        aeal.showAndWait();
       }
     }
-
   }
 
   public void close() {
@@ -144,16 +162,10 @@ public class MidiHandler {
     sharedData.setEwiAttached( false );
   }
 
-  /**
-   * 
-   */
   public void restart() {
-
     close();
-
     // TODO Restart MIDI connections
     System.err.println( "Error - MidiHandler.restart() not yet implemented" );
-
   }
 
   void clearPatches() {
@@ -214,7 +226,6 @@ public class MidiHandler {
     } catch( InvalidMidiDataException e ) {
       e.printStackTrace();
     }
-
   }
 
   synchronized boolean requestDeviceID() {
