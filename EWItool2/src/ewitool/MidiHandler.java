@@ -154,6 +154,9 @@ public class MidiHandler {
         aeal.showAndWait();
       }
     }
+    if (inDev.isOpen() && outDev.isOpen()) {
+      requestDeviceID();
+    }
   }
 
   public void close() {
