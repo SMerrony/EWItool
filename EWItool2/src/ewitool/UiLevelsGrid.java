@@ -46,12 +46,11 @@ public class UiLevelsGrid extends GridPane {
     getRowConstraints().addAll( fixedRC, vgrowRC, vgrowRC, vgrowRC, vgrowRC );
     Label mainLabel = new Label( "Levels" );
     mainLabel.setId( "editor-section-label" );
+    GridPane.setColumnSpan( mainLabel, 2 );
     add( mainLabel, 0, 0 );
    
     masterSlider = new Slider( 0.0, 127.0, 0.0 );
     masterSlider.setOrientation( Orientation.VERTICAL );
-    masterSlider.setMajorTickUnit( 32.0 );
-    GridPane.setRowSpan( masterSlider, 3 );
     masterSlider.valueProperty().addListener( (observable, oldVal, newVal) -> {
       midiHandler.sendLiveControl( 1, 88, newVal.intValue() );
       editPatch.ampLevel = newVal.intValue();
@@ -61,12 +60,10 @@ public class UiLevelsGrid extends GridPane {
     
     octaveSlider = new Slider( 0.0, 127.0, 0.0 );
     octaveSlider.setOrientation( Orientation.VERTICAL );
-    octaveSlider.setMajorTickUnit( 32.0 );
     octaveSlider.valueProperty().addListener( (observable, oldVal, newVal)-> {
       midiHandler.sendLiveControl( 2, 88, newVal.intValue() );
       editPatch.octaveLevel = newVal.intValue();
     });
-    GridPane.setRowSpan( octaveSlider, 3 );
     add( octaveSlider, 1, 2 );
     add( new BoundBelowControlLabel( "Octave", HPos.CENTER, octaveSlider ), 1, 1 );
   }

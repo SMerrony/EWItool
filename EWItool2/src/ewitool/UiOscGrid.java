@@ -87,7 +87,6 @@ public class UiOscGrid extends GridPane {
 
     fineSlider = new Slider( 14.0, 114.0, 64.0 );  // Val is 14-114
     fineSlider.setOrientation( Orientation.HORIZONTAL );
-    fineSlider.setMajorTickUnit( 32.0 );
     fineSlider.valueProperty().addListener( (observable, oldVal, newVal) -> {
       switch( osc ) {
       case OSC1:
@@ -122,7 +121,6 @@ public class UiOscGrid extends GridPane {
 
     beatSlider = new Slider( 0.0, 127.0, 0.0 );
     beatSlider.setOrientation( Orientation.HORIZONTAL );
-    beatSlider.setMajorTickUnit( 32.0 );
     beatSlider.valueProperty().addListener( (observable, oldVal, newVal) -> {
       switch( osc ) {
       case OSC1:
@@ -140,7 +138,6 @@ public class UiOscGrid extends GridPane {
 
     sawSlider = new Slider( 0.0, 127.0, 0.0 );
     sawSlider.setOrientation( Orientation.VERTICAL );
-    sawSlider.setMajorTickUnit( 32.0 );
     sawSlider.valueProperty().addListener( (observable, oldVal, newVal) -> {
       switch( osc ) {
       case OSC1:
@@ -159,7 +156,6 @@ public class UiOscGrid extends GridPane {
 
     triSlider = new Slider( 0.0, 127.0, 0.0 );
     triSlider.setOrientation( Orientation.VERTICAL );
-    triSlider.setMajorTickUnit( 32.0 );
     GridPane.setRowSpan( triSlider, 4 );
     triSlider.valueProperty().addListener( (observable, oldVal, newVal) -> {
       switch( osc ) {
@@ -178,7 +174,6 @@ public class UiOscGrid extends GridPane {
 
     sqrSlider = new Slider( 0.0, 127.0, 0.0 );
     sqrSlider.setOrientation( Orientation.VERTICAL );
-    sqrSlider.setMajorTickUnit( 32.0 );
     GridPane.setRowSpan( sqrSlider, 4 );
     sqrSlider.valueProperty().addListener( (observable, oldVal, newVal) -> {
       switch( osc ) {
@@ -212,7 +207,6 @@ public class UiOscGrid extends GridPane {
 
     pwmWidthSlider = new Slider( 0.0, 127.0, 0.0 );
     pwmWidthSlider.setOrientation( Orientation.HORIZONTAL );
-    pwmWidthSlider.setMajorTickUnit( 32.0 );
     pwmWidthSlider.valueProperty().addListener( (observable, oldVal, newVal) -> {
       switch( osc ) {
       case OSC1:
@@ -230,7 +224,6 @@ public class UiOscGrid extends GridPane {
 
     pwmFreqSlider = new Slider( 0.0, 127.0, 0.0 );
     pwmFreqSlider.setOrientation( Orientation.HORIZONTAL );
-    pwmFreqSlider.setMajorTickUnit( 32.0 );
     pwmFreqSlider.valueProperty().addListener( (observable, oldVal, newVal) -> {
       switch( osc ) {
       case OSC1:
@@ -248,7 +241,6 @@ public class UiOscGrid extends GridPane {
 
     pwmDepthSlider = new Slider( 0.0, 127.0, 0.0 );
     pwmDepthSlider.setOrientation( Orientation.HORIZONTAL );
-    pwmDepthSlider.setMajorTickUnit( 32.0 );
     pwmDepthSlider.valueProperty().addListener( (observable, oldVal, newVal) -> {
       switch( osc ) {
       case OSC1:
@@ -266,7 +258,6 @@ public class UiOscGrid extends GridPane {
 
     sweepTimeSlider = new Slider( 0.0, 127.0, 0.0 );
     sweepTimeSlider.setOrientation( Orientation.HORIZONTAL );
-    sweepTimeSlider.setMajorTickUnit( 32.0 );
     sweepTimeSlider.valueProperty().addListener( (observable, oldVal, newVal) -> {
       switch( osc ) {
       case OSC1:
@@ -284,7 +275,6 @@ public class UiOscGrid extends GridPane {
 
     sweepDepthSlider = new Slider( 0.0, 127.0, 0.0 );
     sweepDepthSlider.setOrientation( Orientation.HORIZONTAL );
-    sweepDepthSlider.setMajorTickUnit( 32.0 );
     sweepDepthSlider.valueProperty().addListener( (observable, oldVal, newVal) -> {
       switch( osc ) {
       case OSC1:
@@ -302,7 +292,6 @@ public class UiOscGrid extends GridPane {
 
     brAttainSlider = new Slider( 0.0, 127.0, 0.0 );
     brAttainSlider.setOrientation( Orientation.HORIZONTAL );
-    brAttainSlider.setMajorTickUnit( 32.0 );
     brAttainSlider.valueProperty().addListener( (observable, oldVal, newVal) -> {
       switch( osc ) {
       case OSC1:
@@ -320,7 +309,6 @@ public class UiOscGrid extends GridPane {
 
     brThreshSlider = new Slider( 0.0, 127.0, 0.0 );
     brThreshSlider.setOrientation( Orientation.HORIZONTAL );
-    brThreshSlider.setMajorTickUnit( 32.0 );
     brThreshSlider.valueProperty().addListener( (observable, oldVal, newVal) -> {
       switch( osc ) {
       case OSC1:
@@ -338,7 +326,6 @@ public class UiOscGrid extends GridPane {
 
     brCurveSlider = new Slider( 0.0, 127.0, 0.0 );
     brCurveSlider.setOrientation( Orientation.HORIZONTAL );
-    brCurveSlider.setMajorTickUnit( 32.0 );
     brCurveSlider.valueProperty().addListener( (observable, oldVal, newVal) -> {
       switch( osc ) {
       case OSC1:
@@ -356,7 +343,6 @@ public class UiOscGrid extends GridPane {
 
     brDepthSlider = new Slider( 0.0, 127.0, 0.0 );
     brDepthSlider.setOrientation( Orientation.HORIZONTAL );
-    brDepthSlider.setMajorTickUnit( 32.0 );
     brDepthSlider.valueProperty().addListener( (observable, oldVal, newVal) -> {
       switch( osc ) {
       case OSC1:
@@ -374,7 +360,6 @@ public class UiOscGrid extends GridPane {
 
     volSlider = new Slider( 0.0, 127.0, 0.0 );
     volSlider.setOrientation( Orientation.VERTICAL );
-    volSlider.setMajorTickUnit( 32.0 );
     volSlider.valueProperty().addListener( (observable, oldVal, newVal) -> {
       switch( osc ) {
       case OSC1:
