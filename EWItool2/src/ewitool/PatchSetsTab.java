@@ -24,14 +24,19 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Optional;
+
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Tab;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.GridPane;
 import javafx.stage.DirectoryChooser;
 import javafx.util.Callback;
@@ -45,7 +50,7 @@ public class PatchSetsTab extends Tab {
   ObservableList<EWI4000sPatch> patchesInSetOL;
 
   // TODO: reload functionality
-  PatchSetsTab( ScratchPad scratchPad, UserPrefs userPrefs ) {
+  PatchSetsTab( ScratchPad scratchPad, UserPrefs userPrefs, MidiHandler midiHandler ) {
     
     setText( "Patch Set Library" );
     setClosable( false );
@@ -119,6 +124,36 @@ public class PatchSetsTab extends Tab {
     importButton = new Button( "Import" );
     gp.add( importButton, 0, 3 );
     loadEwiButton = new Button( "Load into EWI" );
+    loadEwiButton.setOnAction( (ae) -> {
+      if (patchSetList.getSelectionModel().getSelectedIndex() != -1) {
+        Alert al = new Alert( AlertType.CONFIRMATION );
+        al.setTitle( "EWItool - Confirmation" );
+        al.setHeaderText( "Confirm Overwriting EWI4000s Contents" );
+        al.setContentText( "This will overwrite all the patches in the EWI with the chosen Patch Set.  "
+            + "Do you really want to do this?" );
+        Optional<ButtonType> response = al.showAndWait();
+        if(response.isPresent() && response.get() == ButtonType.OK) {  
+          Alert sbusyAlert = new Alert( AlertType.INFORMATION, "Sending all patches.  Please wait..." );
+          sbusyAlert.setTitle( "EWItool" );
+          sbusyAlert.setHeaderText( null );
+          sbusyAlert.show();
+          for ( int p = 0; p < 100; p++ ) {
+            midiHandler.sendPatch( patchesInSetOL.get( p ), EWI4000sPatch.EWI_SAVE );
+            sbusyAlert.setTitle( (p+1) + " of 100" );
+            // wait for sendQ to empty (otherwise the requests all queue up in a flash
+            // and this method finishes...
+            while( midiHandler.sharedData.sendQ.size() > 0) {
+              try {
+                Thread.sleep( 10 );
+              } catch( Exception e ) {
+                e.printStackTrace();
+              }
+            }
+          } 
+          sbusyAlert.close();
+        }
+      }
+    });
     gp.add( loadEwiButton, 1, 3 );
     loadEwiButton.setDisable( true );
     deleteButton = new Button( "Delete" );

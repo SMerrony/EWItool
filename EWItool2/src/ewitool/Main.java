@@ -91,7 +91,7 @@ public class Main extends Application {
       scratchPadTab = new ScratchPadTab( scratchPad );
       tabPane.getTabs().add( scratchPadTab );
 
-      patchSetsTab = new PatchSetsTab( scratchPad, userPrefs );
+      patchSetsTab = new PatchSetsTab( scratchPad, userPrefs, midiHandler );
       tabPane.getTabs().add( patchSetsTab );
 
       epxTab = new EPXTab( sharedData, scratchPad, userPrefs );
