@@ -44,6 +44,7 @@ public class PatchSetsTab extends Tab {
   ListView<EWI4000sPatch> patchListView;
   ObservableList<EWI4000sPatch> patchesInSetOL;
 
+  // TODO: reload functionality
   PatchSetsTab( ScratchPad scratchPad, UserPrefs userPrefs ) {
     
     setText( "Patch Set Library" );

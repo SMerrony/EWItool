@@ -28,16 +28,18 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 
 public class Main extends Application {
 
   static final String  APP_NAME = "EWItool";
-  static final double  APP_VERSION = 0.8;
+  static final double  APP_VERSION = 1.9;
   static final int     COPYRIGHT_YEAR = 2016;
   static final String  RELEASE_STATUS = "Alpha";
   static final String  LEAD_AUTHOR = "S.Merrony";
@@ -50,6 +52,7 @@ public class Main extends Application {
   private static final String  ONLINE_HELP = "https://github.com/SMerrony/EWItool2/wiki";
 
   MenuBar mainMenuBar;
+  Menu patchMenu;
   TabPane tabPane;
   Tab scratchPadTab, patchSetsTab, epxTab, currentPatchSetTab, keyPatchesTab, patchEditorTab; 
   UiStatusBar statusBar;
@@ -107,6 +110,11 @@ public class Main extends Application {
       keyPatchesTab = new KeyPatchesTab();
       keyPatchesTab.setDisable( true );
       tabPane.getTabs().add( keyPatchesTab );
+      
+      tabPane.getSelectionModel().selectedItemProperty().addListener( (tab, oldtab, newtab) -> {
+        if (newtab == patchEditorTab) patchMenu.setDisable( false );
+        if (oldtab == patchEditorTab) patchMenu.setDisable( true );
+      });
 
       // MIDI port assignment change listeners
       userPrefs.midiInPort.addListener( new ChangeListener<String>() {
@@ -154,10 +162,12 @@ public class Main extends Application {
 
   class MainMenuBar extends MenuBar {
 
-    Menu fileMenu, midiMenu, ewiMenu, patchMenu, helpMenu;
+    Menu fileMenu, midiMenu, ewiMenu, helpMenu;
+    Menu generateSubmenu, processSubmenu;
     MenuItem quitItem,
     portsItem, panicItem, // monitorItem,
     fetchAllItem,
+    storeItem, revertItem, copyItem,
     helpItem, aboutItem;
 
     @SuppressWarnings( "unused" )
@@ -206,14 +216,42 @@ public class Main extends Application {
       });
       ewiMenu.getItems().addAll( fetchAllItem );
 
-      // TODO - I think we can do without this
-      //patchMenu = new Menu( "Patch" );
+      patchMenu = new Menu( "Patch" );
+      patchMenu.setDisable( true );
+      storeItem = new MenuItem( "Store to EWI" );
+      storeItem.setAccelerator( KeyCombination.keyCombination( "Ctrl+S" ) );
+      storeItem.setOnAction( (ae) -> ((PatchEditorTab) patchEditorTab).store() );
+      revertItem = new MenuItem( "Revert Edits" );
+      revertItem.setAccelerator( KeyCombination.keyCombination( "Ctrl+Z" ) );
+      revertItem.setOnAction( (ae) -> ((PatchEditorTab) patchEditorTab).revert() );
+      copyItem = new MenuItem( "Copy to Scratchpad" );
+      copyItem.setAccelerator( KeyCombination.keyCombination( "Ctrl+C" ) );
+      copyItem.setOnAction( (ae) -> ((PatchEditorTab) patchEditorTab).copyToScratchPad() );
+      
+      generateSubmenu = new Menu( "Generate" );
+      MenuItem genDefaultItem = new MenuItem( "Default Patch" );
+      genDefaultItem.setOnAction( (ae) -> ((PatchEditorTab) patchEditorTab).defaultPatch() );
+      MenuItem genRandomItem = new MenuItem( "Random Patch" );
+      genRandomItem.setOnAction( (ae) -> ((PatchEditorTab) patchEditorTab).randomPatch() );
+      generateSubmenu.getItems().addAll( genDefaultItem, genRandomItem );
+      
+      processSubmenu = new Menu( "Process" );
+      MenuItem dryItem = new MenuItem( "Make Dry" );
+      dryItem.setOnAction( (ae) -> ((PatchEditorTab) patchEditorTab).makeDry() );
+      MenuItem maxVolItem = new MenuItem( "Maximise Volume" );
+      maxVolItem.setOnAction( (ae) -> ((PatchEditorTab) patchEditorTab).makeMaxVol() );
+      MenuItem rmNoiseItem = new MenuItem( "Remove Noise" );
+      rmNoiseItem.setOnAction( (ae) -> ((PatchEditorTab) patchEditorTab).makeNoNoise() );
+      MenuItem rand10PctItem = new MenuItem( "Randomise by 10%" );
+      rand10PctItem.setOnAction( (ae) -> ((PatchEditorTab) patchEditorTab).randomiseBy10pct() );
+      processSubmenu.getItems().addAll( dryItem, maxVolItem, rmNoiseItem, rand10PctItem );
+      patchMenu.getItems().addAll( storeItem, revertItem, copyItem, 
+                                   new SeparatorMenuItem(), 
+                                   generateSubmenu, processSubmenu );
 
       helpMenu = new Menu( "Help" );
       helpItem = new MenuItem( "Online Help" );
-      helpItem.setOnAction( (ae) -> {
-        getHostServices().showDocument( ONLINE_HELP );
-      });
+      helpItem.setOnAction( (ae) -> getHostServices().showDocument( ONLINE_HELP ) );
       aboutItem = new MenuItem( "About " + Main.APP_NAME );
       aboutItem.setOnAction( (ae) -> {
         Alert aboutAlert = new Alert( AlertType.INFORMATION );
@@ -224,7 +262,7 @@ public class Main extends Application {
       });
       helpMenu.getItems().addAll( helpItem, aboutItem );
 
-      getMenus().addAll( fileMenu, midiMenu, ewiMenu, helpMenu );
+      getMenus().addAll( fileMenu, midiMenu, ewiMenu, patchMenu, helpMenu );
 
     }
 
