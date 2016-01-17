@@ -66,12 +66,18 @@ public class MidiHandler {
   public final static int  EWI_SYSEX_PRESET_DUMP_LEN = EWI4000sPatch.EWI_PATCH_LENGTH;
   public final static int  EWI_SYSEX_QUICKPC_DUMP_LEN = 91;
   public final static int  EWI_SYSEX_ID_RESPONSE_LEN = 15;
-  // N.B. MIDI_TIMEOUT_MS must be significantly longer than MIDI_MESSAGE_SPACER_MS
-  // otherwise send & receive can get out of sync
+  
+  /** N.B. MIDI_TIMEOUT_MS must be significantly longer than MIDI_MESSAGE_LONG_PAUSE_MS
+  * otherwise send & receive can get out of sync
+  */
   public final static int  MIDI_MESSAGE_SHORT_PAUSE_MS = 100;
   public final static int  MIDI_MESSAGE_LONG_PAUSE_MS  = 250;
   public final static int  MIDI_TIMEOUT_MS            = 3000;
 
+  /** This is used to temporarily IGNORE (not block) CC events on the sendQ.  The
+   * events are deliberately lost.  Using this prevents the EWI being flooded with 
+   * messages when the UI is being set up or redrawn.
+   */
   public volatile boolean  ignoreEvents;
   
   SharedData sharedData;
@@ -79,16 +85,32 @@ public class MidiHandler {
   Thread sendThread;
   MidiDevice inDev = null, outDev = null;
   Receiver midiIn, midiOut;
+  
+  MidiDevice.Info[] infos;
 
   MidiHandler( SharedData pSharedData, UserPrefs pUserPrefs ) {
 
     sharedData = pSharedData;
     userPrefs = pUserPrefs;
     ignoreEvents = false;
-    MidiDevice device;
-    MidiDevice.Info[] infos = MidiSystem.getMidiDeviceInfo();
-    for (int d = 0; d < infos.length; d++) {
 
+    scanAndOpenMIDIPorts();
+    
+    /* this is just a nice-to-have... */
+    if (inDev.isOpen() && outDev.isOpen()) {
+      requestDeviceID();
+    }
+  }
+  
+  /** Go through all MIDI devices looking for Ports.  If the port matches 
+   * either the IN or OUT port set in UserPrefs then open it.
+   */
+  private void scanAndOpenMIDIPorts() {
+    
+    MidiDevice device;
+    
+    infos = MidiSystem.getMidiDeviceInfo();
+    for (int d = 0; d < infos.length; d++) {
       try {
         device = MidiSystem.getMidiDevice( infos[d] );
         if (!(device instanceof Sequencer) && !(device instanceof Synthesizer)) {
@@ -110,11 +132,14 @@ public class MidiHandler {
                 aeal.setContentText( "The EWItool MidiHandler could not open chosen MIDI OUT device" );
                 aeal.showAndWait();
               }
-
-              (sendThread = new Thread( new MidiSender( sharedData, outDev ) )).start();
-              sendThread.setName( "EWItool MIDI Sender" );
-              Debugger.log( "Debug - OUT Port: " + infos[d].getName());
-              sharedData.setMidiOutDev( infos[d].getName() );
+              if (outDev.isOpen()) {
+                (sendThread = new Thread( new MidiSender( sharedData, outDev ) )).start();
+                sendThread.setName( "EWItool MIDI Sender" );
+                Debugger.log( "Debug - OUT Port: " + infos[d].getName());
+                sharedData.setMidiOutDev( infos[d].getName() );
+              } else {
+                Debugger.log( "Debug - Could not open OUT Port: " + infos[d].getName());
+              }
             }
           } else if (device.getMaxTransmitters() != 0) {
             if (infos[d].getName().equals( userPrefs.midiInPort.getValue() )) {
@@ -154,21 +179,28 @@ public class MidiHandler {
         aeal.showAndWait();
       }
     }
-    if (inDev.isOpen() && outDev.isOpen()) {
-      requestDeviceID();
-    }
   }
 
   public void close() {
-    if (sendThread != null && sendThread.isAlive()) sendThread.interrupt();
+    if (sendThread != null && sendThread.isAlive()) {
+      sendThread.interrupt();
+      try {
+        sendThread.join();
+      } catch( InterruptedException e ) {
+        e.printStackTrace();
+      }
+    }
     if (inDev !=null && inDev.isOpen()) { midiIn.close(); inDev.close(); }
     sharedData.setEwiAttached( false );
   }
 
   public void restart() {
     close();
-    // TODO Restart MIDI connections
-    System.err.println( "Error - MidiHandler.restart() not yet implemented" );
+    scanAndOpenMIDIPorts();   
+    /* this is just a nice-to-have... */
+    if (inDev.isOpen() && outDev.isOpen()) {
+      requestDeviceID();
+    }
   }
 
   void clearPatches() {

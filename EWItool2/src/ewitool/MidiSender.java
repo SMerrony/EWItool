@@ -43,6 +43,10 @@ public class MidiSender implements Runnable {
     sharedData = pSharedData;
     msgQ = pSharedData.sendQ;
     outDev = pOutDev;
+    if (!outDev.isOpen()) {
+      System.err.println( "Error - MidiSender() called with non-open MIDI Device" );
+      System.exit( 1 );   
+    }
     try {
       receiver = outDev.getReceiver();
     } catch( MidiUnavailableException e ) {
@@ -58,9 +62,8 @@ public class MidiSender implements Runnable {
   public void run() {
 
     SendMsg msg;
-
-    while( true ) {
-      try {
+    try {   
+      while( true ) {
         msg = msgQ.take(); 
         if (!outDev.isOpen()) {
           System.err.println( "Error - MidiSender: MIDI Out device is not open" );
@@ -135,15 +138,13 @@ public class MidiSender implements Runnable {
           break;
 
         }
-      } catch( InterruptedException e ) {
-        Debugger.log( "DEBUG - MidiSender closing" );
-        receiver.close();
-        outDev.close();
-      }
-
+      } 
     }
-
+    catch( InterruptedException e ) {
+      Debugger.log( "DEBUG - MidiSender closing" );
+      receiver.close();
+      outDev.close();
+    }
   }
-
 }
 

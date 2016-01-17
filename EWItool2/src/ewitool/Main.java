@@ -193,22 +193,27 @@ public class Main extends Application {
       fetchAllItem = new MenuItem( "Fetch All Patches" );
       fetchAllItem.setOnAction( (ae) -> {
         Debugger.log( "DEBUG - Fetch All..." );
-        midiHandler.requestDeviceID();
-        Alert busyAlert = new Alert( AlertType.INFORMATION, "Fetching all patches.  Please wait..." );
-        busyAlert.setTitle( "EWItool" );
-        busyAlert.setHeaderText( null );
-        busyAlert.show();
-        sharedData.clear();
-        for (int p = 0; p < EWI4000sPatch.EWI_NUM_PATCHES; p++) {
-          midiHandler.requestPatch( p );
-          busyAlert.setTitle( (p + 1) + " of 100" );
+        if (!midiHandler.requestDeviceID()) {
+          Alert errAlert = new Alert( AlertType.ERROR, "Not connected to an EWI4000s");
+          errAlert.setTitle( "EWItool - Error" );
+          errAlert.showAndWait();
+        } else {
+          Alert busyAlert = new Alert( AlertType.INFORMATION, "Fetching all patches.  Please wait..." );
+          busyAlert.setTitle( "EWItool" );
+          busyAlert.setHeaderText( null );
+          busyAlert.show();
+          sharedData.clear();
+          for (int p = 0; p < EWI4000sPatch.EWI_NUM_PATCHES; p++) {
+            midiHandler.requestPatch( p );
+            busyAlert.setTitle( (p + 1) + " of 100" );
+          }
+          busyAlert.close();
+          ((CurrentPatchSetTab) currentPatchSetTab).updateLabels();
+          ((PatchEditorTab) patchEditorTab).populateCombo( sharedData );
+          currentPatchSetTab.setDisable( false );
+          patchEditorTab.setDisable( false );
+          tabPane.getSelectionModel().select( currentPatchSetTab );
         }
-        busyAlert.close();
-        ((CurrentPatchSetTab) currentPatchSetTab).updateLabels();
-        ((PatchEditorTab) patchEditorTab).populateCombo( sharedData );
-        currentPatchSetTab.setDisable( false );
-        patchEditorTab.setDisable( false );
-        tabPane.getSelectionModel().select( currentPatchSetTab );
       });
       ewiMenu.getItems().addAll( fetchAllItem );
 
