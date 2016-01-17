@@ -147,6 +147,7 @@ public class CurrentPatchSetTab extends Tab {
         patchButtons[p].setText( sharedData.ewiPatchList.get( p ).getName() );
       }
     }
+    ((PatchEditorTab) patchEditorTab).populateCombo( sharedData );
   }
 
   // The Patch Actions dialog that appears when a button is pressed

@@ -50,7 +50,7 @@ public class PatchSetsTab extends Tab {
   ObservableList<EWI4000sPatch> patchesInSetOL;
 
   // TODO: reload functionality
-  PatchSetsTab( ScratchPad scratchPad, UserPrefs userPrefs, MidiHandler midiHandler ) {
+  PatchSetsTab( SharedData sharedData, ScratchPad scratchPad, UserPrefs userPrefs, MidiHandler midiHandler, Tab currentPatchSetTab ) {
     
     setText( "Patch Set Library" );
     setClosable( false );
@@ -123,6 +123,7 @@ public class PatchSetsTab extends Tab {
   
     importButton = new Button( "Import" );
     gp.add( importButton, 0, 3 );
+    
     loadEwiButton = new Button( "Load into EWI" );
     loadEwiButton.setOnAction( (ae) -> {
       if (patchSetList.getSelectionModel().getSelectedIndex() != -1) {
@@ -137,9 +138,11 @@ public class PatchSetsTab extends Tab {
           sbusyAlert.setTitle( "EWItool" );
           sbusyAlert.setHeaderText( null );
           sbusyAlert.show();
+          sharedData.clear();
           for ( int p = 0; p < 100; p++ ) {
             midiHandler.sendPatch( patchesInSetOL.get( p ), EWI4000sPatch.EWI_SAVE );
             sbusyAlert.setTitle( (p+1) + " of 100" );
+            sharedData.ewiPatchList.add( patchesInSetOL.get( p ) );
             // wait for sendQ to empty (otherwise the requests all queue up in a flash
             // and this method finishes...
             while( midiHandler.sharedData.sendQ.size() > 0) {
@@ -149,13 +152,16 @@ public class PatchSetsTab extends Tab {
                 e.printStackTrace();
               }
             }
-          } 
+          }
+          sharedData.setLastPatchLoaded( 99 );
+          ((CurrentPatchSetTab) currentPatchSetTab).updateLabels();
           sbusyAlert.close();
         }
       }
     });
     gp.add( loadEwiButton, 1, 3 );
     loadEwiButton.setDisable( true );
+    
     deleteButton = new Button( "Delete" );
     gp.add( deleteButton, 2, 3 );
     deleteButton.setDisable( true );

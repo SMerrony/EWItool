@@ -89,27 +89,23 @@ public class Main extends Application {
       tabPane = new TabPane();
 
       scratchPadTab = new ScratchPadTab( scratchPad );
-      tabPane.getTabs().add( scratchPadTab );
-
-      patchSetsTab = new PatchSetsTab( scratchPad, userPrefs, midiHandler );
-      tabPane.getTabs().add( patchSetsTab );
-
-      epxTab = new EPXTab( sharedData, scratchPad, userPrefs );
-      tabPane.getTabs().add( epxTab );
-      //epxTab.setDisable( true );
-
+      epxTab = new EPXTab( sharedData, scratchPad, userPrefs ); 
       patchEditorTab = new PatchEditorTab( sharedData, scratchPad, midiHandler );
-
       currentPatchSetTab = new CurrentPatchSetTab( sharedData, scratchPad, midiHandler, patchEditorTab );
-      tabPane.getTabs().add( currentPatchSetTab );
+      patchSetsTab = new PatchSetsTab( sharedData, scratchPad, userPrefs, midiHandler, currentPatchSetTab );   
+      keyPatchesTab = new KeyPatchesTab();     
+      
+      tabPane.getTabs().addAll( scratchPadTab, 
+                                patchSetsTab, 
+                                epxTab, 
+                                currentPatchSetTab, 
+                                patchEditorTab, 
+                                keyPatchesTab 
+                              );
+
       currentPatchSetTab.setDisable( true );
-
-      tabPane.getTabs().add( patchEditorTab );
       patchEditorTab.setDisable( true );
-
-      keyPatchesTab = new KeyPatchesTab();
       keyPatchesTab.setDisable( true );
-      tabPane.getTabs().add( keyPatchesTab );
       
       tabPane.getSelectionModel().selectedItemProperty().addListener( (tab, oldtab, newtab) -> {
         if (newtab == patchEditorTab) patchMenu.setDisable( false );

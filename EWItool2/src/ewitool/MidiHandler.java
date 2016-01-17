@@ -257,7 +257,7 @@ public class MidiHandler {
     } catch( InterruptedException e ) {
       Debugger.log( "DEBUG - MidiHandler did not EWI4000s and was interrupted" );
     }
-    requestDeviceID();
+    //requestDeviceID();
     return false;
   }
 
