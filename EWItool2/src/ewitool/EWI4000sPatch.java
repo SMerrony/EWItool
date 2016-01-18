@@ -26,9 +26,17 @@
  */
 package ewitool;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 
 import javax.xml.bind.DatatypeConverter;
+
+import ewitool.Main.Status;
 
 public class EWI4000sPatch { 
   
@@ -490,4 +498,23 @@ public class EWI4000sPatch {
   public String toHex() {
     return toHex( patchBlob, false );
   }
+  
+  public Status save( String filename ) throws IOException {
+    UserPrefs prefs = new UserPrefs();
+    Path path = Paths.get( prefs.getExportLocation(), filename );
+    if (Files.exists( path )) return Status.ALREADY_EXISTS;
+    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    bos.write( patchBlob );
+    byte[] bytes = bos.toByteArray();
+    try {
+      Files.write( path, bytes );
+    } catch( FileAlreadyExistsException e) {
+      return Status.ALREADY_EXISTS;
+    } catch( IOException e ) {
+      return Status.NO_PERMISSION;
+    }
+    return Status.OK;
+  }
+
 }
+

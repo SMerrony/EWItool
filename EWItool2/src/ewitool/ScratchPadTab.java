@@ -41,7 +41,7 @@ public class ScratchPadTab extends Tab {
   ListView<EWI4000sPatch> patchList;
   ScratchPad scratchPad;
 
-  ScratchPadTab( ScratchPad scratchPad, Tab epxTab ) {
+  ScratchPadTab( SharedData sharedData, ScratchPad scratchPad, Tab epxTab ) {
 
     setText( "Scratchpad" );
     setClosable( false );
@@ -142,6 +142,41 @@ public class ScratchPadTab extends Tab {
     gp.add( exchangeButton, 2, 1 );
 
     exportButton = new Button( "Export" );
+    exportButton.setOnAction( (ae) -> {
+      TextInputDialog tid = new TextInputDialog( ".syx" );
+      tid.setTitle( "EWItool - Export Patch" );
+      tid.setHeaderText( "Enter filename for Patch (end with .syx)" );
+      Optional<String> res = tid.showAndWait();
+      res.ifPresent( setName -> {
+        try {
+          EWI4000sPatch tmpPatch = patchList.getSelectionModel().getSelectedItem();
+          switch( tmpPatch.save( setName )) {
+          case OK:
+            Alert al = new Alert( AlertType.INFORMATION );
+            al.setTitle( "EWItool - Export Patch to Library\\export" );
+            al.setContentText( "Patch Set " + tmpPatch.getName() + " exported." );
+            al.showAndWait();
+            sharedData.setStatusMessage( "Patch set "  + tmpPatch.getName() + " exported." );
+            break;
+          case ALREADY_EXISTS:
+            Alert aeal = new Alert( AlertType.ERROR );
+            aeal.setTitle( "EWItool - Export Patch to Library\\export" );
+            aeal.setContentText( "A Patch with that name already exists, please use a different name." );
+            aeal.showAndWait();
+            break;
+          case NO_PERMISSION:
+            Alert npal = new Alert( AlertType.ERROR );
+            npal.setTitle( "EWItool - Export Patch to Library\\export" );
+            npal.setContentText( "Could not write to Library export directory." );
+            npal.showAndWait();
+            break;
+          }
+        } catch( Exception e ) {
+          e.printStackTrace();
+        }
+      });
+
+    });
     gp.add( exportButton, 3, 1 );
 
     setContent( gp );

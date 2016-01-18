@@ -38,6 +38,8 @@ public class UserPrefs {
   private static final String EPX_USERID = "EPX_USERID";
   private static final String EPX_PASSWORD = "EPX_PASSWORD";
   
+  private static final String EXPORT_SUBDIR = "export";
+  
   UserPrefs() {
     p = Preferences.userRoot().node( PREFS_NODE );
     midiInPort = new SimpleStringProperty( getMidiInPort() );
@@ -64,6 +66,11 @@ public class UserPrefs {
   public void setLibraryLocation( String ll ) {
     p.put( LIBRARY_LOCATION, ll );
   }
+  public String getExportLocation() {
+    return getLibraryLocation() + System.getProperty( "file.separator" ) + 
+           EXPORT_SUBDIR;
+  }
+  
   public String getEpxHost() {
     return p.get( EPX_HOST, "<Not Set>" );
   }

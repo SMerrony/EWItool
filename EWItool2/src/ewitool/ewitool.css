@@ -89,6 +89,12 @@
 	-fx-alignment: top-left;
 }
 
+#epx-submit-grid {
+	-fx-padding: 10mm;
+	-fx-hgap: 3mm;
+	-fx-vgap: 3mm;
+}
+
 #editor-header-box {
   -fx-padding: 2;
   -fx-spacing: 2;

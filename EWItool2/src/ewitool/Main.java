@@ -51,6 +51,8 @@ public class Main extends Application {
   private static final Double  MINIMUM_JVM_SPEC = 1.8;
   private static final String  ONLINE_HELP = "https://github.com/SMerrony/EWItool2/wiki";
 
+  public enum Status { OK, ALREADY_EXISTS, NO_PERMISSION }
+  
   MenuBar mainMenuBar;
   Menu patchMenu;
   TabPane tabPane;
@@ -89,7 +91,7 @@ public class Main extends Application {
       tabPane = new TabPane();
       
       epxTab = new EPXTab( sharedData, scratchPad, userPrefs );
-      scratchPadTab = new ScratchPadTab( scratchPad, epxTab );
+      scratchPadTab = new ScratchPadTab( sharedData, scratchPad, epxTab );
       patchEditorTab = new PatchEditorTab( sharedData, scratchPad, midiHandler );
       currentPatchSetTab = new CurrentPatchSetTab( sharedData, scratchPad, midiHandler, patchEditorTab );
       patchSetsTab = new PatchSetsTab( sharedData, scratchPad, userPrefs, midiHandler, currentPatchSetTab );   

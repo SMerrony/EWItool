@@ -25,10 +25,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
+import ewitool.Main.Status;
+
 public final class PatchSet {
-  
-  public enum Status { OK, ALREADY_EXISTS, NO_PERMISSION }
-  
+   
   public static Status save( ArrayList<EWI4000sPatch> patchList, String filename ) throws IOException {
     
     UserPrefs prefs = new UserPrefs();
