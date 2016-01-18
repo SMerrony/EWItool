@@ -26,6 +26,9 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.LinkedList;
 
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+
 /**
  * @author steve
  *
@@ -224,6 +227,61 @@ public class EPX {
       e.printStackTrace();
     }
     return dr;
+  }
+  
+  public void insertPatch( String name, String origin, String type,
+                           String desc, boolean isPrivate, String tags,
+                           String hexPatch ) {
+    URL url;
+    String priv = isPrivate ? "true" : "false";
+    try {
+      url = new URL( PROTOCOL + userPrefs.getEpxHost() + BASE_REQ + "insertPatch" +
+          "&userid=" + userPrefs.getEpxUserid() + 
+          "&passwd=" + userPrefs.getEpxPassword() +
+          "&name=" + URLEncoder.encode( name, URL_ENCODING ) +
+          "&origin=" + URLEncoder.encode( origin, URL_ENCODING ) +
+          "&type=" + URLEncoder.encode( type, URL_ENCODING ) +
+          "&desc=" + URLEncoder.encode( desc, URL_ENCODING ) +
+          "&private=" + priv +
+          "&tags=" + URLEncoder.encode( tags, URL_ENCODING ) +
+          "&hexpatch=" + hexPatch
+          );
+      
+      HttpURLConnection con = (HttpURLConnection) url.openConnection();
+      con.setRequestProperty( "User-Agent", USER_AGENT );
+      int respCode = con.getResponseCode();
+      Debugger.log( "DEBUG - EPX: Got response " + respCode + " for insertPatch request" );
+      BufferedReader br = new BufferedReader( new InputStreamReader( con.getInputStream() ) );
+      String line = br.readLine();
+      while (!line.contains( "<body>" )) {
+        line = br.readLine();
+      }
+      String resp = br.readLine();
+      if (resp.contains( "Resource id #" )) {
+        Alert okAl = new Alert( AlertType.INFORMATION );
+        okAl.setTitle( "EWItool - Patch Exchange Submission" );
+        okAl.setContentText( "Patch Succesfully sent to EWI Patch Exchange - Thank You" );
+        okAl.showAndWait();
+      } else if (resp.contains( "duplicate key" )) {
+        Alert w1Al = new Alert( AlertType.ERROR );
+        w1Al.setTitle( "EWItool - Patch Exchange Submission" );
+        w1Al.setContentText( "Export error - that patch is already in the exchange" );
+        w1Al.showAndWait(); 
+      } else {
+        Alert w2Al = new Alert( AlertType.ERROR);
+        w2Al.setTitle( "EWItool - Patch Exchange Submission" );
+        w2Al.setContentText( "Export Error" );
+        Debugger.log( "DEBUG - EPX: Got error " + resp + " for insertPatch request" );
+        w2Al.showAndWait();
+      }
+    } catch( MalformedURLException e ) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch( IOException e ) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+ 
   }
   
   public void deletePatch( int id ) {

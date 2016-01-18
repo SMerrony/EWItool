@@ -487,4 +487,7 @@ public class EWI4000sPatch {
     return hexStr;
   }
   
+  public String toHex() {
+    return toHex( patchBlob, false );
+  }
 }

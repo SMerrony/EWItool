@@ -41,7 +41,7 @@ public class ScratchPadTab extends Tab {
   ListView<EWI4000sPatch> patchList;
   ScratchPad scratchPad;
 
-  ScratchPadTab( ScratchPad scratchPad ) {
+  ScratchPadTab( ScratchPad scratchPad, Tab epxTab ) {
 
     setText( "Scratchpad" );
     setClosable( false );
@@ -133,7 +133,12 @@ public class ScratchPadTab extends Tab {
     } ); 
     gp.add( viewHexButton, 1, 1 );
 
-    exchangeButton = new Button( "Prepare to Exchange" );
+    exchangeButton = new Button( "Add to EWI Patch eXchange" );
+    exchangeButton.setOnAction( (ae) -> {
+      if (patchList.getSelectionModel().getSelectedIndex() != -1) {
+        ((EPXTab) epxTab).contribute( patchList.getSelectionModel().getSelectedItem() );
+      }
+    });
     gp.add( exchangeButton, 2, 1 );
 
     exportButton = new Button( "Export" );

@@ -87,9 +87,9 @@ public class Main extends Application {
       root.setTop( mainMenuBar );
       
       tabPane = new TabPane();
-
-      scratchPadTab = new ScratchPadTab( scratchPad );
-      epxTab = new EPXTab( sharedData, scratchPad, userPrefs ); 
+      
+      epxTab = new EPXTab( sharedData, scratchPad, userPrefs );
+      scratchPadTab = new ScratchPadTab( scratchPad, epxTab );
       patchEditorTab = new PatchEditorTab( sharedData, scratchPad, midiHandler );
       currentPatchSetTab = new CurrentPatchSetTab( sharedData, scratchPad, midiHandler, patchEditorTab );
       patchSetsTab = new PatchSetsTab( sharedData, scratchPad, userPrefs, midiHandler, currentPatchSetTab );   

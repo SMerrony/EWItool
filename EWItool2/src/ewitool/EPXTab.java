@@ -19,6 +19,9 @@ package ewitool;
 
 import java.util.LinkedList;
 
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
@@ -30,6 +33,8 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 public class EPXTab extends Tab {
 
@@ -194,6 +199,45 @@ public class EPXTab extends Tab {
       contribChoice.getItems().addAll( dropdownData[1].split( "," ) );
       originChoice.getItems().addAll( dropdownData[2].split( "," ) );
     }
+  }
+  
+  public void contribute( EWI4000sPatch ewi4000sPatch ) {
+    if (epx.testConnection() && epx.testUser()) {
+      final Stage contDialog = new Stage();
+      contDialog.initModality( Modality.APPLICATION_MODAL );
+      UiEPXSubmitGrid esGrid = new UiEPXSubmitGrid( ewi4000sPatch.getName(), ewi4000sPatch.toHex() );
+      Scene contScene = new Scene( esGrid, 450, 400 );
+      contScene.getStylesheets().add(getClass().getResource("ewitool.css").toExternalForm());
+      contDialog.setScene( contScene );
+      contDialog.setTitle( "EWItool - EPX Contribution" );
+      String[] dropdownData = epx.getDropdowns();
+      esGrid.typeChoice.getItems().addAll( dropdownData[0].split( "," ) );
+      esGrid.cancelButton.setOnAction( (ae) -> contDialog.close() );
+      esGrid.okButton.setOnAction( (ae) -> {
+        if ( esGrid.originField.getText().isEmpty() ||
+             esGrid.typeChoice.getSelectionModel().getSelectedIndex() < 1 ||
+             esGrid.descriptionArea.getText().length() > 255 ) {
+          Alert al = new Alert( AlertType.WARNING );
+          al.setTitle( "EWItool - Data Entry Error" );
+          al.setContentText( "Please fill in all the required fields" );
+          al.showAndWait();
+        } else {
+          epx.insertPatch( esGrid.nameField.getText(), 
+                           esGrid.originField.getText(), 
+                           esGrid.typeChoice.getSelectionModel().getSelectedItem(), 
+                           esGrid.descriptionArea.getText(), 
+                           esGrid.privacyCheckBox.isSelected(), 
+                           esGrid.tagsField.getText(), 
+                           esGrid.hexPatch );
+        }
+      });
+      contDialog.showAndWait();
 
+    } else {
+      Alert al = new Alert( AlertType.WARNING );
+      al.setTitle( "EWItool Warning" );
+      al.setContentText( "You are not connected/logged-in to the EWI Patch eXchange." );
+      al.showAndWait();
+    }
   }
 }
