@@ -163,6 +163,26 @@ public class PatchSetsTab extends Tab {
     loadEwiButton.setDisable( true );
     
     deleteButton = new Button( "Delete" );
+    deleteButton.setOnAction( (ae) -> {
+      if (patchSetList.getSelectionModel().getSelectedIndex() != -1) {
+        Alert al = new Alert( AlertType.CONFIRMATION );
+        al.setTitle( "EWItool - Confirmation" );
+        al.setHeaderText( "Confirm Deleting Patch Set" );
+        al.setContentText( "This will delete the chosen Patch Set from storage.  "
+            + "Do you really want to do this?" );
+        Optional<ButtonType> response = al.showAndWait();
+        if(response.isPresent() && response.get() == ButtonType.OK) {  
+          UserPrefs prefs = new UserPrefs();
+          Path path = Paths.get( prefs.getLibraryLocation(), patchSetList.getSelectionModel().getSelectedItem() );
+          try {
+            Files.delete( path );
+            patchSetList.getItems().remove( patchSetList.getSelectionModel().getSelectedIndex() );
+          } catch( Exception e ) {
+            e.printStackTrace();
+          }
+        }
+      }
+    });
     gp.add( deleteButton, 2, 3 );
     deleteButton.setDisable( true );
     
