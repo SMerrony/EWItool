@@ -163,7 +163,7 @@ public class Main extends Application {
     Menu fileMenu, midiMenu, ewiMenu, helpMenu;
     Menu generateSubmenu, processSubmenu;
     MenuItem quitItem,
-    portsItem, panicItem, // monitorItem,
+    portsItem, // panicItem, // monitorItem,
     fetchAllItem,
     storeItem, revertItem, copyItem,
     helpItem, aboutItem;
@@ -184,12 +184,12 @@ public class Main extends Application {
       midiMenu = new Menu( "MIDI" );
       portsItem = new MenuItem( "Ports" );
       portsItem.addEventHandler( ActionEvent.ANY, new PortsItemEventHandler( userPrefs ) );
-      panicItem = new MenuItem( "Panic (All Notes Off)" );
+      //panicItem = new MenuItem( "Panic (All Notes Off)" );
 
       // this will stream MIDI messages to System.out if debugging is enabled in Debugging class
       MidiMonitor monitor = new MidiMonitor( sharedData );
       
-      midiMenu.getItems().addAll( portsItem, panicItem );
+      midiMenu.getItems().addAll( portsItem );
 
       ewiMenu = new Menu( "EWI" );
       fetchAllItem = new MenuItem( "Fetch All Patches" );
