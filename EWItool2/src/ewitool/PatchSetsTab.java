@@ -39,6 +39,8 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.GridPane;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.Callback;
 
 public class PatchSetsTab extends Tab {
@@ -49,7 +51,6 @@ public class PatchSetsTab extends Tab {
   ListView<EWI4000sPatch> patchListView;
   ObservableList<EWI4000sPatch> patchesInSetOL;
 
-  // TODO: reload functionality
   PatchSetsTab( SharedData sharedData, ScratchPad scratchPad, UserPrefs userPrefs, MidiHandler midiHandler, Tab currentPatchSetTab ) {
     
     setText( "Patch Set Library" );
@@ -67,13 +68,14 @@ public class PatchSetsTab extends Tab {
     gp.add( libLocButton, 2, 0 );
     libLocButton.setOnAction( (ae) -> {
       DirectoryChooser dc = new DirectoryChooser();
-      dc.setTitle( "Choose EWI Patch Set Library location" );
+      dc.setTitle( "Choose EWI Patch Set Library location..." );
       if (!userPrefs.getLibraryLocation().equals( "<Not Chosen>" ))
         dc.setInitialDirectory( new File( userPrefs.getLibraryLocation() ) );
       File chosenLLdirFile = dc.showDialog( null );
       if (chosenLLdirFile != null) {
         userPrefs.setLibraryLocation( chosenLLdirFile.getAbsolutePath() );
         libLocLabel.setText( chosenLLdirFile.getAbsolutePath() );
+        refreshPatchSetList( chosenLLdirFile.getAbsolutePath() );
       }
     });
 
@@ -84,12 +86,7 @@ public class PatchSetsTab extends Tab {
     gp.add( patchSetList, 0, 2 );
     GridPane.setColumnSpan( patchSetList, 3 );
     if (!userPrefs.getLibraryLocation().equals( "<Not Chosen>" )){
-      File llFile = new File( userPrefs.getLibraryLocation() );
-      patchSetList.getItems().addAll( llFile.list( new FilenameFilter() {
-        public boolean accept( File llFile, String name ) {
-          return name.toLowerCase().endsWith( ".syx" );
-        }
-      }) );
+      refreshPatchSetList( userPrefs.getLibraryLocation() );
     } 
     
     // Handle changes to the set list selection
@@ -122,6 +119,19 @@ public class PatchSetsTab extends Tab {
         }); 
   
     importButton = new Button( "Import" );
+    importButton.setOnAction( (ae) -> {
+      FileChooser fc = new FileChooser();
+      fc.setTitle( "Choose Soundbank to Import..." );
+      fc.setInitialDirectory( new File( userPrefs.getLibraryLocation() ) );
+      fc.getExtensionFilters().add( new ExtensionFilter( "Legacy Soundbanks (.BNK, .SQS)", "*.sqs", "*.bnk" ) );
+      File chosenFile = fc.showOpenDialog( null );
+      if (chosenFile != null) {
+        int p = PatchSet.convertLegacy( chosenFile );
+        sharedData.setStatusMessage( "Imported " + p + " patches from legacy soundbank" );
+
+        refreshPatchSetList( userPrefs.getLibraryLocation() );
+      }
+    });
     gp.add( importButton, 0, 3 );
     
     loadEwiButton = new Button( "Load into EWI" );
@@ -234,4 +244,13 @@ public class PatchSetsTab extends Tab {
     
   }
 
+  private void refreshPatchSetList( String location ) {
+    File llFile = new File( location );
+    patchSetList.getItems().clear();
+    patchSetList.getItems().addAll( llFile.list( new FilenameFilter() {
+      public boolean accept( File llFile, String name ) {
+        return name.toLowerCase().endsWith( ".syx" );
+      }
+    }) );
+  }
 }
