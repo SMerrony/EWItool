@@ -41,8 +41,8 @@
 
 #status-grid {
 	-fx-padding: 10mm;
-	-fx-hgap: 3.0mm;
-	-fx-vgap: 3.0mm;
+	-fx-hgap: 3mm;
+	-fx-vgap: 3mm;
 }
 
 #status-label {
@@ -51,16 +51,27 @@
 	-fx-border-style: solid;
 	-fx-border-color: darkgray;
 	-fx-border-width: 1px;
-	-fx-padding: 2.0mm;	
+	-fx-padding: 2mm;	
 }
 
 #scratchpad-grid {
 	-fx-padding: 10mm;
-	-fx-hgap: 3.0mm;
-	-fx-vgap: 3.0mm;
+	-fx-hgap: 3mm;
+	-fx-vgap: 3mm;
 }
 #scratchpad-grid .button {
 	-fx-min-width: 25mm;
+}
+
+#patchset-library-grid {
+	-fx-padding: 10mm;
+	-fx-hgap: 3mm;
+	-fx-vgap: 3mm;
+}
+
+#patchset-library-grid .label {
+	-fx-font: bold 9pt sans;
+	-fx-alignment: top-left;
 }
 
 #epx-grid {
@@ -142,3 +153,17 @@
 	-fx-shape: "M0, 0L10, 0L10, 5L5, 10L0, 5 Z";
 }
 */
+
+#key-patches-grid {
+	-fx-padding: 10mm;
+	-fx-hgap: 3mm;
+	-fx-vgap: 3mm;
+}
+#key-patches-header {
+	-fx-font: bold 11pt sans;
+	-fx-min-width: 20mm;
+	-fx-alignment: center;
+}
+#key-patches-grid .choice-box {
+	-fx-min-width: 40mm;
+}

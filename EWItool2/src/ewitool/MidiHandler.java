@@ -23,15 +23,12 @@ package ewitool;
 
 import java.util.concurrent.TimeUnit;
 
-import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiDevice;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Receiver;
 import javax.sound.midi.Sequencer;
 import javax.sound.midi.Synthesizer;
-import javax.sound.midi.SysexMessage;
-
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 
@@ -66,6 +63,8 @@ public class MidiHandler {
   public final static int  EWI_SYSEX_PRESET_DUMP_LEN = EWI4000sPatch.EWI_PATCH_LENGTH;
   public final static int  EWI_SYSEX_QUICKPC_DUMP_LEN = 91;
   public final static int  EWI_SYSEX_ID_RESPONSE_LEN = 15;
+
+  public final static int  EWI_NUM_QUICKPCS      = 84;
   
   /** N.B. MIDI_TIMEOUT_MS must be significantly longer than MIDI_MESSAGE_LONG_PAUSE_MS
   * otherwise send & receive can get out of sync
@@ -208,12 +207,10 @@ public class MidiHandler {
   }
 
   void requestPatch( final int p ) {
-
     if (p < 0 || p >= EWI4000sPatch.EWI_NUM_PATCHES) {
       System.err.println( "Error - Attempt to request out-of-range patch (" + p + ")" );
       System.exit( 1 );
     }
-
     byte[] reqMsg = new byte[7];
     reqMsg[0] = MIDI_SYSEX_HEADER;
     reqMsg[1] = MIDI_SYSEX_AKAI_ID;	// 0x47 71.
@@ -246,23 +243,38 @@ public class MidiHandler {
   }
 
   synchronized void requestQuickPCs() {
-
-    byte[] reqMsg = new byte[6];
-    reqMsg[0] = MIDI_SYSEX_AKAI_ID;
-    reqMsg[1] = MIDI_SYSEX_AKAI_EWI4K;
-    reqMsg[2] = MIDI_SYSEX_ALLCHANNELS;
-    reqMsg[3] = MIDI_QUICKPC_DUMP_REQ;
-    reqMsg[4] = 0x00;
-    reqMsg[5] = MIDI_SYSEX_TRAILER;
-    SysexMessage sysEx;
-    try {
-      sysEx = new SysexMessage( SysexMessage.SYSTEM_EXCLUSIVE, reqMsg, reqMsg.length );
-      midiOut.send( sysEx, -1 );
-    } catch( InvalidMidiDataException e ) {
-      e.printStackTrace();
-    }
+    byte[] reqMsg = new byte[7];
+    reqMsg[0] = MIDI_SYSEX_HEADER;
+    reqMsg[1] = MIDI_SYSEX_AKAI_ID;
+    reqMsg[2] = MIDI_SYSEX_AKAI_EWI4K;
+    reqMsg[3] = MIDI_SYSEX_ALLCHANNELS;
+    reqMsg[4] = MIDI_QUICKPC_DUMP_REQ;
+    reqMsg[5] = 0x00;
+    reqMsg[6] = MIDI_SYSEX_TRAILER;
+    Debugger.log( "DEBUG - MidiHandler Sending request for all Quick PCs" );
+    sharedData.loadedQuickPCs = false;
+    sendSysEx( reqMsg.clone(), SendMsg.DelayType.SHORT );
   }
 
+  synchronized void sendQuickPCs( byte[] pcs ) {
+    if (pcs.length != EWI_NUM_QUICKPCS) {
+      System.err.println( "Error - sendQuickPCs got wrong number of PCs" );
+      System.exit( 1 );
+    }
+    byte[] sndMsg = new byte[6 + pcs.length + 1];
+    sndMsg[0] = MIDI_SYSEX_HEADER;
+    sndMsg[1] = MIDI_SYSEX_AKAI_ID;
+    sndMsg[2] = MIDI_SYSEX_AKAI_EWI4K;
+    sndMsg[3] = MIDI_SYSEX_ALLCHANNELS;
+    sndMsg[4] = MIDI_QUICKPC_DUMP;
+    sndMsg[5] = 0x00;
+    for (int b = 0; b < pcs.length; b++)
+      sndMsg[6 + b] = (pcs[b] >= 0 && pcs[b] < 100) ? pcs[b] : 0;
+    sndMsg[6 + pcs.length] = MIDI_SYSEX_TRAILER;
+    Debugger.log( "DEBUG - MidiHandler Sending dump of all Quick PCs to EWI" );
+    sendSysEx( sndMsg.clone(), SendMsg.DelayType.LONG );
+  }
+  
   synchronized boolean requestDeviceID() {
     byte[] reqMsg = new byte[6];
     reqMsg[0] = MIDI_SYSEX_HEADER;

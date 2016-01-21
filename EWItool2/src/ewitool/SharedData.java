@@ -34,6 +34,7 @@ public class SharedData extends Observable {
   public final static int EWI_CONNECTION = 3;
   
   private volatile int lastPatchLoaded;
+  public  volatile boolean loadedQuickPCs;
   private volatile boolean ewiAttached, epxAvailable;
   private volatile int scratchPadCount;
   private volatile String statusMessage;
@@ -43,9 +44,9 @@ public class SharedData extends Observable {
   enum DeviceIdResponse { WRONG_LENGTH, NOT_AKAI, NOT_EWI4000S, IS_EWI4000S }
   
   // We ASSUME that there are always NUM_EWI_PATCHES on this list once it is loaded...
-  ArrayList<EWI4000sPatch> ewiPatchList;
+  public ArrayList<EWI4000sPatch> ewiPatchList;
   
-  //public volatile EWI4000sPatch editPatch;  // This is the patch currently being edited
+  public byte[] quickPCs;
   
   // Queues to synchronise requesting/receiving MIDI info
   BlockingQueue<Integer> patchQ, keyPatchQ;
@@ -58,6 +59,8 @@ public class SharedData extends Observable {
   SharedData() {
     lastPatchLoaded = NONE;
     ewiPatchList = new ArrayList<EWI4000sPatch>(); //FXCollections.observableArrayList();
+    loadedQuickPCs = false;
+    quickPCs = new byte[MidiHandler.EWI_NUM_QUICKPCS];
     patchQ = new LinkedBlockingQueue<Integer>();
     keyPatchQ = new LinkedBlockingQueue<Integer>();
     deviceIdQ = new LinkedBlockingQueue<DeviceIdResponse>();

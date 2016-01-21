@@ -95,8 +95,8 @@ public class Main extends Application {
       patchEditorTab = new PatchEditorTab( sharedData, scratchPad, midiHandler );
       currentPatchSetTab = new CurrentPatchSetTab( sharedData, scratchPad, midiHandler, patchEditorTab );
       patchSetsTab = new PatchSetsTab( sharedData, scratchPad, userPrefs, midiHandler, currentPatchSetTab );   
-      keyPatchesTab = new KeyPatchesTab();     
-      
+      keyPatchesTab = new KeyPatchesTab( sharedData, midiHandler );     
+     
       tabPane.getTabs().addAll( scratchPadTab, 
                                 patchSetsTab, 
                                 epxTab, 
@@ -214,6 +214,7 @@ public class Main extends Application {
           ((PatchEditorTab) patchEditorTab).populateCombo( sharedData );
           currentPatchSetTab.setDisable( false );
           patchEditorTab.setDisable( false );
+          keyPatchesTab.setDisable( false );
           tabPane.getSelectionModel().select( currentPatchSetTab );
         }
       });

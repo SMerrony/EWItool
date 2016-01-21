@@ -37,7 +37,10 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Tab;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.RowConstraints;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -58,9 +61,21 @@ public class PatchSetsTab extends Tab {
     
     GridPane gp = new GridPane();
     gp.setMaxHeight( Double.MAX_VALUE );
-    gp.setId( "scratchpad-grid" );
+    gp.setId( "patchset-library-grid" );
+    
+    ColumnConstraints ccs;
+    // cols can grow indefinitely
+    ccs = new ColumnConstraints(); // 40.0, 90.0, Double.MAX_VALUE );
+    ccs.setHgrow( Priority.ALWAYS );
+    gp.getColumnConstraints().addAll( ccs, ccs, ccs, ccs );
 
-    Label llLabel = new Label( "Library location: " );
+    RowConstraints fixedRC, vgrowRC;
+    fixedRC = new RowConstraints();
+    vgrowRC = new RowConstraints();
+    vgrowRC.setVgrow( Priority.ALWAYS );
+    gp.getRowConstraints().addAll( fixedRC, vgrowRC, vgrowRC, fixedRC );
+
+    Label llLabel = new Label( "Patch Set Library location: " );
     gp.add( llLabel, 0, 0 );
     Label libLocLabel = new Label( userPrefs.getLibraryLocation() );
     gp.add( libLocLabel, 1, 0 );
@@ -80,6 +95,7 @@ public class PatchSetsTab extends Tab {
     });
 
     Label setsLabel = new Label( "Patch Sets" );
+    GridPane.setColumnSpan( setsLabel, 2 );
     gp.add( setsLabel, 0, 1 );
     
     patchSetList = new ListView<String>();
