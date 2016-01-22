@@ -17,12 +17,19 @@
 
 package ewitool;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.geometry.HPos;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Tab;
 import javafx.scene.layout.ColumnConstraints;
@@ -592,6 +599,140 @@ public class PatchEditorTab extends Tab {
     midiHandler.sendPatch( editPatch, EWI4000sPatch.EWI_EDIT );     
   }
   
+  public void mergePatchesUi() {
+    List<String> patchNames = new ArrayList<>();
+    for (int p = 0; p < EWI4000sPatch.EWI_NUM_PATCHES; p++)
+      patchNames.add( sharedData.ewiPatchList.get( p ).getName() );
+    Dialog<Integer> mergeDialog = new Dialog<>();
+    mergeDialog.setTitle( "EWItool - Merge Patches" );
+    mergeDialog.setHeaderText( "Choose patch to merge with..." );
+    ListView<String> lv  = new ListView<>();
+    lv.getItems().setAll( patchNames ); // don't need Observable here
+    mergeDialog.getDialogPane().setContent( lv );
+    mergeDialog.setResultConverter( button -> { 
+      if (button == ButtonType.OK)
+        return lv.getSelectionModel().getSelectedIndex();
+      else
+        return null;
+    } );
+    mergeDialog.getDialogPane().getButtonTypes().addAll( ButtonType.OK, ButtonType.CANCEL );
+    Optional<Integer> result = mergeDialog.showAndWait();
+    if (result.isPresent() && result.get() != -1) {
+      mergeWith( result.get() );    
+    }
+  }
+  
+  private void mergeWith( int otherPatchNum ) {
+    /* There is a risk of flooding the EWI if we change everything via CCs,
+     * so we change the editPatch object and reset the UI.
+     */
+    midiHandler.ignoreEvents = true;
+    uneditedPatch = editPatch;
+    EWI4000sPatch tmpPatch = sharedData.ewiPatchList.get( otherPatchNum );
+    
+    editPatch.osc1.octave = mixInts( editPatch.osc1.octave, 50, tmpPatch.osc1.octave  );
+    editPatch.osc1.semitone = mixInts( editPatch.osc1.semitone, 50, tmpPatch.osc1.semitone  );
+
+    editPatch.osc1.fine = mixInts( editPatch.osc1.fine, 50, tmpPatch.osc1.fine  );
+    editPatch.osc1.beat = mixInts( editPatch.osc1.beat, 50, tmpPatch.osc1.beat);
+    editPatch.osc1.sawtooth = mixInts( editPatch.osc1.sawtooth, 50, tmpPatch.osc1.sawtooth);
+    editPatch.osc1.triangle = mixInts( editPatch.osc1.triangle, 50, tmpPatch.osc1.triangle);
+    editPatch.osc1.square = mixInts( editPatch.osc1.square, 50, tmpPatch.osc1.square);
+    editPatch.osc1.pulseWidth = mixInts( editPatch.osc1.pulseWidth, 50, tmpPatch.osc1.pulseWidth);
+    editPatch.osc1.pwmDepth = mixInts( editPatch.osc1.pwmDepth, 50, tmpPatch.osc1.pwmDepth);
+    editPatch.osc1.pwmFreq = mixInts( editPatch.osc1.pwmFreq, 50, tmpPatch.osc1.pwmFreq);
+    editPatch.osc1.sweepDepth = mixInts( editPatch.osc1.sweepDepth, 50, tmpPatch.osc1.sweepDepth);
+    editPatch.osc1.sweepTime = mixInts( editPatch.osc1.sweepTime, 50, tmpPatch.osc1.sweepTime);
+    editPatch.osc1.breathAttain = mixInts( editPatch.osc1.breathAttain, 50, tmpPatch.osc1.breathAttain);
+    editPatch.osc1.breathDepth = mixInts( editPatch.osc1.breathDepth, 50, tmpPatch.osc1.breathDepth);
+    editPatch.osc1.breathCurve = mixInts( editPatch.osc1.breathCurve, 50, tmpPatch.osc1.breathCurve);
+    editPatch.osc1.breathThreshold = mixInts( editPatch.osc1.breathThreshold, 50, tmpPatch.osc1.breathThreshold);
+    editPatch.osc1.level = mixInts( editPatch.osc1.level, 50, tmpPatch.osc1.level);
+
+    //editPatch.osc2Xfade = mixInts( 0, 1 );
+    
+    editPatch.osc1.octave = mixInts( editPatch.osc1.octave, 50, tmpPatch.osc1.octave);
+    editPatch.osc1.semitone = mixInts( editPatch.osc1.semitone, 50, tmpPatch.osc1.semitone); 
+    
+    editPatch.osc2.fine = mixInts( editPatch.osc2.fine, 50, tmpPatch.osc2.fine);
+    editPatch.osc2.beat = mixInts( editPatch.osc2.beat, 50, tmpPatch.osc2.beat);
+    editPatch.osc2.sawtooth = mixInts( editPatch.osc2.sawtooth, 50, tmpPatch.osc2.sawtooth);
+    editPatch.osc2.triangle = mixInts( editPatch.osc2.triangle, 50, tmpPatch.osc2.triangle);
+    editPatch.osc2.square = mixInts( editPatch.osc2.square, 50, tmpPatch.osc2.square);
+    editPatch.osc2.pulseWidth = mixInts( editPatch.osc2.pulseWidth, 50, tmpPatch.osc2.pulseWidth);
+    editPatch.osc2.pwmDepth = mixInts( editPatch.osc2.pwmDepth, 50, tmpPatch.osc2.pwmDepth);
+    editPatch.osc2.pwmFreq = mixInts( editPatch.osc2.pwmFreq, 50, tmpPatch.osc2.pwmFreq);
+    editPatch.osc2.sweepDepth = mixInts( editPatch.osc2.sweepDepth, 50, tmpPatch.osc2.sweepDepth);
+    editPatch.osc2.sweepTime = mixInts( editPatch.osc2.sweepTime, 50, tmpPatch.osc2.sweepTime);
+    editPatch.osc2.breathAttain = mixInts( editPatch.osc2.breathAttain, 50, tmpPatch.osc2.breathAttain);
+    editPatch.osc2.breathDepth = mixInts( editPatch.osc2.breathDepth, 50, tmpPatch.osc2.breathDepth);
+    editPatch.osc2.breathCurve = mixInts( editPatch.osc2.breathCurve, 50, tmpPatch.osc2.breathCurve);
+    editPatch.osc2.breathThreshold = mixInts( editPatch.osc2.breathThreshold, 50, tmpPatch.osc2.breathThreshold);
+    editPatch.osc2.level = mixInts( editPatch.osc2.level, 50, tmpPatch.osc2.level);
+    
+    //editPatch.formantFilter = mixInts( editPatch.formantFilter, 50, tmpPatch.formantFilter);
+    //editPatch.keyTrigger = mixInts( 0, 1 );
+    //editPatch.oscFilterLink = mixInts( 0, 50, tmpPatch.);
+    
+    //editPatch.oscFilter1.mode = mixInts( 0, 4 );
+    editPatch.oscFilter1.breathCurve = mixInts( editPatch.oscFilter1.breathCurve, 50, tmpPatch.oscFilter1.breathCurve);
+    editPatch.oscFilter1.breathMod = mixInts( editPatch.oscFilter1.breathMod, 50, tmpPatch.oscFilter1.breathMod);
+    editPatch.oscFilter1.freq = mixInts( editPatch.oscFilter1.freq, 50, tmpPatch.oscFilter1.freq);
+    editPatch.oscFilter1.keyFollow = mixInts( editPatch.oscFilter1.keyFollow, 50, tmpPatch.oscFilter1.keyFollow);
+    editPatch.oscFilter1.lfoBreath = mixInts( editPatch.oscFilter1.lfoBreath, 50, tmpPatch.oscFilter1.lfoBreath);
+    editPatch.oscFilter1.lfoDepth = mixInts( editPatch.oscFilter1.lfoDepth, 50, tmpPatch.oscFilter1.lfoDepth);
+    editPatch.oscFilter1.lfoFreq = mixInts( editPatch.oscFilter1.lfoFreq, 50, tmpPatch.oscFilter1.lfoFreq);
+    editPatch.oscFilter1.lfoThreshold = mixInts( editPatch.oscFilter1.lfoThreshold, 50, tmpPatch.oscFilter1.lfoThreshold);
+    editPatch.oscFilter1.q = mixInts( editPatch.oscFilter1.q, 50, tmpPatch.oscFilter1.q);
+    editPatch.oscFilter1.sweepDepth = mixInts( editPatch.oscFilter1.sweepDepth, 50, tmpPatch.oscFilter1.sweepDepth);
+    editPatch.oscFilter1.sweepTime = mixInts( editPatch.oscFilter1.sweepTime, 50, tmpPatch.oscFilter1.sweepTime);
+
+    //editPatch.oscFilter2.mode = mixInts( editPatch.oscFilter2.mode, 4 oscFilter2.mode);
+    editPatch.oscFilter2.breathCurve = mixInts( editPatch.oscFilter2.breathCurve, 50, tmpPatch.oscFilter2.breathCurve);
+    editPatch.oscFilter2.breathMod = mixInts( editPatch.oscFilter2.breathMod, 50, tmpPatch.oscFilter2.breathMod);
+    editPatch.oscFilter2.freq = mixInts( editPatch.oscFilter2.freq, 50, tmpPatch.oscFilter2.freq);
+    editPatch.oscFilter2.keyFollow = mixInts( editPatch.oscFilter2.keyFollow, 50, tmpPatch.oscFilter2.keyFollow);
+    editPatch.oscFilter2.lfoBreath = mixInts( editPatch.oscFilter2.lfoBreath, 50, tmpPatch.oscFilter2.lfoBreath);
+    editPatch.oscFilter2.lfoDepth = mixInts( editPatch.oscFilter2.lfoDepth, 50, tmpPatch.oscFilter2.lfoDepth);
+    editPatch.oscFilter2.lfoFreq = mixInts( editPatch.oscFilter2.lfoFreq, 50, tmpPatch.oscFilter2.lfoFreq);
+    editPatch.oscFilter2.lfoThreshold = mixInts( editPatch.oscFilter2.lfoThreshold, 50, tmpPatch.oscFilter2.lfoThreshold);
+    editPatch.oscFilter2.q = mixInts( editPatch.oscFilter2.q, 50, tmpPatch.oscFilter2.q);
+    editPatch.oscFilter2.sweepDepth = mixInts( editPatch.oscFilter2.sweepDepth, 50, tmpPatch.oscFilter2.sweepDepth);
+    editPatch.oscFilter2.sweepTime = mixInts( editPatch.oscFilter2.sweepTime, 50, tmpPatch.oscFilter2.sweepTime);
+    
+    editPatch.noiseBreath = mixInts( editPatch.noiseBreath, 50, tmpPatch.noiseBreath);
+    editPatch.noiseLevel = mixInts( editPatch.noiseLevel, 50, tmpPatch.noiseLevel);
+    editPatch.noiseTime = mixInts( editPatch.noiseTime, 50, tmpPatch.noiseTime);
+    
+    // TODO add noise filters
+    
+   // editPatch.chorusSwitch = mixInts( 0, 1 );
+    editPatch.chorusDelay1 = mixInts( editPatch.chorusDelay1, 50, tmpPatch.chorusDelay1);
+    editPatch.chorusModLev1 = mixInts( editPatch.chorusModLev1, 50, tmpPatch.chorusModLev1);
+    editPatch.chorusWetLev1 = mixInts( editPatch.chorusWetLev1, 50, tmpPatch.chorusWetLev1);
+    editPatch.chorusDelay2 = mixInts( editPatch.chorusDelay2, 50, tmpPatch.chorusDelay2);
+    editPatch.chorusModLev2 = mixInts( editPatch.chorusModLev2, 50, tmpPatch.chorusModLev2);
+    editPatch.chorusWetLev2 = mixInts( editPatch.chorusWetLev2, 50, tmpPatch.chorusWetLev2);
+    editPatch.chorusDryLevel = mixInts( editPatch.chorusDryLevel, 50, tmpPatch.chorusDryLevel);
+    editPatch.chorusFeedback = mixInts( editPatch.chorusFeedback, 50, tmpPatch.chorusFeedback);
+    editPatch.chorusLFOfreq = mixInts( editPatch.chorusLFOfreq, 50, tmpPatch.chorusLFOfreq);
+    editPatch.delayTime = mixInts( editPatch.delayTime, 50, tmpPatch.delayTime);
+    editPatch.delayDamp = mixInts( editPatch.delayDamp, 50, tmpPatch.delayDamp);
+    editPatch.delayFeedback = mixInts( editPatch.delayFeedback, 50, tmpPatch.delayFeedback);
+    editPatch.delayDry = mixInts( editPatch.delayDry, 50, tmpPatch.delayDry);
+    editPatch.delayLevel = mixInts( editPatch.delayLevel, 50, tmpPatch.delayLevel);
+    editPatch.reverbDamp = mixInts( editPatch.reverbDamp, 50, tmpPatch.reverbDamp);
+    editPatch.reverbDensity = mixInts( editPatch.reverbDensity, 50, tmpPatch.reverbDensity);
+    editPatch.reverbDry = mixInts( editPatch.reverbDry, 50, tmpPatch.reverbDry);
+    editPatch.reverbLevel = mixInts( editPatch.reverbLevel, 50, tmpPatch.reverbLevel);
+    editPatch.reverbTime = mixInts( editPatch.reverbTime, 50, tmpPatch.reverbTime);
+    
+    editPatch.encodeBlob();
+    setAllControls();
+    midiHandler.ignoreEvents = false;
+    midiHandler.sendPatch( editPatch, EWI4000sPatch.EWI_EDIT ); 
+  }
+  
   /*
    * return a psuedorandom integer between min and max
    */
@@ -612,6 +753,17 @@ public class PatchEditorTab extends Tab {
     if (newmax == min) newmax += max/10;
     
     return randBetween( newmin, newmax );
+  }
+  
+  /**
+   * Returns pct of p1 plus 1-pct of p2 i.e. avergage if pct == 50
+   * @param p1
+   * @param pct
+   * @param p2
+   * @return
+   */
+  private int mixInts( int p1, int pct, int p2 ) {
+    return ((p1 * pct) / 100) + ((p2 * (100-pct)) / 100 );
   }
 }
 

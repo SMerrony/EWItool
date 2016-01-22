@@ -39,9 +39,9 @@ import javafx.scene.layout.BorderPane;
 public class Main extends Application {
 
   static final String  APP_NAME = "EWItool";
-  static final double  APP_VERSION = 1.9;
+  static final double  APP_VERSION = 1.91;
   static final int     COPYRIGHT_YEAR = 2016;
-  static final String  RELEASE_STATUS = "Alpha";
+  static final String  RELEASE_STATUS = "Alpha1";
   static final String  LEAD_AUTHOR = "S.Merrony";
 
   public  static final String  ICON = "/resources/EWItoolLogo1.png";
@@ -248,7 +248,9 @@ public class Main extends Application {
       rmNoiseItem.setOnAction( (ae) -> ((PatchEditorTab) patchEditorTab).makeNoNoise() );
       MenuItem rand10PctItem = new MenuItem( "Randomise by 10%" );
       rand10PctItem.setOnAction( (ae) -> ((PatchEditorTab) patchEditorTab).randomiseBy10pct() );
-      processSubmenu.getItems().addAll( dryItem, maxVolItem, rmNoiseItem, rand10PctItem );
+      MenuItem mergeItem = new MenuItem( "Merge with..." );
+      mergeItem.setOnAction( (ae) -> ((PatchEditorTab) patchEditorTab).mergePatchesUi() );
+      processSubmenu.getItems().addAll( dryItem, maxVolItem, rmNoiseItem, rand10PctItem, mergeItem );
       patchMenu.getItems().addAll( storeItem, revertItem, copyItem, 
                                    new SeparatorMenuItem(), 
                                    generateSubmenu, processSubmenu );
