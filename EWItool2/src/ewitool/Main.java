@@ -49,7 +49,7 @@ public class Main extends Application {
   private static final int     SCENE_PREF_HEIGHT = 750;
   private static final String  WINDOW_TITLE = APP_NAME + " - EWI4000s Patch Handling Tool";
   private static final Double  MINIMUM_JVM_SPEC = 1.8;
-  private static final String  ONLINE_HELP = "https://github.com/SMerrony/EWItool2/wiki";
+  private static final String  ONLINE_HELP = "https://github.com/SMerrony/EWItool2/wiki/Using-EWItool";
 
   public enum Status { OK, ALREADY_EXISTS, NO_PERMISSION }
   
