@@ -67,22 +67,23 @@ public class EPX {
   }
 
   public boolean testConnection() {
-    
     try {
-      URL url = new URL( PROTOCOL + userPrefs.getEpxHost() + BASE_REQ + "connectionTest" );
-      HttpURLConnection con = (HttpURLConnection) url.openConnection();
-      con.setRequestProperty( "User-Agent", USER_AGENT );
-      int respCode = con.getResponseCode();
-      Debugger.log( "DEBUG - EPX: Got response " + respCode + " for connection test" );
-      if (respCode == 200) {
-        BufferedReader br = new BufferedReader( new InputStreamReader( con.getInputStream() ) );
-        String line;
-        StringBuffer reply = new StringBuffer();
-        while ((line = br.readLine()) != null) reply.append( line );
-        br.close();
-        if (reply.toString().contains( "Connection: OK" )) {
-          sharedData.setEpxAvailable( true );
-          return true;
+      if (userPrefs.getEpxHost() != "<Not Set>") {
+        URL url = new URL( PROTOCOL + userPrefs.getEpxHost() + BASE_REQ + "connectionTest" );
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestProperty( "User-Agent", USER_AGENT );
+        int respCode = con.getResponseCode();
+        Debugger.log( "DEBUG - EPX: Got response " + respCode + " for connection test" );
+        if (respCode == 200) {
+          BufferedReader br = new BufferedReader( new InputStreamReader( con.getInputStream() ) );
+          String line;
+          StringBuffer reply = new StringBuffer();
+          while ((line = br.readLine()) != null) reply.append( line );
+          br.close();
+          if (reply.toString().contains( "Connection: OK" )) {
+            sharedData.setEpxAvailable( true );
+            return true;
+          }
         }
       }
     } catch( MalformedURLException e ) {
