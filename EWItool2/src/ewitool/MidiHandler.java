@@ -96,8 +96,9 @@ public class MidiHandler {
     scanAndOpenMIDIPorts();
     
     /* this is just a nice-to-have... */
-    if (inDev.isOpen() && outDev.isOpen()) {
-      requestDeviceID();
+    if (inDev != null && outDev != null)
+      if (inDev.isOpen() && outDev.isOpen()) {
+        requestDeviceID();
     }
   }
   
