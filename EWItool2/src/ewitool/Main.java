@@ -39,9 +39,9 @@ import javafx.scene.layout.BorderPane;
 public class Main extends Application {
 
   static final String  APP_NAME = "EWItool";
-  static final double  APP_VERSION = 1.92;
+  static final double  APP_VERSION = 1.93;
   static final int     COPYRIGHT_YEAR = 2016;
-  static final String  RELEASE_STATUS = "Alpha2";
+  static final String  RELEASE_STATUS = "Alpha3";
   static final String  LEAD_AUTHOR = "S.Merrony";
 
   public  static final String  ICON = "/resources/EWItoolLogo1.png";
@@ -154,7 +154,7 @@ public class Main extends Application {
       System.err.println( "Error - EWItool requires at least version " + MINIMUM_JVM_SPEC + " of Java to run." );
       System.exit( 1 );
     } else {
-      Debugger.log( "DEBUG - JVM Spec. " + jvmSpec + " detected" );
+      Debugger.log( "DEBUG - JVM Spec. " + jvmSpec + " detected.  JRE version: " + System.getProperty( "java.version" ) );
     }
   }
 

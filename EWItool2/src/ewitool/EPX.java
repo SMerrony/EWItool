@@ -36,7 +36,8 @@ import javafx.scene.control.Alert.AlertType;
 public class EPX {
   
   public static final String USER_AGENT = Main.APP_NAME + "/" + Main.APP_VERSION + 
-                                          " (" + System.getProperty( "os.name" ) + ")";
+                                          " (" + System.getProperty( "os.name" ) + ")" +
+                                          " JVM/" + System.getProperty( "java.version" );
   public static final String PROTOCOL = "http://";
   public static final String BASE_REQ = "/EPX/epx.php?action=";
   public static final String URL_ENCODING = "UTF-8";
