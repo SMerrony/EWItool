@@ -43,7 +43,7 @@ public class UiLevelsGrid extends GridPane {
     vgrowRC = new RowConstraints();
     vgrowRC.setVgrow( Priority.ALWAYS );
     
-    getRowConstraints().addAll( fixedRC, vgrowRC, vgrowRC, vgrowRC, vgrowRC );
+    getRowConstraints().addAll( fixedRC, fixedRC, vgrowRC );
     Label mainLabel = new Label( "Levels" );
     mainLabel.setId( "editor-section-label" );
     GridPane.setColumnSpan( mainLabel, 2 );

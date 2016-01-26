@@ -76,6 +76,7 @@ public class PatchEditorTab extends Tab {
     editPatch = new EWI4000sPatch();
 
     GridPane peGrid = new GridPane();
+    peGrid.setId( "editor-outer-grid" );
     ColumnConstraints ccsGrowable = new ColumnConstraints( 40.0, 90.0, Double.MAX_VALUE );
     RowConstraints rcsFixed = new RowConstraints(), rcsGrowable = new RowConstraints();
     ccsGrowable.setHgrow( Priority.ALWAYS );

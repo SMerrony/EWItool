@@ -26,32 +26,19 @@
 }
 
 #status-bar .label {
+	-fx-font-size: 8pt;
 	-fx-label-padding: 0.0 1mm 0.0 1mm;
 }
 
 #status-value {
 	-fx-background-color: white;
-	-fx-min-width: 20mm;
+	-fx-border-radius: 6mm; 
 }
 
 #status-message {
 	-fx-background-color: white;
 	-fx-min-width: 80mm;
-}
-
-#status-grid {
-	-fx-padding: 10mm;
-	-fx-hgap: 3mm;
-	-fx-vgap: 3mm;
-}
-
-#status-label {
-	-fx-background-color: white;
-	/* -fx-border-radius: 5; */
-	-fx-border-style: solid;
-	-fx-border-color: darkgray;
-	-fx-border-width: 1px;
-	-fx-padding: 2mm;	
+	-fx-border-radius: 6mm; 
 }
 
 #scratchpad-grid {
@@ -112,10 +99,13 @@
 	/* -fx-background-color: lightgray; */
 }
 
+#editor-outer-grid {
+	-fx-padding: 1mm;
+}
+/* each area of the Patch Editor is an editor-grid */
 #editor-grid {
 	-fx-border-color: darkgray;
 	-fx-padding: 2px;
-	/* visibility: -fx-min-width: 2.0cm; */
 	-fx-pref-width: 25mm;
 	-fx-alignment: center;
 }
