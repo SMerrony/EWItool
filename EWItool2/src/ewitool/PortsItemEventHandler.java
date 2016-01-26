@@ -78,15 +78,13 @@ public class PortsItemEventHandler implements EventHandler<ActionEvent> {
           if (device.getMaxReceivers() != 0) {
             opIx++;
             outPorts.add( infos[d].getName() );
-            if (infos[d].getName().equals( lastOutDevice ))
-              outView.getSelectionModel().clearAndSelect( opIx );
-            //Debugger.log( "Debug - OUT Port: " + infos[d].getName());
+            if (infos[d].getName().equals( lastOutDevice )) outView.getSelectionModel().clearAndSelect( opIx );
+            Debugger.log( "DEBUG - Found OUT Port: " + infos[d].getName() + " - " + infos[d].getDescription() );
           } else if (device.getMaxTransmitters() != 0) {
             ipIx++;
             inPorts.add( infos[d].getName() );
-            if (infos[d].getName().equals( lastInDevice )) 
-              inView.getSelectionModel().clearAndSelect( ipIx );
-            //Debugger.log( "Debug - IN Port: " + infos[d].getName() );
+            if (infos[d].getName().equals( lastInDevice )) inView.getSelectionModel().clearAndSelect( ipIx );
+            Debugger.log( "DEBUG - Found IN Port: " + infos[d].getName() + " - " + infos[d].getDescription() );
           }
         }
         
