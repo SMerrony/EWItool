@@ -148,7 +148,7 @@ public class Main extends Application {
     }
   }
 
-  void checkJVMspec() {
+  private static void checkJVMspec() {
     Double jvmSpec = Double.parseDouble( System.getProperty( "java.specification.version" ) );
     if ( jvmSpec < MINIMUM_JVM_SPEC) {
       System.err.println( "Error - EWItool requires at least version " + MINIMUM_JVM_SPEC + " of Java to run." );
@@ -158,7 +158,7 @@ public class Main extends Application {
     }
   }
 
-  class MainMenuBar extends MenuBar {
+  private class MainMenuBar extends MenuBar {
 
     Menu fileMenu, midiMenu, ewiMenu, helpMenu;
     Menu generateSubmenu, processSubmenu;

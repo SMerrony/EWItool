@@ -18,7 +18,6 @@
     along with EWItool.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package ewitool;
 
 import java.util.concurrent.TimeUnit;
@@ -120,17 +119,13 @@ public class MidiHandler {
                 outDev = MidiSystem.getMidiDevice( infos[d] );
               } catch( MidiUnavailableException e ) {
                 e.printStackTrace();
-                System.err.println( "Error - MidiHandler() could not obtain chosen MIDI OUT device info" );
+                errAlert( "Error - MidiHandler() could not obtain chosen MIDI OUT device info" );
               }
               try {
                 outDev.open();
               } catch( MidiUnavailableException e1 ) {
                 e1.printStackTrace();
-                System.err.println( "Error - MidiHandler() could not open chosen MIDI OUT device" );
-                Alert aeal = new Alert( AlertType.ERROR );
-                aeal.setTitle( "EWItool - MIDI" );
-                aeal.setContentText( "The EWItool MidiHandler could not open chosen MIDI OUT device" );
-                aeal.showAndWait();
+                errAlert( "Error - MidiHandler() could not open chosen MIDI OUT device" );
               }
               if (outDev.isOpen()) {
                 (sendThread = new Thread( new MidiSender( sharedData, outDev ) )).start();
@@ -147,21 +142,13 @@ public class MidiHandler {
                 inDev = MidiSystem.getMidiDevice( infos[d] );
               } catch( MidiUnavailableException e ) {
                 e.printStackTrace();
-                System.err.println( "Error - MidiHandler() could not obtain chosen MIDI IN device info" );
-                Alert aeal = new Alert( AlertType.ERROR );
-                aeal.setTitle( "EWItool - MIDI" );
-                aeal.setContentText( "The EWItool MidiHandler could not open chosen MIDI IN device" );
-                aeal.showAndWait();
+                errAlert( "Error - MidiHandler() could not obtain chosen MIDI IN device info" );
               }
               try {
                 inDev.open(); 
               } catch( MidiUnavailableException e1 ) {
                 e1.printStackTrace();
-                System.err.println( "Error - MidiHandler() could not open chosen MIDI IN device" );
-                Alert aeal = new Alert( AlertType.ERROR );
-                aeal.setTitle( "EWItool - MIDI" );
-                aeal.setContentText( "The EWItool MidiHandler could not open chosen MIDI IN device" );
-                aeal.showAndWait();
+                errAlert( "Error - MidiHandler() could not open chosen MIDI IN device" );
               }
               midiIn = new MidiReceiver( sharedData );
               inDev.getTransmitter().setReceiver( midiIn );
@@ -172,13 +159,17 @@ public class MidiHandler {
         }  
       } catch( MidiUnavailableException e ) {
         e.printStackTrace();
-        System.err.println( "Error - MidiHandler() could not obtain MIDI devices info" );
-        Alert aeal = new Alert( AlertType.ERROR );
-        aeal.setTitle( "EWItool - MIDI" );
-        aeal.setContentText( "The EWItool MidiHandler could not open obtain MIDI Device information from the system" );
-        aeal.showAndWait();
+        errAlert( "Error - MidiHandler() could not obtain MIDI devices info" );
       }
     }
+  }
+  
+  private static void errAlert( String msg ) {
+    System.err.println( msg );
+    Alert al = new Alert( AlertType.ERROR );
+    al.setTitle( "EWItool - MIDI" );
+    al.setContentText( msg );
+    al.showAndWait();
   }
 
   public void close() {
@@ -198,8 +189,9 @@ public class MidiHandler {
     close();
     scanAndOpenMIDIPorts();   
     /* this is just a nice-to-have... */
-    if (inDev.isOpen() && outDev.isOpen()) {
-      requestDeviceID();
+    if (inDev != null && outDev != null)
+      if (inDev.isOpen() && outDev.isOpen()) {
+        requestDeviceID();
     }
   }
 
