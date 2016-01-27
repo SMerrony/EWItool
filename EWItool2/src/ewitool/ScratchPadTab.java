@@ -46,13 +46,13 @@ public class ScratchPadTab extends Tab {
     setText( "Scratchpad" );
     setClosable( false );
 
-    if (!scratchPad.load()) {
-      Alert warnAlert = new Alert( AlertType.WARNING );
-      warnAlert.setTitle( "EWItool - Warning" );
-      warnAlert.setContentText( "Cannot load Scratchpad.  It could be that the Library Path is not set or the directory is inaccessible.  " + 
-          "Please check the location on the Patch Set Library tab before continuing." );
-      warnAlert.showAndWait();
-    }
+//    if (!scratchPad.load()) {
+//      Alert warnAlert = new Alert( AlertType.WARNING );
+//      warnAlert.setTitle( "EWItool - Warning" );
+//      warnAlert.setContentText( "Cannot load Scratchpad.  It could be that the Library Path is not set or the directory is inaccessible.  " + 
+//          "Please check the location on the Patch Set Library tab before continuing." );
+//      warnAlert.showAndWait();
+//    }
 
     GridPane gp = new GridPane();
     gp.setMaxHeight( Double.MAX_VALUE );

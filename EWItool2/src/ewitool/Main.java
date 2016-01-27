@@ -39,9 +39,9 @@ import javafx.scene.layout.BorderPane;
 public class Main extends Application {
 
   static final String  APP_NAME = "EWItool";
-  static final double  APP_VERSION = 1.93;
+  static final double  APP_VERSION = 1.94;
   static final int     COPYRIGHT_YEAR = 2016;
-  static final String  RELEASE_STATUS = "Alpha3";
+  static final String  RELEASE_STATUS = "Alpha4";
   static final String  LEAD_AUTHOR = "S.Merrony";
 
   public  static final String  ICON = "/resources/EWItoolLogo1.png";
@@ -115,19 +115,13 @@ public class Main extends Application {
       });
 
       // MIDI port assignment change listeners
-      userPrefs.midiInPort.addListener( new ChangeListener<String>() {
-        @Override
-        public void changed( ObservableValue<? extends String> observable, String oldValue, String newValue ) {
+      userPrefs.midiInPort.addListener( (ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
           Debugger.log( "Debug - Noticed that IN Port Changed to : " + newValue );
           midiHandler.restart();
-        }
       });
-      userPrefs.midiOutPort.addListener( new ChangeListener<String>() {
-        @Override
-        public void changed( ObservableValue<? extends String> observable, String oldValue, String newValue ) {
+      userPrefs.midiOutPort.addListener( (ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
           Debugger.log( "Debug - Noticed that OUT Port Changed to : " + newValue );
           midiHandler.restart();
-        }
       });
 
       // customise icon

@@ -268,7 +268,7 @@ public class MidiHandler {
     sendSysEx( sndMsg.clone(), SendMsg.DelayType.LONG );
   }
   
-  synchronized boolean requestDeviceID() {
+  synchronized final boolean requestDeviceID() {
     byte[] reqMsg = new byte[6];
     reqMsg[0] = MIDI_SYSEX_HEADER;
     reqMsg[1] = MIDI_SYSEX_NONREALTIME;

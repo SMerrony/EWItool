@@ -30,7 +30,7 @@ public class MidiReceiver implements Receiver {
   MidiMonitorMessage mmsg;
 
   /**
-   * @param ewiPatchList
+   * @param pSharedData
    */
   public MidiReceiver( SharedData pSharedData ) {
     sharedData = pSharedData;
@@ -120,7 +120,9 @@ public class MidiReceiver implements Receiver {
         return;
       }
 
-      System.err.println( "Warning - Unrecognised SysEx type of length " + messageBytes.length + " received from EWI, starting: " + messageBytes[0] + " " + messageBytes[1]+ " " + messageBytes[2] );
+      System.err.println( "Warning - Unrecognised SysEx type of length " + messageBytes.length + 
+                          " received from EWI, starting: " + messageBytes[0] + " " + messageBytes[1] + 
+                          " " + messageBytes[2] );
     }
   }
 

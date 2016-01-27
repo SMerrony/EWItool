@@ -47,9 +47,10 @@ public class PortsItemEventHandler implements EventHandler<ActionEvent> {
     userPrefs = pPrefs;
   }
 
+  @Override
   public void handle( ActionEvent arg0 ) {
     
-    Dialog<ButtonType> dialog = new Dialog<ButtonType>();
+    Dialog<ButtonType> dialog = new Dialog<>();
     dialog.setTitle( "EWItool - Select MIDI Ports" );
     dialog.getDialogPane().getButtonTypes().addAll( ButtonType.CANCEL, ButtonType.OK );
     GridPane gp = new GridPane();
@@ -58,12 +59,12 @@ public class PortsItemEventHandler implements EventHandler<ActionEvent> {
     gp.add( new Label( "MIDI Out Ports" ), 1, 0 );
     
     ListView<String> inView, outView;
-    List<String> inPortList = new ArrayList<String>(),
-                 outPortList = new ArrayList<String>();
+    List<String> inPortList = new ArrayList<>(),
+                 outPortList = new ArrayList<>();
     ObservableList<String> inPorts = FXCollections.observableArrayList( inPortList ), 
                            outPorts = FXCollections.observableArrayList( outPortList );
-    inView = new ListView<String>( inPorts );
-    outView = new ListView<String>( outPorts );
+    inView = new ListView<>( inPorts );
+    outView = new ListView<>( outPorts );
        
     String lastInDevice = userPrefs.getMidiInPort();
     String lastOutDevice = userPrefs.getMidiOutPort();
@@ -71,27 +72,30 @@ public class PortsItemEventHandler implements EventHandler<ActionEvent> {
     
     MidiDevice device;
     MidiDevice.Info[] infos = MidiSystem.getMidiDeviceInfo();
-    for (int d = 0; d < infos.length; d++) {
-      try {
-        device = MidiSystem.getMidiDevice( infos[d] );
-        if (!(device instanceof Sequencer) && !(device instanceof Synthesizer)) {
-          if (device.getMaxReceivers() != 0) {
-            opIx++;
-            outPorts.add( infos[d].getName() );
-            if (infos[d].getName().equals( lastOutDevice )) outView.getSelectionModel().clearAndSelect( opIx );
-            Debugger.log( "DEBUG - Found OUT Port: " + infos[d].getName() + " - " + infos[d].getDescription() );
-          } else if (device.getMaxTransmitters() != 0) {
-            ipIx++;
-            inPorts.add( infos[d].getName() );
-            if (infos[d].getName().equals( lastInDevice )) inView.getSelectionModel().clearAndSelect( ipIx );
-            Debugger.log( "DEBUG - Found IN Port: " + infos[d].getName() + " - " + infos[d].getDescription() );
+      for ( MidiDevice.Info info : infos ) {
+          try {
+              device = MidiSystem.getMidiDevice( info );
+              if (!( device instanceof Sequencer ) && !( device instanceof Synthesizer )) {
+                  if (device.getMaxReceivers() != 0) {
+                      opIx++;
+                      outPorts.add( info.getName() );
+                      if (info.getName().equals( lastOutDevice )) {
+                          outView.getSelectionModel().clearAndSelect( opIx );
+                      }
+                      Debugger.log( "DEBUG - Found OUT Port: " + info.getName() + " - " + info.getDescription() );
+                  } else if (device.getMaxTransmitters() != 0) {
+                      ipIx++;
+                      inPorts.add( info.getName() );
+                      if (info.getName().equals( lastInDevice )) {
+                          inView.getSelectionModel().clearAndSelect( ipIx );
+                      }
+                      Debugger.log( "DEBUG - Found IN Port: " + info.getName() + " - " + info.getDescription() );
+                  }
+              }
+          } catch (Exception e) {
+              System.err.println( "ERROR - Fetching MIDI information" );
           }
-        }
-        
-      } catch (Exception e) {
-        System.err.println( "ERROR - Fetching MIDI information" );
       }
-    }
  
     gp.add( inView, 0, 1 );
     gp.add( outView, 1, 1 );
