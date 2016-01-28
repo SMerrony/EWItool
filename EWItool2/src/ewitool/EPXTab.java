@@ -75,22 +75,22 @@ public class EPXTab extends Tab {
     querySectionLabel.setId( "epx-section-label" );
     queryGrid.add( querySectionLabel, 0, 0 );
     queryGrid.add( new Label( "Type" ), 0, 1 );
-    typeChoice = new ChoiceBox<String>();
+    typeChoice = new ChoiceBox<>();
     typeChoice.getItems().addAll( "All" );
     typeChoice.getSelectionModel().select( 0 );
     queryGrid.add( typeChoice, 1, 1 );
     queryGrid.add( new Label( "Added in the last..." ), 0, 2 );
-    addedChoice = new ChoiceBox<String>();
+    addedChoice = new ChoiceBox<>();
     addedChoice.getItems().addAll( "All", "1 day", "7 days", "1 month", "3 months", "1 year" );
     addedChoice.getSelectionModel().select( 0 );
     queryGrid.add( addedChoice, 1, 2 );
     queryGrid.add( new Label( "Contributor" ), 0, 3 );
-    contribChoice = new ChoiceBox<String>();
+    contribChoice = new ChoiceBox<>();
     contribChoice.getItems().addAll( "All" ); // more added programatically
     contribChoice.getSelectionModel().select( 0 );
     queryGrid.add( contribChoice, 1, 3 );
     queryGrid.add( new Label( "Origin" ), 0, 4 );
-    originChoice = new ChoiceBox<String>();
+    originChoice = new ChoiceBox<>();
     originChoice.getItems().addAll( "All" ); // more added programatically
     originChoice.getSelectionModel().select( 0 );
     queryGrid.add( originChoice, 1, 4 );
@@ -107,9 +107,7 @@ public class EPXTab extends Tab {
                                                    qTagsField.getText()
                                                  );
       resultsView.getItems().clear();
-      for (EPX.QueryResult qr : lqr) {
-        resultsView.getItems().add( qr.name_user + " #" + qr.epx_id );
-      }
+      lqr.stream().forEach( (qr) ->  resultsView.getItems().add( qr.name_user + " #" + qr.epx_id )  );
     });
     queryGrid.add( queryButton, 1, 6 );
     queryGrid.setDisable( true );  // disabled until we know we can connect
@@ -126,7 +124,7 @@ public class EPXTab extends Tab {
     resultsGrid.add( resultsSectionLabel, 0, 0 );
     resultsGrid.getRowConstraints().add( fixedRC );
     
-    resultsView = new ListView<String>();
+    resultsView = new ListView<>();
     resultsView.getSelectionModel().selectedItemProperty().addListener( (item)-> {
       if (resultsView.getSelectionModel().getSelectedIndex() != -1){
         String selected = resultsView.getSelectionModel().getSelectedItem();

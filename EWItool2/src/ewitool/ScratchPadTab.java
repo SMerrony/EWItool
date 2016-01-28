@@ -32,7 +32,6 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
-import javafx.util.Callback;
 
 public class ScratchPadTab extends Tab {
 
@@ -46,6 +45,7 @@ public class ScratchPadTab extends Tab {
     setText( "Scratchpad" );
     setClosable( false );
 
+    scratchPad.load();
 //    if (!scratchPad.load()) {
 //      Alert warnAlert = new Alert( AlertType.WARNING );
 //      warnAlert.setTitle( "EWItool - Warning" );
@@ -65,24 +65,21 @@ public class ScratchPadTab extends Tab {
     row1.setVgrow( Priority.ALWAYS );
     gp.getRowConstraints().addAll( row1 );
 
-    patchList = new ListView<EWI4000sPatch>( scratchPad.patchList );
+    patchList = new ListView<>( scratchPad.patchList );
     patchList.setMaxSize( Double.MAX_VALUE, Double.MAX_VALUE );
-    patchList.setCellFactory( new Callback<ListView<EWI4000sPatch>, ListCell<EWI4000sPatch>>(){
-      @Override 
-      public ListCell<EWI4000sPatch> call( ListView<EWI4000sPatch> p ) {
+    patchList.setCellFactory( (ListView<EWI4000sPatch> p) -> {
         ListCell<EWI4000sPatch> cell = new ListCell<EWI4000sPatch>() {
-          @Override
-          protected void updateItem( EWI4000sPatch ep, boolean bln ) {
-            super.updateItem( ep, bln );
-            if (ep != null) {
-              setText( ep.getName() );
-            } else {
-              setText( "" );
+            @Override
+            protected void updateItem( EWI4000sPatch ep, boolean bln ) {
+                super.updateItem( ep, bln );
+                if (ep != null) {
+                    setText( ep.getName() );
+                } else {
+                    setText( "" );
+                }
             }
-          }
         };
         return cell;
-      }
     });
 
     gp.add( patchList, 0, 0, 1, 2 );

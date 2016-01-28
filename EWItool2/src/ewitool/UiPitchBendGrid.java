@@ -52,13 +52,13 @@ public class UiPitchBendGrid extends GridPane {
     GridPane.setValignment( mainLabel, VPos.TOP );
     add( mainLabel, 0, 0 );
 
-    enableCheck = new CheckBox( "Enable" );
+    enableCheck = new CheckBox( "Step Mode" );
     enableCheck.setOnAction( (event) -> {
       if (enableCheck.isSelected()) {
-	midiHandler.sendLiveControl( 9, 81, 1 );
+	midiHandler.sendLiveControl( 1, 81, 1 );
 	editPatch.bendStepMode = 1;
       } else {
-	midiHandler.sendLiveControl( 9, 81, 0 );
+	midiHandler.sendLiveControl( 1, 81, 0 );
 	editPatch.bendStepMode = 0;
       }
     });
@@ -67,10 +67,9 @@ public class UiPitchBendGrid extends GridPane {
     add( new ControlLabel( "Range", HPos.CENTER ), 0, 2 );
     
     rangeChoice = new ChoiceBox<Integer>();
-    for (int i = 0; i < 13; i++)
-      rangeChoice.getItems().add( i );
+    for (int i = 0; i < 13; i++) rangeChoice.getItems().add( i );
     rangeChoice.setOnAction( (event) -> {
-      midiHandler.sendLiveControl( 8, 81, rangeChoice.getSelectionModel().getSelectedIndex() );
+      midiHandler.sendLiveControl( 0, 81, rangeChoice.getSelectionModel().getSelectedIndex() );
       editPatch.bendRange = rangeChoice.getSelectionModel().getSelectedIndex(); 
     });
     add( rangeChoice, 0, 3 );   

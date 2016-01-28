@@ -202,7 +202,7 @@ public class EWI4000sPatch {
   byte filler5;
   byte filler6;
   byte filler7;
-  volatile char name[];
+  char name[];
   Osc  osc1;     // 64,18
   Osc  osc2;     // 65,18
   Filter oscFilter1;   // 72,12
@@ -303,7 +303,7 @@ public class EWI4000sPatch {
   
   public boolean isEmpty() { return empty; }
 
-  public void setEmpty( boolean empty ) { this.empty = empty; }
+  public final void setEmpty( boolean empty ) { this.empty = empty; }
   
   // the patch name is stored in the patch as a space-padded char[]
   // so it must be converted for use as a normal string
@@ -339,7 +339,7 @@ public class EWI4000sPatch {
   }
 
   // extract the individual properties from the blob
-  void decodeBlob() {
+  public final void decodeBlob() {
      header = Arrays.copyOfRange( patchBlob, 0, 4 );
      mode = patchBlob[4];     // 0x00 to store, 0x20 to edit
      patchNum = patchBlob[5];

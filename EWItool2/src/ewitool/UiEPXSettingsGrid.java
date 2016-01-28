@@ -39,7 +39,7 @@ public class UiEPXSettingsGrid extends GridPane {
     //uidField, passwdField, serverField;
     TextField uidField = new TextField();
     String uid = userPrefs.getEpxUserid();
-    if (uid == "<Not Set>") {
+    if ("<Not Set>".equals( uid )) {
       uidField.setPromptText( uid );
     } else {
       uidField.setText( uid );
@@ -49,7 +49,7 @@ public class UiEPXSettingsGrid extends GridPane {
     add( new Label( "Password" ), 0, 2 );
     PasswordField passwdField = new PasswordField();
     String pwd = userPrefs.getEpxPassword();
-    if (pwd == "<Not Set>") {
+    if ("<Not Set>".equals( pwd )) {
       passwdField.setPromptText( pwd );
     } else {
       passwdField.setText( pwd );
@@ -59,7 +59,7 @@ public class UiEPXSettingsGrid extends GridPane {
     add( new Label( "Server" ), 0, 3 );
     TextField serverField = new TextField();
     String serv = userPrefs.getEpxHost();
-    if (serv == "<Not Set>") {
+    if ("<Not Set>".equals( serv )) {
       serverField.setPromptText( serv );
     } else {
       serverField.setText( serv );

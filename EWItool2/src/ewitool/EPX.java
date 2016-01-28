@@ -45,12 +45,12 @@ public class EPX {
   SharedData sharedData;
   UserPrefs userPrefs;
   
-  class QueryResult {
+  public class QueryResult {
     String name_user;
     int    epx_id;
   }
   
-  class DetailsResult {
+  public class DetailsResult {
     String name;
     String contrib;
     String origin;
@@ -69,7 +69,7 @@ public class EPX {
 
   public boolean testConnection() {
     try {
-      if (userPrefs.getEpxHost() != "<Not Set>") {
+      if (!"<Not Set>".equals( userPrefs.getEpxHost() )) {
         URL url = new URL( PROTOCOL + userPrefs.getEpxHost() + BASE_REQ + "connectionTest" );
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestProperty( "User-Agent", USER_AGENT );
@@ -169,7 +169,7 @@ public class EPX {
         line = br.readLine();
       }
       line = br.readLine();
-      LinkedList<QueryResult> lqr = new LinkedList<QueryResult>();
+      LinkedList<QueryResult> lqr = new LinkedList<>();
       while (line != null && line.length() > 3 && !line.contains( "</body>" )) {
         if (line.startsWith( "Error:" )) {
           System.err.println( "ERROR - EPX: " + line );
@@ -218,10 +218,7 @@ public class EPX {
       dr.type = dets[4];
       dr.desc = dets[5];
       dr.added = dets[6];
-      if (dets[7].contentEquals( "0" )) 
-        dr.privateFlag = false;
-      else
-        dr.privateFlag = true;
+      dr.privateFlag = !dets[7].contentEquals( "0" );
       if (dets.length == 9) dr.tags = dets[8];
     } catch( MalformedURLException e ) {
       e.printStackTrace();
