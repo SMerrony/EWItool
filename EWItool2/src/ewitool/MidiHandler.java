@@ -21,6 +21,8 @@
 package ewitool;
 
 import java.util.concurrent.TimeUnit;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 
 import javax.sound.midi.MidiDevice;
 import javax.sound.midi.MidiSystem;
@@ -30,6 +32,7 @@ import javax.sound.midi.Sequencer;
 import javax.sound.midi.Synthesizer;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.util.Duration;
 
 public class MidiHandler {
 
@@ -93,12 +96,21 @@ public class MidiHandler {
     ignoreEvents = false;
 
     scanAndOpenMIDIPorts();
-    
-    /* this is just a nice-to-have... */
-    if (inDev != null && outDev != null)
-      if (inDev.isOpen() && outDev.isOpen()) {
-        requestDeviceID();
-    }
+
+    Task<Void> checkerTask = new Task<Void>() {
+      @Override
+      protected Void call() throws Exception {
+        while (true) {
+          if (inDev != null && outDev != null) {
+            if (inDev.isOpen() && outDev.isOpen()) {
+              Platform.runLater( () -> requestDeviceID() );
+            }
+          }
+          Thread.sleep( 15000 ); // 15s
+        }
+      }
+    };
+    new Thread( checkerTask ).start();
   }
   
   /** Go through all MIDI devices looking for Ports.  If the port matches 
