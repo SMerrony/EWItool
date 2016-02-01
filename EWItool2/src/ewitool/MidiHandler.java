@@ -32,7 +32,6 @@ import javax.sound.midi.Sequencer;
 import javax.sound.midi.Synthesizer;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.util.Duration;
 
 public class MidiHandler {
 
@@ -155,7 +154,8 @@ public class MidiHandler {
                 (sendThread = new Thread( new MidiSender( sharedData, outDev ) )).start();
                 sendThread.setName( "EWItool MIDI Sender" );
                 Debugger.log( "Debug - OUT Port: " + infos[d].getName());
-                sharedData.setMidiOutDev( infos[d].getName() );
+                final String outName = infos[d].getName();
+                Platform.runLater( () -> sharedData.setMidiOutDev( outName ) );
               } else {
                 Debugger.log( "Debug - Could not open OUT Port: " + infos[d].getName());
               }
@@ -177,7 +177,8 @@ public class MidiHandler {
               midiIn = new MidiReceiver( sharedData );
               inDev.getTransmitter().setReceiver( midiIn );
               Debugger.log( "Debug - IN Port: " + infos[d].getName() );
-              sharedData.setMidiInDev( infos[d].getName() );
+              final String inName = infos[d].getName();
+              Platform.runLater( () -> sharedData.setMidiInDev( inName ) );
             }
           }
         }  
