@@ -274,11 +274,11 @@ public class EPX {
         w2Al.showAndWait();
       }
     } catch( MalformedURLException e ) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
+      System.err.println( "ERROR - Malformed URL in EPX.deletePatch" );
     } catch( IOException e ) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
+      System.err.println( "ERROR - I/O error in EPX.deletePatch" );
     }
  
   }
@@ -296,11 +296,11 @@ public class EPX {
       Debugger.log( "DEBUG - EPX: Got response " + respCode + " for deletePatch request" );
 
     } catch( MalformedURLException e ) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
+      System.err.println( "ERROR - Malformed URL in EPX.deletePatch" );
     } catch( IOException e ) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
+      System.err.println( "ERROR - I/O error in EPX.deletePatch" );
     }
 
   }

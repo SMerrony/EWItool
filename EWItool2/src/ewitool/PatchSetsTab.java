@@ -129,8 +129,8 @@ public class PatchSetsTab extends Tab {
               copyButton.setDisable( true );
             }
           } catch( IOException e ) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
+            System.err.println( "ERROR - I/O error in PatchSetsTab Listener" );
           } 
         }); 
   

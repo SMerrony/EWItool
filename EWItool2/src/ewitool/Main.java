@@ -40,7 +40,7 @@ public class Main extends Application {
   static final String  APP_NAME = "EWItool";
   static final double  APP_VERSION = 1.94;
   static final int     COPYRIGHT_YEAR = 2016;
-  static final String  RELEASE_STATUS = "Alpha4";
+  static final String  RELEASE_STATUS = "Beta";
   static final String  LEAD_AUTHOR = "S.Merrony";
 
   public  static final String  ICON = "/resources/EWItoolLogo1.png";
@@ -67,6 +67,7 @@ public class Main extends Application {
   @Override
   public void start(Stage mainStage) {
     try {
+      Debugger.log( "DEBUG - EWItool version: " + APP_VERSION );
       checkJVMspec();
       BorderPane root = new BorderPane();
       Scene scene = new Scene( root, SCENE_PREF_WIDTH, SCENE_PREF_HEIGHT );

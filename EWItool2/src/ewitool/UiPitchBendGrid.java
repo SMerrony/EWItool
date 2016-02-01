@@ -76,7 +76,7 @@ public class UiPitchBendGrid extends GridPane {
   }
   
   void setControls( EWI4000sPatch editPatch ) {
-    enableCheck.setSelected( editPatch.bendStepMode == 1 );  // TODO Check this is working
+    enableCheck.setSelected( editPatch.bendStepMode == 1 ); 
     rangeChoice.getSelectionModel().select( editPatch.bendRange );
   }
 }
