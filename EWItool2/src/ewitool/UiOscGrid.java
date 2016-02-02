@@ -69,8 +69,8 @@ public class UiOscGrid extends GridPane {
     add( new GroupLabel( "Breath" ), 9, 0 );
 
     add( new ControlLabel( "Octave", HPos.CENTER ), 0, 1 );
-    octaveChoice = new ChoiceBox<Integer>();
-    octaveChoice.getItems().addAll( 2, 1, 0, -1, -2 );
+    octaveChoice = new ChoiceBox<>();
+    octaveChoice.getItems().addAll( -2, -1, 0, 1, 2 );
     octaveChoice.setOnAction( (event) -> {
       switch( osc ) {
       case OSC1:
@@ -103,17 +103,17 @@ public class UiOscGrid extends GridPane {
     add( new BoundRightControlLabel( "Fine", HPos.CENTER, fineSlider ), 1, 1 );
 
     add( new ControlLabel( "Semitone", HPos.CENTER ), 0, 3 );
-    semitoneChoice = new ChoiceBox<Integer>();
-    for (int s = 12; s > -13; s--) semitoneChoice.getItems().add( s );
+    semitoneChoice = new ChoiceBox<>();
+    for (int s = -12; s < 13; s++) semitoneChoice.getItems().add( s );
     semitoneChoice.setOnAction( (event) -> {
       switch( osc ) {
       case OSC1:
-        midiHandler.sendLiveControl( 1, 64, octaveChoice.getSelectionModel().getSelectedIndex() + 52);
-        editPatch.osc1.semitone = octaveChoice.getSelectionModel().getSelectedIndex() + 52; 
+        midiHandler.sendLiveControl( 1, 64, semitoneChoice.getSelectionModel().getSelectedIndex() + 52);
+        editPatch.osc1.semitone = semitoneChoice.getSelectionModel().getSelectedIndex() + 52; 
         break;
       case OSC2:
-        midiHandler.sendLiveControl( 1, 65, octaveChoice.getSelectionModel().getSelectedIndex() + 52);
-        editPatch.osc2.semitone = octaveChoice.getSelectionModel().getSelectedIndex() + 52; 
+        midiHandler.sendLiveControl( 1, 65, semitoneChoice.getSelectionModel().getSelectedIndex() + 52);
+        editPatch.osc2.semitone = semitoneChoice.getSelectionModel().getSelectedIndex() + 52; 
         break;
       }
     });
