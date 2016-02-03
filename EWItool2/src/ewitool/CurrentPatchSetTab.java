@@ -1,5 +1,7 @@
 package ewitool;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 import javafx.event.ActionEvent;
@@ -137,10 +139,19 @@ public class CurrentPatchSetTab extends Tab {
     });
     
     gp.add( printButton, 7, 20 );
+    
+    DateTimeFormatter format = DateTimeFormatter.ofPattern( "MMM d yyy hh:mm a" );
+    Label dateLabel = new Label( LocalDateTime.now().format( format ) );
+    GridPane.setColumnSpan( dateLabel, 2 );
+    gp.add( dateLabel, 8, 20 );
 
     setContent( gp );   
   }
 
+  /**
+   * refresh the button labels eg. after reloading data from EWI
+   * ONLY call this from the main GUI thread.
+   */
   public void updateLabels() { 
     if (sharedData.ewiPatchList.size() > 0) {
       for (int p = 0; p <EWI4000sPatch.EWI_NUM_PATCHES; p++ ) {
