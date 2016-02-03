@@ -20,6 +20,9 @@ package ewitool;
 import javafx.concurrent.Task;
 
 /**
+ * This class (task) currently logs MIDI I/O via the Debug object.
+ * In the future it could log to a user display...
+ * 
  * @author steve
  *
  */
@@ -32,13 +35,12 @@ public class MidiMonitor {
     sharedData = pSharedData;
 
     if (Debugger.isEnabled) {
-
       Task<Object> task = new Task<Object>() {
         @Override
         protected Object call() throws Exception {
           MidiMonitorMessage msg;
           final String FMT = "%02x ";
-          sharedData.setMidiMonitoring( true );
+
           while( true ) {
             try {
               msg = sharedData.monitorQ.take();
@@ -79,6 +81,7 @@ public class MidiMonitor {
 
       Thread th = new Thread( task );
       th.setDaemon( true );
+      sharedData.setMidiMonitoring( true );
       th.start();
     }
   }

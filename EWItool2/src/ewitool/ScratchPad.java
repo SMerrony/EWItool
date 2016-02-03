@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
+import javafx.application.Platform;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -50,7 +51,7 @@ public class ScratchPad {
   
   // load the scratchpad from disk
   public boolean load() {
-	if (userPrefs.getLibraryLocation().equals( "<Not Chosen>" )) return false;
+    if (userPrefs.getLibraryLocation().equals( "<Not Chosen>" )) return false;
     Path spPath = Paths.get( userPrefs.getLibraryLocation(), SCRATCHPAD_NAME );
     try {
       byte[] allBytes = Files.readAllBytes( spPath );
@@ -63,7 +64,7 @@ public class ScratchPad {
           ep.decodeBlob();
           patchList.add( ep );
         }
-        sharedData.setScratchPadCount( patchList.size() );
+         Platform.runLater( () -> sharedData.setScratchPadCount( patchList.size() ) );
       }
     } catch( IOException e ) {
       return false;
@@ -80,7 +81,7 @@ public class ScratchPad {
       for (int p = 0; p < patchList.size(); p++){
         Files.write( spPath, patchList.get( p ).patchBlob, StandardOpenOption.APPEND );
       }
-      sharedData.setScratchPadCount( patchList.size() );
+       Platform.runLater( () -> sharedData.setScratchPadCount( patchList.size() ) );
     } catch( IOException e ) {
       e.printStackTrace();
       return false;
@@ -113,7 +114,7 @@ public class ScratchPad {
     try {
       Files.delete( spPath );
       Files.createFile( spPath );
-      sharedData.setScratchPadCount( 0 );
+       Platform.runLater( () -> sharedData.setScratchPadCount( 0 ) );
     } catch( IOException e ) {
       e.printStackTrace();
       return false;
