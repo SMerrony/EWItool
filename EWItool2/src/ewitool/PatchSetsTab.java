@@ -98,7 +98,11 @@ public class PatchSetsTab extends Tab {
     GridPane.setColumnSpan( setsLabel, 2 );
     gp.add( setsLabel, 0, 1 );
     
-    patchSetList = new ListView<String>();
+    Button reloadButton = new Button( "Reload" );
+    reloadButton.setOnAction( (ae) -> refreshPatchSetList( userPrefs.getLibraryLocation() ) );
+    gp.add( reloadButton, 2, 1 );
+        
+    patchSetList = new ListView<>();
     gp.add( patchSetList, 0, 2 );
     GridPane.setColumnSpan( patchSetList, 3 );
     if (!userPrefs.getLibraryLocation().equals( "<Not Chosen>" )){
@@ -110,28 +114,30 @@ public class PatchSetsTab extends Tab {
         (ObservableValue< ? extends String > observable, String oldValue, String newValue ) -> {
           Debugger.log( "DEBUG - changed - " + newValue + " chosen" );
           patchesInSetOL.clear();
-          Path path = Paths.get( userPrefs.getLibraryLocation(), newValue );
-          try {
-            byte[] allBytes = Files.readAllBytes( path );
-            if ((allBytes != null) && allBytes.length > 200 ) {
-              Debugger.log( "DEBUG - bytes read: " + allBytes.length );
-              for (int byteOffset = 0; byteOffset < allBytes.length; byteOffset += EWI4000sPatch.EWI_PATCH_LENGTH ) {
-                EWI4000sPatch ep = new EWI4000sPatch();
-                ep.patchBlob = Arrays.copyOfRange( allBytes, byteOffset, byteOffset + EWI4000sPatch.EWI_PATCH_LENGTH  );
-                ep.decodeBlob();
-                patchesInSetOL.add( ep );
-                //Debugger.log( "DEBUG - patch loaded" );
+          if (newValue != null) {
+            Path path = Paths.get( userPrefs.getLibraryLocation(), newValue );
+            try {
+              byte[] allBytes = Files.readAllBytes( path );
+              if (( allBytes != null ) && allBytes.length > 200) {
+                Debugger.log( "DEBUG - bytes read: " + allBytes.length );
+                for ( int byteOffset = 0; byteOffset < allBytes.length; byteOffset += EWI4000sPatch.EWI_PATCH_LENGTH ) {
+                  EWI4000sPatch ep = new EWI4000sPatch();
+                  ep.patchBlob = Arrays.copyOfRange( allBytes, byteOffset, byteOffset + EWI4000sPatch.EWI_PATCH_LENGTH );
+                  ep.decodeBlob();
+                  patchesInSetOL.add( ep );
+                  //Debugger.log( "DEBUG - patch loaded" );
+                }
+                patchListView.setItems( null );
+                patchListView.setItems( patchesInSetOL );
+                loadEwiButton.setDisable( false );
+                deleteButton.setDisable( false );
+                copyButton.setDisable( true );
               }
-              patchListView.setItems( null );
-              patchListView.setItems( patchesInSetOL );
-              loadEwiButton.setDisable( false );
-              deleteButton.setDisable( false );
-              copyButton.setDisable( true );
+            } catch (IOException e) {
+              e.printStackTrace();
+              System.err.println( "ERROR - I/O error in PatchSetsTab Listener" );
             }
-          } catch( IOException e ) {
-            e.printStackTrace();
-            System.err.println( "ERROR - I/O error in PatchSetsTab Listener" );
-          } 
+          }
         }); 
   
     importButton = new Button( "Import" );
@@ -214,7 +220,7 @@ public class PatchSetsTab extends Tab {
     
     Label patchesLabel = new Label( "Patches" );
     gp.add( patchesLabel, 3, 0 );
-    
+
     patchesInSetOL = FXCollections.observableArrayList( );
     
     patchListView = new ListView<EWI4000sPatch>( patchesInSetOL );
@@ -262,6 +268,7 @@ public class PatchSetsTab extends Tab {
 
   private void refreshPatchSetList( String location ) {
     File llFile = new File( location );
+    patchSetList.getSelectionModel().clearSelection();
     patchSetList.getItems().clear();
     patchSetList.getItems().addAll( llFile.list( new FilenameFilter() {
       public boolean accept( File llFile, String name ) {
