@@ -38,7 +38,6 @@ public class ScratchPadTab extends Tab {
   Button clearButton, deleteButton, renameButton, 
   viewHexButton, exchangeButton, exportButton;
   ListView<EWI4000sPatch> patchList;
-  ScratchPad scratchPad;
 
   ScratchPadTab( SharedData sharedData, ScratchPad scratchPad, Tab epxTab ) {
 

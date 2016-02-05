@@ -66,80 +66,77 @@ public class Main extends Application {
 
   @Override
   public void start(Stage mainStage) {
-    try {
-      Debugger.log( "DEBUG - EWItool version: " + APP_VERSION );
-      checkJVMspec();
-      BorderPane root = new BorderPane();
-      Scene scene = new Scene( root, SCENE_PREF_WIDTH, SCENE_PREF_HEIGHT );
-      scene.getStylesheets().add(getClass().getResource("ewitool.css").toExternalForm());
-      mainStage.setTitle(WINDOW_TITLE);
-      
-      sharedData = new SharedData();  // Create this 1st - holds all info shared across objects
-      
-      UserPrefs userPrefs = new UserPrefs();
-      ScratchPad scratchPad = new ScratchPad( sharedData, userPrefs );
-      
-      statusBar = new UiStatusBar( sharedData );
-      sharedData.addObserver( statusBar );
-      root.setBottom( statusBar );
 
-      midiHandler = new MidiHandler( sharedData, userPrefs );
+    Debugger.log( "DEBUG - EWItool version: " + APP_VERSION );
+    checkJVMspec();
+    BorderPane root = new BorderPane();
+    Scene scene = new Scene( root, SCENE_PREF_WIDTH, SCENE_PREF_HEIGHT );
+    scene.getStylesheets().add(getClass().getResource("ewitool.css").toExternalForm());
+    mainStage.setTitle(WINDOW_TITLE);
 
-      mainMenuBar = new MainMenuBar( mainStage, userPrefs, midiHandler );
-      root.setTop( mainMenuBar );
-      
-      tabPane = new TabPane();
-      
-      epxTab = new EPXTab( sharedData, scratchPad, userPrefs );
-      scratchPadTab = new ScratchPadTab( sharedData, scratchPad, epxTab );
-      patchEditorTab = new PatchEditorTab( sharedData, scratchPad, midiHandler );
-      currentPatchSetTab = new CurrentPatchSetTab( sharedData, scratchPad, midiHandler, patchEditorTab );
-      patchSetsTab = new PatchSetsTab( sharedData, scratchPad, userPrefs, midiHandler, currentPatchSetTab );   
-      keyPatchesTab = new KeyPatchesTab( sharedData, midiHandler );     
-     
-      tabPane.getTabs().addAll( scratchPadTab, 
-                                patchSetsTab, 
-                                epxTab, 
-                                currentPatchSetTab, 
-                                patchEditorTab, 
-                                keyPatchesTab 
-                              );
+    sharedData = new SharedData();  // Create this 1st - holds all info shared across objects
 
-      currentPatchSetTab.setDisable( true );
-      patchEditorTab.setDisable( true );
-      keyPatchesTab.setDisable( true );
-      
-      tabPane.getSelectionModel().selectedItemProperty().addListener( (tab, oldtab, newtab) -> {
-        if (newtab == patchEditorTab) patchMenu.setDisable( false );
-        if (oldtab == patchEditorTab) patchMenu.setDisable( true );
-      });
+    UserPrefs userPrefs = new UserPrefs();
+    ScratchPad scratchPad = new ScratchPad( sharedData, userPrefs );
 
-      // MIDI port assignment change listeners
-      userPrefs.midiInPort.addListener( (ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
-          Debugger.log( "Debug - Noticed that IN Port Changed to : " + newValue );
-          midiHandler.restart();
-      });
-      userPrefs.midiOutPort.addListener( (ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
-          Debugger.log( "Debug - Noticed that OUT Port Changed to : " + newValue );
-          midiHandler.restart();
-      });
+    statusBar = new UiStatusBar( sharedData );
+    sharedData.addObserver( statusBar );
+    root.setBottom( statusBar );
 
-      // customise icon
-      mainStage.getIcons().add( new Image( this.getClass().getResourceAsStream( ICON )));
+    midiHandler = new MidiHandler( sharedData, userPrefs );
 
-      mainStage.setOnCloseRequest( (we) -> {
-        Debugger.log( "DEBUG - clean exit" );
-        midiHandler.close();
-        Platform.exit();
-        System.exit( 0 );           
-      });
+    mainMenuBar = new MainMenuBar( mainStage, userPrefs, midiHandler );
+    root.setTop( mainMenuBar );
 
-      root.setCenter( tabPane );
-      mainStage.setScene(scene);
-      mainStage.show();
-    } catch(Exception e) {
-      e.printStackTrace();
-    }
+    tabPane = new TabPane();
+
+    epxTab = new EPXTab( sharedData, scratchPad, userPrefs );
+    scratchPadTab = new ScratchPadTab( sharedData, scratchPad, epxTab );
+    patchEditorTab = new PatchEditorTab( sharedData, scratchPad, midiHandler );
+    currentPatchSetTab = new CurrentPatchSetTab( sharedData, scratchPad, midiHandler, patchEditorTab );
+    patchSetsTab = new PatchSetsTab( sharedData, scratchPad, userPrefs, midiHandler, currentPatchSetTab );   
+    keyPatchesTab = new KeyPatchesTab( sharedData, midiHandler );     
+
+    tabPane.getTabs().addAll( scratchPadTab, 
+                              patchSetsTab, 
+                              epxTab, 
+                              currentPatchSetTab, 
+                              patchEditorTab, 
+                              keyPatchesTab 
+                            );
+
+    currentPatchSetTab.setDisable( true );
+    patchEditorTab.setDisable( true );
+    keyPatchesTab.setDisable( true );
+
+    tabPane.getSelectionModel().selectedItemProperty().addListener( (tab, oldtab, newtab) -> {
+      if (newtab == patchEditorTab) patchMenu.setDisable( false );
+      if (oldtab == patchEditorTab) patchMenu.setDisable( true );
+    });
+
+    // MIDI port assignment change listeners
+    userPrefs.midiInPort.addListener( (ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+        Debugger.log( "Debug - Noticed that IN Port Changed to : " + newValue );
+        midiHandler.restart();
+    });
+    userPrefs.midiOutPort.addListener( (ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+        Debugger.log( "Debug - Noticed that OUT Port Changed to : " + newValue );
+        midiHandler.restart();
+    });
+
+    // customise icon
+    mainStage.getIcons().add( new Image( this.getClass().getResourceAsStream( ICON )));
+
+    mainStage.setOnCloseRequest( (we) -> {
+      Debugger.log( "DEBUG - clean exit" );
+      midiHandler.close();
+      Platform.exit();
+      System.exit( 0 );           
+    });
+
+    root.setCenter( tabPane );
+    mainStage.setScene(scene);
+    mainStage.show();
   }
 
   private static void checkJVMspec() {

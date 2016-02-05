@@ -91,7 +91,7 @@ public class EPX {
       e.printStackTrace();
     } catch( IOException e ) {
       e.printStackTrace();
-    }
+    } 
     sharedData.setEpxAvailable( false );
     return false;
   }
@@ -131,7 +131,7 @@ public class EPX {
       if (respCode != 200) return null;
       BufferedReader br = new BufferedReader( new InputStreamReader( con.getInputStream() ) );
       String line = br.readLine();
-      while (!line.contains( "<body>" )) {
+      while (line != null && !line.contains( "<body>" )) {
         line = br.readLine();
       }
       dds[0] = br.readLine();
@@ -165,7 +165,7 @@ public class EPX {
       if (respCode != 200) return null;
       BufferedReader br = new BufferedReader( new InputStreamReader( con.getInputStream() ) );
       String line = br.readLine();
-      while (!line.contains( "<body>" )) {
+      while (line != null && !line.contains( "<body>" )) {
         line = br.readLine();
       }
       line = br.readLine();
@@ -206,7 +206,7 @@ public class EPX {
       if (respCode != 200) return null;
       BufferedReader br = new BufferedReader( new InputStreamReader( con.getInputStream() ) );
       String line = br.readLine();
-      while (!line.contains( "<body>" )) {
+      while (line != null && !line.contains( "<body>" )) {
         line = br.readLine();
       }
       String[] dets = br.readLine().split( "," );
@@ -220,6 +220,7 @@ public class EPX {
       dr.added = dets[6];
       dr.privateFlag = !dets[7].contentEquals( "0" );
       if (dets.length == 9) dr.tags = dets[8];
+      br.close();
     } catch( MalformedURLException e ) {
       e.printStackTrace();
     } catch( IOException e ) {
@@ -252,16 +253,16 @@ public class EPX {
       Debugger.log( "DEBUG - EPX: Got response " + respCode + " for insertPatch request" );
       BufferedReader br = new BufferedReader( new InputStreamReader( con.getInputStream() ) );
       String line = br.readLine();
-      while (!line.contains( "<body>" )) {
+      while (line != null && !line.contains( "<body>" )) {
         line = br.readLine();
       }
       String resp = br.readLine();
-      if (resp.contains( "Resource id #" )) {
+      if (resp != null && resp.contains( "Resource id #" )) {
         Alert okAl = new Alert( AlertType.INFORMATION );
         okAl.setTitle( "EWItool - Patch Exchange Submission" );
         okAl.setContentText( "Patch Succesfully sent to EWI Patch Exchange - Thank You" );
         okAl.showAndWait();
-      } else if (resp.contains( "duplicate key" )) {
+      } else if (resp != null && resp.contains( "duplicate key" )) {
         Alert w1Al = new Alert( AlertType.ERROR );
         w1Al.setTitle( "EWItool - Patch Exchange Submission" );
         w1Al.setContentText( "Export error - that patch is already in the exchange" );
@@ -273,13 +274,14 @@ public class EPX {
         Debugger.log( "DEBUG - EPX: Got error " + resp + " for insertPatch request" );
         w2Al.showAndWait();
       }
+      br.close();
     } catch( MalformedURLException e ) {
       e.printStackTrace();
       System.err.println( "ERROR - Malformed URL in EPX.deletePatch" );
     } catch( IOException e ) {
       e.printStackTrace();
       System.err.println( "ERROR - I/O error in EPX.deletePatch" );
-    }
+    } 
  
   }
   

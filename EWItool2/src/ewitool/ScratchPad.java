@@ -55,7 +55,7 @@ public class ScratchPad {
     Path spPath = Paths.get( userPrefs.getLibraryLocation(), SCRATCHPAD_NAME );
     try {
       byte[] allBytes = Files.readAllBytes( spPath );
-      if ((allBytes != null) && allBytes.length > 200 ) {
+      if (allBytes.length > 200) {
         Debugger.log( "DEBUG - Scratchpad: bytes read: " + allBytes.length );
         patchList.clear();
         for (int byteOffset = 0; byteOffset < allBytes.length; byteOffset += EWI4000sPatch.EWI_PATCH_LENGTH ) {

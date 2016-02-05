@@ -12,7 +12,7 @@ public class SendMsg {
   public byte[]  bytes;
 
   // control change properties...
-  public int channel;
+  //  public int channel;
   public int cc;
   public int value;
   

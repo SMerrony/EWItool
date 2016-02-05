@@ -26,7 +26,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.control.PasswordField;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.ColumnConstraints;
@@ -41,8 +40,6 @@ public class EPXTab extends Tab {
   ChoiceBox<String> typeChoice, addedChoice, contribChoice, originChoice;
   TextField qTagsField;
   Button queryButton;
-  TextField uidField, serverField;
-  PasswordField passwdField;
   ListView<String> resultsView;
   String hexPatch;
   GridPane detailGrid;
@@ -132,7 +129,7 @@ public class EPXTab extends Tab {
         EPX.DetailsResult dr = epx.getDetails( currentEpxPatchID );
         if (dr != null) {
           ((UiEPXDetailsGrid) detailGrid).setFields( dr );
-          if (dr.contrib.contentEquals( userPrefs.getEpxUserid() ))
+          if (dr.contrib != null && dr.contrib.contentEquals( userPrefs.getEpxUserid() ))
             deleteButton.setDisable( false );
           else
             deleteButton.setDisable( true );

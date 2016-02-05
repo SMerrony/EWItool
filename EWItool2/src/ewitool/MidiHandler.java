@@ -84,7 +84,7 @@ public class MidiHandler {
   UserPrefs userPrefs;
   Thread sendThread;
   MidiDevice inDev = null, outDev = null;
-  Receiver midiIn, midiOut;
+  Receiver midiIn;
   
   MidiDevice.Info[] infos;
 

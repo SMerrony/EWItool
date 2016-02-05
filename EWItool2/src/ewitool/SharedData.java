@@ -49,7 +49,7 @@ public class SharedData extends Observable {
   public byte[] quickPCs;
   
   // Queues to synchronise requesting/receiving MIDI info
-  BlockingQueue<Integer> patchQ, keyPatchQ;
+  BlockingQueue<Integer> patchQ; //, keyPatchQ;
   BlockingQueue<DeviceIdResponse> deviceIdQ;
   BlockingQueue<SendMsg> sendQ;
   BlockingQueue<MidiMonitorMessage> monitorQ;
@@ -61,11 +61,11 @@ public class SharedData extends Observable {
     ewiPatchList = new EWI4000sPatch[EWI4000sPatch.EWI_NUM_PATCHES];
     loadedQuickPCs = false;
     quickPCs = new byte[MidiHandler.EWI_NUM_QUICKPCS];
-    patchQ = new LinkedBlockingQueue<Integer>();
-    keyPatchQ = new LinkedBlockingQueue<Integer>();
-    deviceIdQ = new LinkedBlockingQueue<DeviceIdResponse>();
-    sendQ = new LinkedBlockingQueue<SendMsg>();
-    monitorQ = new LinkedBlockingQueue<MidiMonitorMessage>();
+    patchQ = new LinkedBlockingQueue<>();
+//    keyPatchQ = new LinkedBlockingQueue<>();
+    deviceIdQ = new LinkedBlockingQueue<>();
+    sendQ = new LinkedBlockingQueue<>();
+    monitorQ = new LinkedBlockingQueue<>();
     ewiAttached = false;
     epxAvailable = false;
     midiInDev = "[Not set]";

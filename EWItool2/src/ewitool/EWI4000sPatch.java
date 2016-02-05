@@ -500,7 +500,8 @@ public class EWI4000sPatch {
   }
     
   public static String toHex( byte[] blob, boolean addSpaces ) {
-    String fmt, hexStr = "";
+    String fmt;
+    StringBuffer hexStr = new StringBuffer();
     if (blob.length < EWI_PATCH_LENGTH) return "Too short";
     if (blob.length > EWI_PATCH_LENGTH) return "Too long";
     if (addSpaces)
@@ -508,9 +509,9 @@ public class EWI4000sPatch {
     else
       fmt = "%02x";
     for (int b = 0; b < EWI_PATCH_LENGTH; b++) {
-      hexStr = hexStr + String.format( fmt, blob[b] );
+      hexStr.append( String.format( fmt, blob[b] ) );
     }
-    return hexStr;
+    return hexStr.toString();
   }
   
   public String toHex() {

@@ -23,9 +23,9 @@ package ewitool;
  */
 public class Debugger {
   
-  public static boolean isEnabled = true;
+  public final static boolean VERBOSE = true;
 
   public static void log( Object o ) {
-    if (isEnabled) System.out.println( o.toString() );
+    if (VERBOSE) System.out.println( o.toString() );
   }
 }

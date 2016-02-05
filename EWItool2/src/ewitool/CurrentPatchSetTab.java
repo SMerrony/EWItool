@@ -177,11 +177,11 @@ public class CurrentPatchSetTab extends Tab {
       ButtonType editType = new ButtonType( "Edit" );
       dialog.getDialogPane().getButtonTypes().add( editType );
       ButtonType copyType = new ButtonType( "Copy to Scratchpad" );
-      if (buttonText != "<Empty>") dialog.getDialogPane().getButtonTypes().add( copyType );
+      if (!buttonText.equals("<Empty>")) dialog.getDialogPane().getButtonTypes().add( copyType );
       ButtonType replaceType = new ButtonType( "Replace from Scratchpad" );
       dialog.getDialogPane().getButtonTypes().add( replaceType );
       ButtonType renameType = new ButtonType( "Rename" );
-      if (buttonText != "<Empty>") dialog.getDialogPane().getButtonTypes().add( renameType );
+      if (!buttonText.equals("<Empty>")) dialog.getDialogPane().getButtonTypes().add( renameType );
       dialog.getDialogPane().getButtonTypes().add( ButtonType.CANCEL );
       GridPane gp = new GridPane();
       gp.add( new Label( "Patch:" ), 0, 0 );

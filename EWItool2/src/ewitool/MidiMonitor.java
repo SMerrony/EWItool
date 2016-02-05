@@ -34,7 +34,7 @@ public class MidiMonitor {
   MidiMonitor( SharedData pSharedData ) {
     sharedData = pSharedData;
 
-    if (Debugger.isEnabled) {
+    if (Debugger.VERBOSE) {
       Task<Object> task = new Task<Object>() {
         @Override
         protected Object call() throws Exception {
