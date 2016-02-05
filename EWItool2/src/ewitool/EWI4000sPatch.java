@@ -40,6 +40,24 @@ import ewitool.Main.Status;
 
 public class EWI4000sPatch { 
   
+  /**
+   * The internal and user-exposed patch numbering systems differ! 
+   * To the EWI operator patches are numbered from 0 to 99 inclusive. 
+   * Internally (and when saved via .syx files) the patches are numbered one less, 
+   * with #99 being shown as patch #0 to the operator.
+   * 
+   * User Display  Internal Number
+   *   0              99
+   *   1               0
+   *   2               1
+   *         ...
+   *  98              97
+   *  99              98
+   * 
+   * In EWItool we use the array of patches in SharedData with the index matching
+   * the number displayed to the EWI player.
+   */
+  
   public final static int EWI_NUM_PATCHES  = 100;  // 0..99
   public final static int EWI_PATCH_LENGTH = 206;  // bytes
   public final static int EWI_PATCHNAME_LENGTH  = 32;
@@ -193,9 +211,9 @@ public class EWI4000sPatch {
   
   byte patchBlob[];
   
-  byte header[];
+  byte header[]; // 4 bytes
   byte mode;     // 0x00 to store, 0x20 to edit
-  int patchNum;
+  int internalPatchNum;
   byte filler2;
   byte filler3;
   byte filler4;
@@ -324,8 +342,8 @@ public class EWI4000sPatch {
     return true;
   }
   
-  public void setPatchNum( byte numByte ) {
-    patchNum = numByte;
+  public void setInternalPatchNum( byte numByte ) {
+    internalPatchNum = numByte;
     patchBlob[5] = numByte;
   }
   
@@ -342,7 +360,7 @@ public class EWI4000sPatch {
   public final void decodeBlob() {
      header = Arrays.copyOfRange( patchBlob, 0, 4 );
      mode = patchBlob[4];     // 0x00 to store, 0x20 to edit
-     patchNum = patchBlob[5];
+     internalPatchNum = patchBlob[5];
      filler2 = patchBlob[6];
      filler3 = patchBlob[7];
      filler4 = patchBlob[8];
@@ -414,7 +432,7 @@ public class EWI4000sPatch {
     
     for (ix = 0; ix < 4; ix++) patchBlob[ix] = header[ix];
     patchBlob[4] = mode;     // 0x00 to store, 0x20 to edit
-    patchBlob[5] = (byte) patchNum; 
+    patchBlob[5] = (byte) internalPatchNum; 
     patchBlob[6] = filler2;
     patchBlob[7] = filler3;
     patchBlob[8] = filler4;

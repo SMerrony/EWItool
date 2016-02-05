@@ -85,7 +85,7 @@ public class PatchEditorTab extends Tab {
     for (int col = 0; col < 12; col++) peGrid.getColumnConstraints().add( ccsGrowable );
     peGrid.getRowConstraints().addAll( rcsFixed, rcsGrowable, rcsGrowable, rcsGrowable, rcsGrowable );
 
-    patchesCombo = new ComboBox<String>();
+    patchesCombo = new ComboBox<>();
 
     HBox headerBox = new HBox();
     headerBox.setId( "editor-header-box" );
@@ -157,7 +157,7 @@ public class PatchEditorTab extends Tab {
     patchesCombo.setOnAction( (ae) -> {
       if (!patchesCombo.getSelectionModel().isEmpty()) {
         midiHandler.ignoreEvents = true;
-        editPatch.patchBlob = sharedData.ewiPatchList.get( patchesCombo.getSelectionModel().getSelectedIndex() ).patchBlob;
+        editPatch.patchBlob = sharedData.ewiPatchList[ patchesCombo.getSelectionModel().getSelectedIndex() ].patchBlob;
         editPatch.decodeBlob();
         uneditedPatch = editPatch;
         Debugger.log( "DEBUG - Patch editor selection changed" );
@@ -191,7 +191,7 @@ public class PatchEditorTab extends Tab {
   public void populateCombo( SharedData sharedData ) {
     patchesCombo.getItems().clear();
     for (int p = 0; p < EWI4000sPatch.EWI_NUM_PATCHES; p++) {
-      patchesCombo.getItems().add( ((p + 1) % 100) + " - " + sharedData.ewiPatchList.get( p ).getName() );
+      patchesCombo.getItems().add( p + " - " + sharedData.ewiPatchList[p].getName() );
     }
   }
   
@@ -200,8 +200,8 @@ public class PatchEditorTab extends Tab {
   public void store() {
     editPatch.encodeBlob();
     midiHandler.sendPatch( editPatch, EWI4000sPatch.EWI_SAVE );
-    sharedData.ewiPatchList.set( editPatch.patchNum, editPatch );
-    sharedData.setStatusMessage( "Patch #" + (editPatch.patchNum + 1 ) + " stored in EWI" );
+    sharedData.ewiPatchList[editPatch.internalPatchNum] = editPatch;
+    sharedData.setStatusMessage( "Patch #" + (editPatch.internalPatchNum + 1 ) + " stored in EWI" );
   }
   
   public void revert() {
@@ -229,16 +229,14 @@ public class PatchEditorTab extends Tab {
   }
   
   public void makeMaxVol() {
-    int orig_max = 0;
-    double factor = 0.0;
-
+    
     // find highest level
-    orig_max = editPatch.osc1.level;
+    int orig_max = editPatch.osc1.level;
     if (editPatch.osc2.level > orig_max) orig_max = editPatch.osc2.level;
     if (editPatch.ampLevel > orig_max) orig_max = editPatch.ampLevel;
     if (editPatch.octaveLevel > orig_max) orig_max = editPatch.octaveLevel;
 
-    factor = 127.0 / orig_max;
+    double factor = 127.0 / orig_max;
     
     osc1Grid.volSlider.setValueChanging( true );
     osc1Grid.volSlider.setValue( editPatch.osc1.level * factor );
@@ -603,7 +601,7 @@ public class PatchEditorTab extends Tab {
   public void mergePatchesUi() {
     List<String> patchNames = new ArrayList<>();
     for (int p = 0; p < EWI4000sPatch.EWI_NUM_PATCHES; p++)
-      patchNames.add( sharedData.ewiPatchList.get( p ).getName() );
+      patchNames.add( sharedData.ewiPatchList[p].getName() );
     Dialog<Integer> mergeDialog = new Dialog<>();
     mergeDialog.setTitle( "EWItool - Merge Patches" );
     mergeDialog.setHeaderText( "Choose patch to merge with..." );
@@ -629,7 +627,7 @@ public class PatchEditorTab extends Tab {
      */
     midiHandler.ignoreEvents = true;
     uneditedPatch = editPatch;
-    EWI4000sPatch tmpPatch = sharedData.ewiPatchList.get( otherPatchNum );
+    EWI4000sPatch tmpPatch = sharedData.ewiPatchList[otherPatchNum];
     
     editPatch.osc1.octave = mixInts( editPatch.osc1.octave, 50, tmpPatch.osc1.octave  );
     editPatch.osc1.semitone = mixInts( editPatch.osc1.semitone, 50, tmpPatch.osc1.semitone  );

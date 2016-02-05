@@ -203,7 +203,6 @@ public class MidiHandler {
       try {
         sendThread.join();
       } catch( InterruptedException e ) {
-        e.printStackTrace();
       }
     }
     if (inDev !=null && inDev.isOpen()) { midiIn.close(); inDev.close(); }
@@ -224,23 +223,36 @@ public class MidiHandler {
     sharedData.clear();
   }
 
+  /**
+   * Fetch a patch from the EWI
+   * 
+   * EWItool uses the DISPLAYED patch number internally, so here we must convert that 
+   * to the EWI-internal patch number...
+   * 
+   * @param p 
+   */
   void requestPatch( final int p ) {
     if (p < 0 || p >= EWI4000sPatch.EWI_NUM_PATCHES) {
       System.err.println( "Error - Attempt to request out-of-range patch (" + p + ")" );
       System.exit( 1 );
     }
+    byte ewiPatchNum;
+    if (p == 0)
+      ewiPatchNum = 99;
+    else
+      ewiPatchNum = (byte) (p - 1);
     byte[] reqMsg = new byte[7];
     reqMsg[0] = MIDI_SYSEX_HEADER;
     reqMsg[1] = MIDI_SYSEX_AKAI_ID;	// 0x47 71.
     reqMsg[2] = MIDI_SYSEX_AKAI_EWI4K;	// 0x64 100.
     reqMsg[3] = MIDI_SYSEX_CHANNEL;	// 0x00
     reqMsg[4] = MIDI_PRESET_DUMP_REQ;	// 0x40 64.
-    reqMsg[5] = (byte) p;
+    reqMsg[5] = ewiPatchNum;
     reqMsg[6] = MIDI_SYSEX_TRAILER;	// 0xf7 -9.
     boolean gotIt = false;
     try {
       while (!gotIt) {
-        Debugger.log( "DEBUG - MidiHandler Sending request for patch: " + p );
+        Debugger.log( "DEBUG - MidiHandler Sending request for patch: " + p + " (Internal patch #: " + ewiPatchNum +")" );
         sendSysEx( reqMsg.clone(), SendMsg.DelayType.SHORT );
         // wait for a patch to be received, or timeout
         Integer pGot = sharedData.patchQ.poll( MIDI_TIMEOUT_MS, TimeUnit.MILLISECONDS );
@@ -338,10 +350,10 @@ public class MidiHandler {
     if (mode == EWI4000sPatch.EWI_EDIT) {
       // if we're going to edit we need to send it again as patch 0 with the 
       // edit flag still set...  
-      int pNum = patch.patchNum;
-      patch.setPatchNum( (byte) 0x00 );
+      int pNum = patch.internalPatchNum;
+      patch.setInternalPatchNum( (byte) 0x00 );
       sendSysEx( patch.patchBlob, SendMsg.DelayType.LONG );
-      patch.setPatchNum( (byte) pNum ); 
+      patch.setInternalPatchNum( (byte) pNum ); 
     }
     return true;
   }

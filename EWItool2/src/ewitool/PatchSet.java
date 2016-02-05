@@ -25,7 +25,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
 import java.util.Arrays;
 import ewitool.Main.Status;
 import javafx.scene.control.Alert;
@@ -51,7 +50,7 @@ public final class PatchSet {
    * @return
    * @throws IOException
    */
-  public static Status save( ArrayList<EWI4000sPatch> patchList, String filename ) throws IOException {
+  public static Status save( EWI4000sPatch[] patchList, String filename ) throws IOException {
     
     UserPrefs prefs = new UserPrefs();
     Path path = Paths.get( prefs.getLibraryLocation(), filename );

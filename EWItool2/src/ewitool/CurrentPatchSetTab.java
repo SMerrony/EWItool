@@ -77,9 +77,9 @@ public class CurrentPatchSetTab extends Tab {
       gp.getRowConstraints().add( rc );
       for (int c = 0; c < 5; c++) {
         int ix = (c * 20 ) + r;
-        gp.add( new Label( Integer.toString( (ix + 1) % 100 ) ), c * 2, r );
-        patchButtons[ix] = new Button( "<Empty>" );  
-        patchButtons[ix].setUserData( ix );  // store the patch number 
+        gp.add( new Label( Integer.toString( ix ) ), c * 2, r );
+        patchButtons[ix] = new Button( "<Not Loaded>" );  
+        patchButtons[ix].setUserData( ix );  // store the visible patch number 
         patchButtons[ix].setMinWidth( 40.0 );
         patchButtons[ix].setPrefWidth( 90.0 );
         patchButtons[ix].setMaxWidth( Double.MAX_VALUE );
@@ -153,12 +153,16 @@ public class CurrentPatchSetTab extends Tab {
    * ONLY call this from the main GUI thread.
    */
   public void updateLabels() { 
-    if (sharedData.ewiPatchList.size() > 0) {
-      for (int p = 0; p <EWI4000sPatch.EWI_NUM_PATCHES; p++ ) {
-        patchButtons[p].setText( sharedData.ewiPatchList.get( p ).getName() );
-      }
+    for (int p = 0; p <EWI4000sPatch.EWI_NUM_PATCHES; p++ ) {
+      patchButtons[p].setText( sharedData.ewiPatchList[p].getName() );
     }
     ((PatchEditorTab) patchEditorTab).populateCombo( sharedData );
+  }
+  
+  public void reset() {
+    for (Button b : patchButtons) b.setText( "<Not Loaded>" );
+    patchEditorTab.setDisable( true );
+    setDisable( true );
   }
 
   // The Patch Actions dialog that appears when a button is pressed
@@ -201,17 +205,23 @@ public class CurrentPatchSetTab extends Tab {
         patchEditorTab.getTabPane().getSelectionModel().select( patchEditorTab );
   
       } else if ( rc.get() == copyType) {
-        scratchPad.addPatch( sharedData.ewiPatchList.get( (int) ((Button)ae.getSource()).getUserData() ) );
+        scratchPad.addPatch( sharedData.ewiPatchList[ (int) ((Button)ae.getSource()).getUserData() ] );
 
       } else if ( rc.get() == replaceType) {
         if (spChoice.getSelectionModel().getSelectedIndex() >= 0) {
           int pNum = (int) ((Button)ae.getSource()).getUserData();
           EWI4000sPatch tmpPatch = scratchPad.patchList.get( spChoice.getSelectionModel().getSelectedIndex() );
-          tmpPatch.setPatchNum( (byte) pNum );
-          sharedData.ewiPatchList.set( pNum, tmpPatch );
+          int ewiInternalPatchNum;
+          if (pNum == 0)
+            ewiInternalPatchNum = 99;
+          else
+            ewiInternalPatchNum = pNum - 1;
+          tmpPatch.setInternalPatchNum( (byte) ewiInternalPatchNum );
+          sharedData.ewiPatchList[pNum] = tmpPatch;
           patchButtons[pNum].setText( tmpPatch.getName() );
           midiHandler.sendPatch( tmpPatch, EWI4000sPatch.EWI_SAVE );
-          sharedData.setStatusMessage( "Patch #" + (pNum+1) + " saved to EWI" );
+          sharedData.setStatusMessage( "Patch #" + pNum + " saved to EWI" );
+          ((PatchEditorTab) patchEditorTab).populateCombo( sharedData );
         } else {
           Alert alert = new Alert( AlertType.WARNING, "No Patch selected from Scratchpad list" );
           alert.showAndWait();
@@ -219,14 +229,15 @@ public class CurrentPatchSetTab extends Tab {
 
       } else if ( rc.get() == renameType) {
         int pNum = (int) ((Button)ae.getSource()).getUserData();
-        if (sharedData.ewiPatchList.get( pNum ).setName( nameField.getText() )) {
+        if (sharedData.ewiPatchList[pNum].setName( nameField.getText() )) {
           patchButtons[pNum].setText( nameField.getText() );
           Alert alert = new Alert( AlertType.INFORMATION, "Patch renamed" );
           alert.setTitle( "EWItool - Rename Patch" );
           alert.setHeaderText( "" );
           alert.showAndWait();
-          midiHandler.sendPatch( sharedData.ewiPatchList.get( pNum ), EWI4000sPatch.EWI_SAVE );
-          sharedData.setStatusMessage( "Patch #" + (pNum+1) + " saved to EWI" );
+          midiHandler.sendPatch( sharedData.ewiPatchList[pNum], EWI4000sPatch.EWI_SAVE );
+          sharedData.setStatusMessage( "Patch #" + pNum + " saved to EWI" );
+          ((PatchEditorTab) patchEditorTab).populateCombo( sharedData );
         } else {
           Alert alert = new Alert( AlertType.WARNING, "Could not rename to '" + nameField.getText() + "'" );
           alert.setTitle( "EWItool - Rename Patch" );

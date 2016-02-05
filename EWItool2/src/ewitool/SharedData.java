@@ -17,7 +17,6 @@
 
 package ewitool;
 
-import java.util.ArrayList;
 import java.util.Observable;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -44,7 +43,8 @@ public class SharedData extends Observable {
   enum DeviceIdResponse { WRONG_LENGTH, NOT_AKAI, NOT_EWI4000S, IS_EWI4000S }
   
   // We ASSUME that there are always NUM_EWI_PATCHES on this list once it is loaded...
-  public ArrayList<EWI4000sPatch> ewiPatchList;
+  //public ArrayList<EWI4000sPatch> ewiPatchList;
+  EWI4000sPatch[] ewiPatchList;
   
   public byte[] quickPCs;
   
@@ -58,7 +58,7 @@ public class SharedData extends Observable {
   
   SharedData() {
     lastPatchLoaded = NONE;
-    ewiPatchList = new ArrayList<EWI4000sPatch>(); //FXCollections.observableArrayList();
+    ewiPatchList = new EWI4000sPatch[EWI4000sPatch.EWI_NUM_PATCHES];
     loadedQuickPCs = false;
     quickPCs = new byte[MidiHandler.EWI_NUM_QUICKPCS];
     patchQ = new LinkedBlockingQueue<Integer>();
@@ -77,7 +77,7 @@ public class SharedData extends Observable {
   }
   
   public void clear() {
-    ewiPatchList.clear();
+    for ( EWI4000sPatch p : ewiPatchList ) p = null;
     setLastPatchLoaded( NONE );
   }
   

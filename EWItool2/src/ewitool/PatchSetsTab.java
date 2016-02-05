@@ -171,10 +171,10 @@ public class PatchSetsTab extends Tab {
           sbusyAlert.setHeaderText( null );
           sbusyAlert.show();
           sharedData.clear();
+          ((CurrentPatchSetTab) currentPatchSetTab).reset();
           for ( int p = 0; p < 100; p++ ) {
             midiHandler.sendPatch( patchesInSetOL.get( p ), EWI4000sPatch.EWI_SAVE );
             sbusyAlert.setTitle( (p+1) + " of 100" );
-            sharedData.ewiPatchList.add( patchesInSetOL.get( p ) );
             // wait for sendQ to empty (otherwise the requests all queue up in a flash
             // and this method finishes...
             while( midiHandler.sharedData.sendQ.size() > 0) {
@@ -185,8 +185,6 @@ public class PatchSetsTab extends Tab {
               }
             }
           }
-          sharedData.setLastPatchLoaded( 99 );
-          ((CurrentPatchSetTab) currentPatchSetTab).updateLabels();
           sbusyAlert.close();
         }
       }

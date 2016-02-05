@@ -64,17 +64,23 @@ public class MidiReceiver implements Receiver {
             System.err.println( "Error - Invalid preset dump SysEx received from EWI (" + messageBytes.length + " bytes)" );
             return;
           }
+          // PATCH...
           EWI4000sPatch thisPatch = new EWI4000sPatch();
           thisPatch.patchBlob[0] = (byte) 0b11110000; // 0xf0
           for (int b = 0; b < (MidiHandler.EWI_SYSEX_PRESET_DUMP_LEN - 1); b++) thisPatch.patchBlob[b+1] = messageBytes[b];
           thisPatch.patchBlob[MidiHandler.EWI_SYSEX_PRESET_DUMP_LEN - 1] = (byte) 0b11110111; // 0xf7
           thisPatch.decodeBlob();
           if (thisPatch.header[3] == MidiHandler.MIDI_SYSEX_ALLCHANNELS) {
-            int thisPatchNum = (int) thisPatch.patchNum;                            // FIXME Adjust patch number++ ???
+            int thisPatchNum = thisPatch.internalPatchNum;   
             if (thisPatchNum < 0 || thisPatchNum >= EWI4000sPatch.EWI_NUM_PATCHES) {
               System.err.println( "Error - Invalid patch number (" + thisPatchNum + ") received from EWI");
             } else {
-              sharedData.ewiPatchList.add( thisPatch );
+              // adjust thisPatchNum to be displayed version of the patch number
+              if (thisPatchNum == 99)
+                thisPatchNum = 0;
+              else
+                thisPatchNum++;
+              sharedData.ewiPatchList[thisPatchNum] = thisPatch ;
               if (thisPatchNum == 99) sharedData.setLastPatchLoaded( thisPatchNum );
               sharedData.patchQ.add( thisPatchNum );
               Debugger.log( "DEBUG - MidiReceiver: Patch number: " + thisPatchNum + " received" );
@@ -88,6 +94,7 @@ public class MidiReceiver implements Receiver {
             System.err.println( "Error - Invalid preset QuickPC dump SysEx received from EWI (" + messageBytes.length + " bytes)" );
             return;
           }
+          // QUICKPC...
           for (int qpc = 0; qpc < MidiHandler.EWI_NUM_QUICKPCS; qpc++) 
             sharedData.quickPCs[qpc] = messageBytes[qpc + 5];
           sharedData.loadedQuickPCs = true;

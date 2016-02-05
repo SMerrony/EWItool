@@ -22,6 +22,7 @@ import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Cursor;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Tab;
 import javafx.scene.control.Tooltip;
 
@@ -82,13 +83,13 @@ public class KeyPatchesTab extends Tab {
   }
   
   void populateChoices() {
-    String[] pNames = new String[sharedData.ewiPatchList.size()];
-    for (int p = 0; p < sharedData.ewiPatchList.size(); p++) {
-      pNames[p] = sharedData.ewiPatchList.get( p ).getName();
+    String[] pNames = new String[EWI4000sPatch.EWI_NUM_PATCHES];
+    for (int p = 0; p < EWI4000sPatch.EWI_NUM_PATCHES; p++) {
+      pNames[p] = sharedData.ewiPatchList[p].getName();
     }
-    for (int cb = 0; cb < keyPatchesGrid.keyChoices.length; cb++) {
-     keyPatchesGrid.keyChoices[cb].getItems().clear();
-     keyPatchesGrid.keyChoices[cb].getItems().addAll( pNames );
+    for ( ChoiceBox<String> keyChoice : keyPatchesGrid.keyChoices ) {
+      keyChoice.getItems().clear();
+      keyChoice.getItems().addAll( pNames );
     }
   }
   
