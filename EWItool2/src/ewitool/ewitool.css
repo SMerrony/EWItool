@@ -17,143 +17,154 @@
  */
 
 .root {
-	/* -fx-background: blue; */
+    /* -fx-background: blue; */
 }
 
 #status-bar {
-	-fx-background-color: lightgray;
-	-fx-padding: 2px;
+    -fx-background-color: lightgray;
+    -fx-padding: 2px;
 }
 
 #status-bar .label {
-	-fx-font-size: 8pt;
-	-fx-label-padding: 0.0 1mm 0.0 1mm;
+    -fx-font-size: 8pt;
+    -fx-label-padding: 0.0 1mm 0.0 1mm;
 }
 
 #status-value {
-	-fx-background-color: white;
-	-fx-border-radius: 6mm; 
+    -fx-background-color: white;
+    -fx-border-radius: 6mm; 
 }
 
 #status-message {
-	-fx-background-color: white;
-	-fx-min-width: 80mm;
-	-fx-border-radius: 6mm; 
+    -fx-background-color: white;
+    -fx-min-width: 80mm;
+    -fx-border-radius: 6mm; 
 }
 
 #scratchpad-grid {
-	-fx-padding: 10mm;
-	-fx-hgap: 3mm;
-	-fx-vgap: 3mm;
+    -fx-padding: 10mm;
+    -fx-hgap: 3mm;
+    -fx-vgap: 3mm;
 }
 #scratchpad-grid .button {
-	-fx-min-width: 25mm;
+    -fx-min-width: 25mm;
 }
 
 #patchset-library-grid {
-	-fx-padding: 10mm;
-	-fx-hgap: 3mm;
-	-fx-vgap: 3mm;
+    -fx-padding: 10mm;
+    -fx-hgap: 3mm;
+    -fx-vgap: 3mm;
 }
 
 #patchset-library-grid .label {
-	-fx-font: bold 9pt sans;
-	-fx-alignment: top-left;
+    -fx-font: bold 9pt sans;
+    -fx-alignment: top-left;
 }
 
 #epx-grid {
-	-fx-padding: 10mm;
-	-fx-hgap: 3mm;
-	-fx-vgap: 3mm;
+    -fx-padding: 10mm;
+    -fx-hgap: 3mm;
+    -fx-vgap: 3mm;
 }
 
 #epx-query-grid {
-	-fx-hgap: 3mm;
-	-fx-vgap: 3mm;
+    -fx-hgap: 3mm;
+    -fx-vgap: 3mm;
 }
 
 #epx-settings-grid {
-	-fx-hgap: 3mm;
-	-fx-vgap: 3mm;
+    -fx-hgap: 3mm;
+    -fx-vgap: 3mm;
 }
 
 #epx-details-grid {
-	-fx-hgap: 3mm;
-	-fx-vgap: 3mm;
+    -fx-hgap: 3mm;
+    -fx-vgap: 3mm;
 }
 
 #epx-section-label {
-	-fx-font: bold 9pt sans;
-	-fx-alignment: top-left;
+    -fx-font: bold 9pt sans;
+    -fx-alignment: top-left;
 }
 
 #epx-submit-grid {
-	-fx-padding: 10mm;
-	-fx-hgap: 3mm;
-	-fx-vgap: 3mm;
+    -fx-padding: 10mm;
+    -fx-hgap: 3mm;
+    -fx-vgap: 3mm;
+}
+
+/* non-standard settings for this grid as there is so much on it */
+#current-patch-set-grid {
+    -fx-padding: 1mm;
+    -fx-hgap: 2mm;
+    -fx-vgap: 1mm;
+}
+
+#current-patch-set-grid-dropover {
+    -fx-background-color: lightgreen;
 }
 
 #editor-header-box {
-  -fx-padding: 2;
-  -fx-spacing: 2;
-	/* -fx-background-color: lightgray; */
+    -fx-padding: 2;
+    -fx-spacing: 2;
+    /* -fx-background-color: lightgray; */
 }
 
 #editor-outer-grid {
-	-fx-padding: 1mm;
+    -fx-padding: 1mm;
 }
 /* each area of the Patch Editor is an editor-grid */
 #editor-grid {
-	-fx-border-color: darkgray;
-	-fx-padding: 2px;
-	-fx-pref-width: 25mm;
-	-fx-alignment: center;
+    -fx-border-color: darkgray;
+    -fx-padding: 2px;
+    -fx-pref-width: 25mm;
+    -fx-alignment: center;
 }
 
 #editor-section-label {
-	-fx-font: bold 9pt sans;
-	-fx-alignment: top-left!important;
+    -fx-font: bold 9pt sans;
+    -fx-alignment: top-left!important;
 }
 
 #editor-group-label {
-	-fx-font-style:italic;
+    -fx-font-style:italic;
 }
 #editor-control-label {
-	-fx-min-width: 9mm;
-	-fx-font-size: 8pt;
+    -fx-min-width: 9mm;
+    -fx-font-size: 8pt;
 }
 
 #editor-grid .slider:vertical {
-	-fx-show-tick-marks: false;
-	-fx-min-width: 5mm;
+    -fx-show-tick-marks: false;
+    -fx-min-width: 5mm;
 }
 /* 
  * #editor-grid .slider:vertical > .thumb {
-	-fx-shape: "M0, 0L5, 0L10, 5L5, 10L0, 10 Z";
+        -fx-shape: "M0, 0L5, 0L10, 5L5, 10L0, 10 Z";
 }
 */
 
 /* ??? strangeness: no selector seems to select :horizontal */
 #editor-grid .slider {
-	-fx-show-tick-marks: false;
-	-fx-min-width: 15mm;
+    -fx-show-tick-marks: false;
+    -fx-min-width: 15mm;
 }
 /*
 #editor-grid .slider > .thumb {
-	-fx-shape: "M0, 0L10, 0L10, 5L5, 10L0, 5 Z";
+        -fx-shape: "M0, 0L10, 0L10, 5L5, 10L0, 5 Z";
 }
 */
 
 #key-patches-grid {
-	-fx-padding: 10mm;
-	-fx-hgap: 3mm;
-	-fx-vgap: 3mm;
+    -fx-padding: 10mm;
+    -fx-hgap: 3mm;
+    -fx-vgap: 3mm;
 }
 #key-patches-header {
-	-fx-font: bold 11pt sans;
-	-fx-min-width: 20mm;
-	-fx-alignment: center;
+    -fx-font: bold 11pt sans;
+    -fx-min-width: 20mm;
+    -fx-alignment: center;
 }
 #key-patches-grid .choice-box {
-	-fx-min-width: 40mm;
+    -fx-min-width: 40mm;
 }

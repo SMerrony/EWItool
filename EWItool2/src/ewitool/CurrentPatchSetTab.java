@@ -7,7 +7,6 @@ import java.util.Optional;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
-import javafx.geometry.Insets;
 import javafx.print.PageLayout;
 import javafx.print.PageOrientation;
 import javafx.print.Paper;
@@ -23,6 +22,9 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
@@ -49,8 +51,7 @@ public class CurrentPatchSetTab extends Tab {
     patchEditorTab = pPatchEditorTab;
 
     GridPane gp = new GridPane();
-    gp.setPadding( new Insets( 10.0 ) );
-    gp.setVgap( 3.0 ); // i.e. minimal vertical gap between buttons
+    gp.setId( "current-patch-set-grid" );
 
     ColumnConstraints[] ccs;
     ccs = new ColumnConstraints[ 2 ];
@@ -84,6 +85,40 @@ public class CurrentPatchSetTab extends Tab {
         patchButtons[ix].setPrefWidth( 90.0 );
         patchButtons[ix].setMaxWidth( Double.MAX_VALUE );
         patchButtons[ix].setOnAction( new PatchButtonEventHandler() );
+        patchButtons[ix].setOnDragDetected( (me) -> { 
+          Debugger.log( "DEBUG - Drag detected from button #" + ix );
+          Dragboard db = patchButtons[ix].startDragAndDrop( TransferMode.MOVE );
+          ClipboardContent content = new ClipboardContent();
+          content.putString( String.valueOf( ix ) );
+          db.setContent(content);
+          me.consume();
+        });
+        patchButtons[ix].setOnDragOver( (de) -> {
+          if (de.getGestureSource() != patchButtons[ix]) de.acceptTransferModes( TransferMode.MOVE );
+          de.consume();
+        });
+        patchButtons[ix].setOnDragEntered( (de) -> {
+          if (de.getGestureSource() != patchButtons[ix]) {
+            patchButtons[ix].setId( "current-patch-set-grid-dropover" );
+          }
+        });
+        patchButtons[ix].setOnDragExited( (de) -> {
+           patchButtons[ix].setId( "" );
+        });
+        patchButtons[ix].setOnDragDropped( (e) -> {
+          Debugger.log( "DEBUG - Drop detected on button #" + ix );
+          Dragboard db = e.getDragboard();
+          if (db.hasString()) {
+            int srcIx = Integer.parseInt( db.getString() );
+            sharedData.swapPatches( ix, srcIx );
+            midiHandler.sendPatch( sharedData.ewiPatchList[ix], EWI4000sPatch.EWI_SAVE );
+            midiHandler.sendPatch( sharedData.ewiPatchList[srcIx], EWI4000sPatch.EWI_SAVE );
+            updateLabels();
+            sharedData.setStatusMessage( "Patches " + ix + " and " + srcIx + " swapped" );
+          }
+          e.setDropCompleted( true );
+          e.consume();
+        });
         gp.add( patchButtons[ix], (c * 2 ) + 1, r );
       }
     }
@@ -171,7 +206,7 @@ public class CurrentPatchSetTab extends Tab {
     @Override
     public void handle( ActionEvent ae ) {
 
-      Dialog<ButtonType> dialog = new Dialog<ButtonType>();
+      Dialog<ButtonType> dialog = new Dialog<>();
       dialog.setTitle( "EWItool - Patch Actions" );
       String buttonText = ((Button)ae.getSource()).getText();
       ButtonType editType = new ButtonType( "Edit" );
@@ -188,7 +223,7 @@ public class CurrentPatchSetTab extends Tab {
       TextField nameField = new TextField( ((Button)ae.getSource()).getText() );
       gp.add( nameField, 1, 0 );
       gp.add( new Label( "Scratchpad:" ), 2, 0 );
-      ChoiceBox< String > spChoice = new ChoiceBox< String >();
+      ChoiceBox<String> spChoice = new ChoiceBox<>();
       for (int p = 0; p < scratchPad.patchList.size(); p++) {
         spChoice.getItems().add( scratchPad.patchList.get( p ).getName() );
       }
@@ -211,12 +246,7 @@ public class CurrentPatchSetTab extends Tab {
         if (spChoice.getSelectionModel().getSelectedIndex() >= 0) {
           int pNum = (int) ((Button)ae.getSource()).getUserData();
           EWI4000sPatch tmpPatch = scratchPad.patchList.get( spChoice.getSelectionModel().getSelectedIndex() );
-          int ewiInternalPatchNum;
-          if (pNum == 0)
-            ewiInternalPatchNum = 99;
-          else
-            ewiInternalPatchNum = pNum - 1;
-          tmpPatch.setInternalPatchNum( (byte) ewiInternalPatchNum );
+          tmpPatch.setInternalPatchNum( (byte) sharedData.ewiPatchNums[pNum] );
           sharedData.ewiPatchList[pNum] = tmpPatch;
           patchButtons[pNum].setText( tmpPatch.getName() );
           midiHandler.sendPatch( tmpPatch, EWI4000sPatch.EWI_SAVE );
