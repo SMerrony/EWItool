@@ -160,7 +160,7 @@ public class Main extends Application {
     helpItem, aboutItem;
 
     @SuppressWarnings( "unused" )
-    public MainMenuBar( Stage mainStage, UserPrefs userPrefs, MidiHandler midiHandler ) {
+     MainMenuBar( Stage mainStage, UserPrefs userPrefs, MidiHandler midiHandler ) {
 
       fileMenu = new Menu( "File" );
       quitItem = new MenuItem( "Quit" );

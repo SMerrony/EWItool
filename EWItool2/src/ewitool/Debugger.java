@@ -23,7 +23,8 @@ package ewitool;
  */
 public class Debugger {
   
-  public final static boolean VERBOSE = true;
+  // FIXME: Always set verbose to false before releasing project!
+  public final static boolean VERBOSE = false;
 
   public static void log( Object o ) {
     if (VERBOSE) System.out.println( o.toString() );
