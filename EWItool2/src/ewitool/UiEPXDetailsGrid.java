@@ -45,7 +45,7 @@ public class UiEPXDetailsGrid extends GridPane {
     RowConstraints vgrowRC = new RowConstraints();
     vgrowRC.setVgrow( Priority.ALWAYS );
     
-    Label detailsSectionLabel = new Label( "Details" );
+    Label detailsSectionLabel = new Label( "Patch Details" );
     detailsSectionLabel.setId( "epx-section-label" );
     add( detailsSectionLabel, 0, 0 );
     getRowConstraints().add( fixedRC );

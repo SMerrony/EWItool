@@ -38,9 +38,9 @@ import javafx.scene.layout.BorderPane;
 public class Main extends Application {
 
   static final String  APP_NAME = "EWItool";
-  static final double  APP_VERSION = 1.95;
+  static final double  APP_VERSION = 2.0;
   static final int     COPYRIGHT_YEAR = 2016;
-  static final String  RELEASE_STATUS = "Beta";
+  static final String  RELEASE_STATUS = "Production";
   static final String  LEAD_AUTHOR = "S.Merrony";
 
   public  static final String  ICON = "/resources/EWItoolLogo1.png";
@@ -48,7 +48,7 @@ public class Main extends Application {
   private static final int     SCENE_PREF_HEIGHT = 750;
   private static final String  WINDOW_TITLE = APP_NAME + " - EWI4000s Patch Handling Tool";
   private static final Double  MINIMUM_JVM_SPEC = 1.8;
-  private static final String  ONLINE_HELP = "https://github.com/SMerrony/EWItool2/wiki/Using-EWItool";
+  private static final String  ONLINE_HELP = "https://github.com/SMerrony/EWItool/wiki/Using-EWItool";
 
   public enum Status { OK, ALREADY_EXISTS, NO_PERMISSION }
   
