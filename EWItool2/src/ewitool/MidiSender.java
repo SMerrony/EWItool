@@ -15,6 +15,12 @@
  *  along with EWItool.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @author S.Merrony
+ * 
+ * v.2.0 Add check for null MIDI message/type and empty SysEx
+ */
+
 package ewitool;
 
 import java.util.concurrent.BlockingQueue;
@@ -34,7 +40,7 @@ public class MidiSender implements Runnable {
   BlockingQueue<SendMsg> msgQ;
   MidiDevice outDev;
   Receiver receiver;
-  
+
   MidiMonitorMessage mmsg;
 
   private final static long NOW = -1;
@@ -45,11 +51,11 @@ public class MidiSender implements Runnable {
     outDev = pOutDev;
     if (!outDev.isOpen()) {
       System.err.println( "Error - MidiSender() called with non-open MIDI Device" );
-      System.exit( 1 );   
+      System.exit( 1 );
     }
     try {
       receiver = outDev.getReceiver();
-    } catch( MidiUnavailableException e ) {
+    } catch (MidiUnavailableException e) {
       e.printStackTrace();
       System.err.println( "Error - MidiSender() could not obtain chosen MIDI OUT receiver" );
       System.exit( 1 );
@@ -62,83 +68,85 @@ public class MidiSender implements Runnable {
   public void run() {
 
     SendMsg msg;
-    try {   
-      while( true ) {
-        msg = msgQ.take(); 
+    try {
+      while (true) {
+        msg = msgQ.take();
         if (!outDev.isOpen()) {
           System.err.println( "Error - MidiSender: MIDI Out device is not open" );
           System.exit( 1 );
         }
-        switch( msg.msgType ) {
-        case CC:
-          try {
-            ShortMessage sm = new ShortMessage( ShortMessage.CONTROL_CHANGE, msg.cc, msg.value );
-            receiver.send( sm, NOW );
-            if (sharedData.getMidiMonitoring()) {
-              mmsg.type = MidiMsgType.CC;
-              mmsg.bytes = sm.getMessage();
-              sharedData.monitorQ.add( mmsg );
-            }
-          } catch( InvalidMidiDataException e ) {
-            e.printStackTrace();
-          } 
-          break;
-        case SYSEX:
-          try {
-            Debugger.log( "DBEUG - MidiSender thread got SysEx to send.  Length: " + msg.bytes.length );
-            if (msg.bytes[0] != MidiHandler.MIDI_SYSEX_HEADER) {
-              System.err.println( "Error - MidiSender received invalid SysEx send request" );
-              System.exit( 1 );
-            }
-            SysexMessage sysEx = new SysexMessage( msg.bytes, msg.bytes.length );
-            receiver.send( sysEx, NOW );
-            if (sharedData.getMidiMonitoring()) {
-              mmsg.type = MidiMsgType.SYSEX;
-              mmsg.bytes = sysEx.getMessage();
-              sharedData.monitorQ.add( mmsg );
-            }
-            // N.B. The final Qt version had a SLEEP(250) here
+        if (msg != null && msg.msgType != null) {
+          switch ( msg.msgType ) {
+          case CC:
             try {
-              switch( msg.delay) {
-              case LONG:
-                Debugger.log( "DEBUG - MidiSender: Long pause after SysEx" );
-                Thread.sleep( MidiHandler.MIDI_MESSAGE_LONG_PAUSE_MS );
-                break;
-              case NONE:
-                Debugger.log( "DEBUG - MidiSender: No pause after SysEx" );
-                break;
-              case SHORT:
-                Debugger.log( "DEBUG - MidiSender: Short pause after SysEx" );
-                Thread.sleep( MidiHandler.MIDI_MESSAGE_SHORT_PAUSE_MS );
-                break;
-              default:
-                System.err.println( "ERROR - MidiSender: INVALID pause after SysEx" );
-                break;
+              ShortMessage sm = new ShortMessage( ShortMessage.CONTROL_CHANGE, msg.cc, msg.value );
+              receiver.send( sm, NOW );
+              if (sharedData.getMidiMonitoring()) {
+                mmsg.type = MidiMsgType.CC;
+                mmsg.bytes = sm.getMessage();
+                sharedData.monitorQ.add( mmsg );
               }
-            } catch( InterruptedException e ) {
+            } catch (InvalidMidiDataException e) {
               e.printStackTrace();
             }
-          } catch( InvalidMidiDataException e ) {
-            e.printStackTrace();
-          }
-          break;
-        case SYSTEM_RESET:
-          try {
-            Debugger.log( "DEBUG - MidiSender sending System Reset to EWI" );
-            ShortMessage sm = new ShortMessage( ShortMessage.SYSTEM_RESET );
-            receiver.send(  sm,  NOW );
-          } catch( InvalidMidiDataException e ) {
-            e.printStackTrace();
-          } 
-          try {
-            Thread.sleep( MidiHandler.MIDI_MESSAGE_LONG_PAUSE_MS );
-          } catch( InterruptedException e ) {
-            e.printStackTrace();
-          }
-          break;
+            break;
+          case SYSEX:
+            try {
+              Debugger.log( "DBEUG - MidiSender thread got SysEx to send.  Length: " + msg.bytes.length );
+              if (msg.bytes.length == 0 || msg.bytes[0] != MidiHandler.MIDI_SYSEX_HEADER) {
+                System.err.println( "Error - MidiSender received invalid SysEx send request" );
+                System.exit( 1 );
+              }
+              SysexMessage sysEx = new SysexMessage( msg.bytes, msg.bytes.length );
+              receiver.send( sysEx, NOW );
+              if (sharedData.getMidiMonitoring()) {
+                mmsg.type = MidiMsgType.SYSEX;
+                mmsg.bytes = sysEx.getMessage();
+                sharedData.monitorQ.add( mmsg );
+              }
+              // N.B. The final Qt version had a SLEEP(250) here
+              try {
+                switch ( msg.delay ) {
+                case LONG:
+                  Debugger.log( "DEBUG - MidiSender: Long pause after SysEx" );
+                  Thread.sleep( MidiHandler.MIDI_MESSAGE_LONG_PAUSE_MS );
+                  break;
+                case NONE:
+                  Debugger.log( "DEBUG - MidiSender: No pause after SysEx" );
+                  break;
+                case SHORT:
+                  Debugger.log( "DEBUG - MidiSender: Short pause after SysEx" );
+                  Thread.sleep( MidiHandler.MIDI_MESSAGE_SHORT_PAUSE_MS );
+                  break;
+                default:
+                  System.err.println( "ERROR - MidiSender: INVALID pause after SysEx" );
+                  break;
+                }
+              } catch (InterruptedException e) {
+                e.printStackTrace();
+              }
+            } catch (InvalidMidiDataException e) {
+              e.printStackTrace();
+            }
+            break;
+          case SYSTEM_RESET:
+            try {
+              Debugger.log( "DEBUG - MidiSender sending System Reset to EWI" );
+              ShortMessage sm = new ShortMessage( ShortMessage.SYSTEM_RESET );
+              receiver.send( sm, NOW );
+            } catch (InvalidMidiDataException e) {
+              e.printStackTrace();
+            }
+            try {
+              Thread.sleep( MidiHandler.MIDI_MESSAGE_LONG_PAUSE_MS );
+            } catch (InterruptedException e) {
+              e.printStackTrace();
+            }
+            break;
 
+          }
         }
-      } 
+      }
     }
     catch( InterruptedException e ) {
       Debugger.log( "DEBUG - MidiSender closing" );
