@@ -27,6 +27,8 @@ import javafx.scene.layout.GridPane;
 
 /**
  * @author steve
+ * 
+ * v.2.0 Improve alert messages
  *
  */
 public class UiEPXSettingsGrid extends GridPane {
@@ -74,7 +76,7 @@ public class UiEPXSettingsGrid extends GridPane {
           serverField.getText().isEmpty()) {
         Alert warnAlert = new Alert( AlertType.WARNING );
         warnAlert.setTitle( "EWItool - Warning" );
-        warnAlert.setContentText( "Please enter your EPX credentials in the Settings fields." );
+        warnAlert.setHeaderText( "Please enter your EPX credentials in the Settings fields." );
         warnAlert.showAndWait();
       } else {
         userPrefs.setEpxUserid( uidField.getText() );
@@ -82,19 +84,22 @@ public class UiEPXSettingsGrid extends GridPane {
         userPrefs.setEpxHost( serverField.getText() );
         if (!epx.testConnection()) {
           Alert errAlert = new Alert( AlertType.ERROR );
-          errAlert.setTitle( "EWItool - Error" );
-          errAlert.setContentText( "Could not connect to EPX server - please check your server setting" );
+          errAlert.setTitle( "EWItool - EPX Error" );
+          errAlert.setHeaderText( "Could not connect to EPX server" );
+          errAlert.setContentText( "Please check your server setting" );
           errAlert.showAndWait();
         } else {
           if (!epx.testUser()) {
             Alert errAlert = new Alert( AlertType.ERROR );
-            errAlert.setTitle( "EWItool - Error" );
-            errAlert.setContentText( "Invalid EPX user ID or password - please check your settings" );
+            errAlert.setTitle( "EWItool - EPX Error" );
+            errAlert.setHeaderText( "Invalid EPX user ID or password" );
+            errAlert.setContentText( "Please check your settings" );
             errAlert.showAndWait();
           } else {
             Alert okAlert = new Alert( AlertType.INFORMATION );
-            okAlert.setTitle( "EWItool - EPX OK" );
-            okAlert.setContentText( "Connection, user ID and password all OK - EPX credentials stored" );
+            okAlert.setTitle( "EWItool - EPX Settings" );
+            okAlert.setHeaderText( "Connection, user ID and password all OK" );
+            okAlert.setContentText( "EPX credentials stored" );
             okAlert.showAndWait();
             queryGrid.setDisable( false );
           }

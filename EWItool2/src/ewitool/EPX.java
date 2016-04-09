@@ -45,12 +45,12 @@ public class EPX {
   SharedData sharedData;
   UserPrefs userPrefs;
   
-  public class QueryResult {
+  static class QueryResult {
     String name_user;
     int    epx_id;
   }
   
-  public class DetailsResult {
+  static class DetailsResult {
     String name;
     String contrib;
     String origin;
