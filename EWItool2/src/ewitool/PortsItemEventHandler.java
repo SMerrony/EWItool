@@ -18,6 +18,11 @@
     along with EWItool.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @author S.Merrony
+ * 
+ * v.2.0  Catch MidiUnavailableException properly
+ */
 package ewitool;
 
 import java.util.ArrayList;
@@ -38,6 +43,7 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.GridPane;
+import javax.sound.midi.MidiUnavailableException;
 
 public class PortsItemEventHandler implements EventHandler<ActionEvent> {
   
@@ -72,30 +78,30 @@ public class PortsItemEventHandler implements EventHandler<ActionEvent> {
     
     MidiDevice device;
     MidiDevice.Info[] infos = MidiSystem.getMidiDeviceInfo();
-      for ( MidiDevice.Info info : infos ) {
-          try {
-              device = MidiSystem.getMidiDevice( info );
-              if (!( device instanceof Sequencer ) && !( device instanceof Synthesizer )) {
-                  if (device.getMaxReceivers() != 0) {
-                      opIx++;
-                      outPorts.add( info.getName() );
-                      if (info.getName().equals( lastOutDevice )) {
-                          outView.getSelectionModel().clearAndSelect( opIx );
-                      }
-                      Debugger.log( "DEBUG - Found OUT Port: " + info.getName() + " - " + info.getDescription() );
-                  } else if (device.getMaxTransmitters() != 0) {
-                      ipIx++;
-                      inPorts.add( info.getName() );
-                      if (info.getName().equals( lastInDevice )) {
-                          inView.getSelectionModel().clearAndSelect( ipIx );
-                      }
-                      Debugger.log( "DEBUG - Found IN Port: " + info.getName() + " - " + info.getDescription() );
-                  }
-              }
-          } catch (Exception e) {
-              System.err.println( "ERROR - Fetching MIDI information" );
+    for ( MidiDevice.Info info : infos ) {
+      try {
+        device = MidiSystem.getMidiDevice( info );
+        if (!( device instanceof Sequencer ) && !( device instanceof Synthesizer )) {
+          if (device.getMaxReceivers() != 0) {
+            opIx++;
+            outPorts.add( info.getName() );
+            if (info.getName().equals( lastOutDevice )) {
+              outView.getSelectionModel().clearAndSelect( opIx );
+            }
+            Debugger.log( "DEBUG - Found OUT Port: " + info.getName() + " - " + info.getDescription() );
+          } else if (device.getMaxTransmitters() != 0) {
+            ipIx++;
+            inPorts.add( info.getName() );
+            if (info.getName().equals( lastInDevice )) {
+              inView.getSelectionModel().clearAndSelect( ipIx );
+            }
+            Debugger.log( "DEBUG - Found IN Port: " + info.getName() + " - " + info.getDescription() );
           }
+        }
+      } catch (MidiUnavailableException ex) {
+        ex.printStackTrace();
       }
+    }
  
     gp.add( inView, 0, 1 );
     gp.add( outView, 1, 1 );
