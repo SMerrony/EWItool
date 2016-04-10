@@ -7,7 +7,4 @@ EWItool has been developed by Steve Merrony. It has recently been redeveloped in
 
 **The new version runs - and has been tested - on recent versions of Windows, OS X and GNU/Linux.**
 
-
-
-
-
+The latest version may always be downloaded from here: https://github.com/SMerrony/EWItool/releases
