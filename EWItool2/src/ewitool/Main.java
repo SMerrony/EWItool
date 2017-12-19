@@ -38,8 +38,8 @@ import javafx.scene.layout.BorderPane;
 public class Main extends Application {
 
   static final String  APP_NAME = "EWItool";
-  static final double  APP_VERSION = 2.0;
-  static final int     COPYRIGHT_YEAR = 2016;
+  static final double  APP_VERSION = 2.1;
+  static final int     COPYRIGHT_YEAR = 2017;
   static final String  RELEASE_STATUS = "Production";
   static final String  LEAD_AUTHOR = "S.Merrony";
 
@@ -153,7 +153,7 @@ public class Main extends Application {
 
     Menu fileMenu, midiMenu, ewiMenu, helpMenu;
     Menu generateSubmenu, processSubmenu;
-    MenuItem quitItem,
+    MenuItem exitItem,
     portsItem, // panicItem, // monitorItem,
     fetchAllItem,
     storeItem, revertItem, copyItem,
@@ -162,18 +162,19 @@ public class Main extends Application {
     @SuppressWarnings( "unused" )
      MainMenuBar( Stage mainStage, UserPrefs userPrefs, MidiHandler midiHandler ) {
 
-      fileMenu = new Menu( "File" );
-      quitItem = new MenuItem( "Quit" );
-      quitItem.setOnAction( (ae) -> {
+      fileMenu = new Menu( "_File" );
+      //fileMenu.setAccelerator( KeyCombination.keyCombination( "Alt+F"));
+      exitItem = new MenuItem( "E_xit" );
+      exitItem.setOnAction( (ae) -> {
         Debugger.log( "DEBUG - clean exit" );
         midiHandler.close();
         Platform.exit();
         System.exit( 0 );           
       });
-      fileMenu.getItems().addAll( quitItem );
+      fileMenu.getItems().addAll(exitItem );
 
-      midiMenu = new Menu( "MIDI" );
-      portsItem = new MenuItem( "Ports" );
+      midiMenu = new Menu( "_MIDI" );
+      portsItem = new MenuItem( "_Ports" );
       portsItem.addEventHandler( ActionEvent.ANY, new PortsItemEventHandler( userPrefs ) );
       //panicItem = new MenuItem( "Panic (All Notes Off)" );
 
@@ -182,8 +183,8 @@ public class Main extends Application {
       
       midiMenu.getItems().addAll( portsItem );
 
-      ewiMenu = new Menu( "EWI" );
-      fetchAllItem = new MenuItem( "Fetch All Patches" );
+      ewiMenu = new Menu( "_EWI" );
+      fetchAllItem = new MenuItem( "Fetch _All Patches" );
       fetchAllItem.setOnAction( (ae) -> {
         Debugger.log( "DEBUG - Fetch All..." );
         if (!midiHandler.requestDeviceID()) {
@@ -211,7 +212,7 @@ public class Main extends Application {
       });
       ewiMenu.getItems().addAll( fetchAllItem );
 
-      patchMenu = new Menu( "Patch" );
+      patchMenu = new Menu( "_Patch" );
       patchMenu.setDisable( true );
       storeItem = new MenuItem( "Store to EWI" );
       storeItem.setAccelerator( KeyCombination.keyCombination( "Ctrl+S" ) );
@@ -223,33 +224,33 @@ public class Main extends Application {
       copyItem.setAccelerator( KeyCombination.keyCombination( "Ctrl+C" ) );
       copyItem.setOnAction( (ae) -> ((PatchEditorTab) patchEditorTab).copyToScratchPad() );
       
-      generateSubmenu = new Menu( "Generate" );
-      MenuItem genDefaultItem = new MenuItem( "Default Patch" );
+      generateSubmenu = new Menu( "_Generate" );
+      MenuItem genDefaultItem = new MenuItem( "_Default Patch" );
       genDefaultItem.setOnAction( (ae) -> ((PatchEditorTab) patchEditorTab).defaultPatch() );
-      MenuItem genRandomItem = new MenuItem( "Random Patch" );
+      MenuItem genRandomItem = new MenuItem( "_Random Patch" );
       genRandomItem.setOnAction( (ae) -> ((PatchEditorTab) patchEditorTab).randomPatch() );
       generateSubmenu.getItems().addAll( genDefaultItem, genRandomItem );
       
-      processSubmenu = new Menu( "Process" );
-      MenuItem dryItem = new MenuItem( "Make Dry" );
+      processSubmenu = new Menu( "_Process" );
+      MenuItem dryItem = new MenuItem( "Make _Dry" );
       dryItem.setOnAction( (ae) -> ((PatchEditorTab) patchEditorTab).makeDry() );
-      MenuItem maxVolItem = new MenuItem( "Maximise Volume" );
+      MenuItem maxVolItem = new MenuItem( "Maximise _Volume" );
       maxVolItem.setOnAction( (ae) -> ((PatchEditorTab) patchEditorTab).makeMaxVol() );
-      MenuItem rmNoiseItem = new MenuItem( "Remove Noise" );
+      MenuItem rmNoiseItem = new MenuItem( "Remove _Noise" );
       rmNoiseItem.setOnAction( (ae) -> ((PatchEditorTab) patchEditorTab).makeNoNoise() );
-      MenuItem rand10PctItem = new MenuItem( "Randomise by 10%" );
+      MenuItem rand10PctItem = new MenuItem( "_Randomise by 10%" );
       rand10PctItem.setOnAction( (ae) -> ((PatchEditorTab) patchEditorTab).randomiseBy10pct() );
-      MenuItem mergeItem = new MenuItem( "Merge with..." );
+      MenuItem mergeItem = new MenuItem( "_Merge with..." );
       mergeItem.setOnAction( (ae) -> ((PatchEditorTab) patchEditorTab).mergePatchesUi() );
       processSubmenu.getItems().addAll( dryItem, maxVolItem, rmNoiseItem, rand10PctItem, mergeItem );
       patchMenu.getItems().addAll( storeItem, revertItem, copyItem, 
                                    new SeparatorMenuItem(), 
                                    generateSubmenu, processSubmenu );
 
-      helpMenu = new Menu( "Help" );
-      helpItem = new MenuItem( "Online Help" );
+      helpMenu = new Menu( "_Help" );
+      helpItem = new MenuItem( "Online _Help" );
       helpItem.setOnAction( (ae) -> getHostServices().showDocument( ONLINE_HELP ) );
-      aboutItem = new MenuItem( "About " + Main.APP_NAME );
+      aboutItem = new MenuItem( "_About " + Main.APP_NAME );
       aboutItem.setOnAction( (ae) -> {
         Alert aboutAlert = new Alert( AlertType.INFORMATION );
         aboutAlert.setTitle( "About EWItool" );
