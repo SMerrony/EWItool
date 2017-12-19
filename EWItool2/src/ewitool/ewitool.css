@@ -137,6 +137,7 @@
 #editor-grid .slider:vertical {
     -fx-show-tick-marks: false;
     -fx-min-width: 5mm;
+    -fx-block-increment: 1;
 }
 /* 
  * #editor-grid .slider:vertical > .thumb {
@@ -148,6 +149,7 @@
 #editor-grid .slider {
     -fx-show-tick-marks: false;
     -fx-min-width: 15mm;
+    -fx-block-increment: 1;
 }
 /*
 #editor-grid .slider > .thumb {
