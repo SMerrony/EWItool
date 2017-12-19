@@ -17,6 +17,7 @@
 
 package ewitool;
 
+import java.io.File;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
@@ -60,9 +61,16 @@ public class UserPrefs {
     p.put( MIDI_OUT_PORT, op );
     midiOutPort.set( op );  // This must be last as it notifies change
   }
-  public String getLibraryLocation() {
-    return p.get( LIBRARY_LOCATION, "<Not Chosen>" );
-  }
+    public String getLibraryLocation() {
+        String location = p.get( LIBRARY_LOCATION, "<Not Chosen>" );
+        if (!location.equals( "<Not Chosen>" )) {
+            File llFile = new File( location );
+            if (!llFile.exists()) {
+                return "<Not Chosen>";
+            }
+        }
+        return location;
+    }
   public void setLibraryLocation( String ll ) {
     p.put( LIBRARY_LOCATION, ll );
   }

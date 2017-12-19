@@ -264,14 +264,18 @@ public class PatchSetsTab extends Tab {
     
   }
 
-  private void refreshPatchSetList( String location ) {
-    File llFile = new File( location );
-    patchSetList.getSelectionModel().clearSelection();
-    patchSetList.getItems().clear();
-    patchSetList.getItems().addAll( llFile.list( new FilenameFilter() {
-      public boolean accept( File llFile, String name ) {
-        return name.toLowerCase().endsWith( ".syx" );
-      }
-    }) );
-  }
+    private void refreshPatchSetList(String location) {
+        if (!location.equals( "<Not Chosen>" )) {
+            File llFile = new File( location );
+            if (llFile.exists())  {
+                patchSetList.getSelectionModel().clearSelection();
+                patchSetList.getItems().clear();
+                patchSetList.getItems().addAll( llFile.list( new FilenameFilter() {
+                    public boolean accept(File llFile, String name) {
+                        return name.toLowerCase().endsWith( ".syx" );
+                    }
+                } ) );
+            }
+        }
+    }
 }
