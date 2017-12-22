@@ -202,11 +202,13 @@ public class Main extends Application {
         if (!midiHandler.requestDeviceID()) {
           Alert errAlert = new Alert( AlertType.ERROR, "Not connected to an EWI4000s");
           errAlert.setTitle( "EWItool - Error" );
+          errAlert.initOwner( mainStage );
           errAlert.showAndWait();
         } else {
           Alert busyAlert = new Alert( AlertType.INFORMATION, "Fetching all patches.  Please wait..." );
           busyAlert.setTitle( "EWItool" );
           busyAlert.setHeaderText( null );
+          busyAlert.initOwner( mainStage );
           busyAlert.show();
           sharedData.clear();
           for (int p = 0; p < EWI4000sPatch.EWI_NUM_PATCHES; p++) {
@@ -268,6 +270,7 @@ public class Main extends Application {
         aboutAlert.setTitle( "About EWItool" );
         aboutAlert.setHeaderText( "EWItool version " + APP_VERSION + " (" + RELEASE_STATUS + ")" );
         aboutAlert.setContentText( "Copyright " + COPYRIGHT_YEAR + " " + LEAD_AUTHOR );
+        aboutAlert.initOwner( mainStage );
         aboutAlert.showAndWait();
       });
       helpMenu.getItems().addAll( helpItem, aboutItem );
