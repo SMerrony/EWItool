@@ -108,20 +108,24 @@ public class MidiHandler {
     };
     new Thread( mt ).start();
 
-    Task<Void> checkerTask = new Task<Void>() {
-      @Override
-      protected Void call() throws Exception {
-        while (true) {
-          if (inDev != null && outDev != null) {
-            if (inDev.isOpen() && outDev.isOpen()) {
-              Platform.runLater( () -> requestDeviceID() );
-            }
-          }
-          Thread.sleep( 15000 ); // 15s
-        }
-      }
-    };
-    new Thread( checkerTask ).start();
+    
+    // This was unsafe w.r.t. other MIDI messages that may be in-flight.
+    // If it is to be reintroduced at any point then it should probably wait for 
+    // MIDI idle and somehow LOCK other MIDI traffic before each query
+//    Task<Void> checkerTask = new Task<Void>() {
+//      @Override
+//      protected Void call() throws Exception {
+//        while (true) {
+//          if (inDev != null && outDev != null) {
+//            if (inDev.isOpen() && outDev.isOpen()) {
+//              Platform.runLater( () -> requestDeviceID() );
+//            }
+//          }
+//          Thread.sleep( 15000 ); // 15s
+//        }
+//      }
+//    };
+//    new Thread( checkerTask ).start();
   }
   
   /** Go through all MIDI devices looking for Ports.  If the port matches 
