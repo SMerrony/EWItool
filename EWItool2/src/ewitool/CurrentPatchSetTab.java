@@ -213,21 +213,21 @@ public class CurrentPatchSetTab extends Tab {
       dialog.getDialogPane().getButtonTypes().add( editType );
       ButtonType copyType = new ButtonType( "Copy to Scratchpad" );
       if (!buttonText.equals("<Empty>")) dialog.getDialogPane().getButtonTypes().add( copyType );
-      ButtonType replaceType = new ButtonType( "Replace from Scratchpad" );
-      dialog.getDialogPane().getButtonTypes().add( replaceType );
+      ButtonType pasteType = new ButtonType( "Paste from Scratchpad" );
+      dialog.getDialogPane().getButtonTypes().add(pasteType );
       ButtonType renameType = new ButtonType( "Rename" );
       if (!buttonText.equals("<Empty>")) dialog.getDialogPane().getButtonTypes().add( renameType );
       dialog.getDialogPane().getButtonTypes().add( ButtonType.CANCEL );
       GridPane gp = new GridPane();
-      gp.add( new Label( "Patch:" ), 0, 0 );
+      gp.add( new Label( "Patch: " ), 0, 0 );
       TextField nameField = new TextField( ((Button)ae.getSource()).getText() );
-      gp.add( nameField, 1, 0 );
-      gp.add( new Label( "Scratchpad:" ), 2, 0 );
+      gp.add( nameField, 2, 0 );
+      gp.add( new Label( " Scratchpad Patch for Pasting: " ), 3, 0 );
       ChoiceBox<String> spChoice = new ChoiceBox<>();
       for (int p = 0; p < scratchPad.patchList.size(); p++) {
         spChoice.getItems().add( scratchPad.patchList.get( p ).getName() );
       }
-      gp.add( spChoice, 3, 0 );
+      gp.add( spChoice, 4, 0 );
 
       dialog.getDialogPane().setContent( gp );
 
@@ -242,7 +242,7 @@ public class CurrentPatchSetTab extends Tab {
       } else if ( rc.get() == copyType) {
         scratchPad.addPatch( sharedData.ewiPatchList[ (int) ((Button)ae.getSource()).getUserData() ] );
 
-      } else if ( rc.get() == replaceType) {
+      } else if ( rc.get() == pasteType) {
         if (spChoice.getSelectionModel().getSelectedIndex() >= 0) {
           int pNum = (int) ((Button)ae.getSource()).getUserData();
           EWI4000sPatch tmpPatch = scratchPad.patchList.get( spChoice.getSelectionModel().getSelectedIndex() );
