@@ -40,7 +40,7 @@ public class Main extends Application {
 
   static final String  APP_NAME = "EWItool";
   static final double  APP_VERSION = 2.1;
-  static final int     COPYRIGHT_YEAR = 2017;
+  static final int     COPYRIGHT_YEAR = 2018;
   static final String  RELEASE_STATUS = "Production";
   static final String  LEAD_AUTHOR = "S.Merrony";
 
@@ -119,6 +119,7 @@ public class Main extends Application {
 
     currentPatchSetTab.setDisable( true );
 // FIXME Uncomment before release    patchEditorTab.setDisable( true );
+    patchEditorTab.setDisable( true );
     keyPatchesTab.setDisable( true );
 
     tabPane.getSelectionModel().selectedItemProperty().addListener( (tab, oldtab, newtab) -> {
